@@ -10,6 +10,7 @@ import { getDefaultConfig, RainbowKitProvider, darkTheme } from '@rainbow-me/rai
 import { WagmiProvider } from 'wagmi';
 import { mainnet, polygon, optimism, arbitrum, base, flowPreviewnet } from 'wagmi/chains';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { flowDarkTheme } from './FlowDarkTheme'; // Import your custom theme
 
 const config = getDefaultConfig({
   appName: 'My RainbowKit App',
@@ -29,7 +30,7 @@ root.render(
     <Router>
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider theme={darkTheme()}>
+          <RainbowKitProvider theme={flowDarkTheme}>
             <App />
           </RainbowKitProvider>
         </QueryClientProvider>
