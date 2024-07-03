@@ -1,7 +1,7 @@
 // src/App.jsx
 import { useEffect } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import ObservableComponent from './ObservableComponent';
+import BridgeForm from './BridgeForm';
 import './index.css';
 
 const App = () => {
@@ -19,7 +19,7 @@ const App = () => {
         </div>
       </header>
       <main className="p-4 w-full flex-1">
-        <ObservableComponent />
+        <BridgeForm />
       </main>
     </div>
   );
