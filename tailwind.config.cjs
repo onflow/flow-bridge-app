@@ -7,6 +7,9 @@ export default {
   ],
   theme: {
     extend: {
+      borderRadius: {
+        xlg: '16px',
+      },
       colors: {
         primary: {
           DEFAULT: '#00EF8B',

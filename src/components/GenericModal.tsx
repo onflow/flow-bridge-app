@@ -27,7 +27,7 @@ const GenericModal: React.FC<GenericModalProps> = ({ title, onClose, children })
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl">{title}</h2>
-          <button onClick={onClose} className="bg-transparent text-white">&times;</button>
+          <button onClick={onClose} className="bg-transparent text-white border-0">&times;</button>
         </div>
         <div className="overflow-auto flex-grow">
           {children}

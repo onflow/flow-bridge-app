@@ -1,33 +1,43 @@
 // src/components/NetworkSelectorModal.tsx
-import React, { useState } from "react";
-import GenericModal from "./GenericModal";
-import NetworkLabel from "./NetworkLabel";
+import React, { useState, useEffect } from 'react';
+import GenericModal from './GenericModal';
+import NetworkLabel from './NetworkLabel';
+import { setSourceNetwork, setDestinationNetwork, state } from '../store';
+import ApiService from '../services/ApiService';
 
 interface NetworkSelectorModalProps {
   onClose: () => void;
+  isSource: boolean;
 }
 
-const networkList = [
-  { name: "Ethereum Mainnet", icon: "/src/assets/ethereum.png" },
-  { name: "BNB Chain", icon: "/src/assets/bnb.png" },
-  { name: "Avalanche", icon: "/src/assets/avalanche.png" },
-  { name: "Polygon PoS", icon: "/src/assets/polygon.png" },
-  { name: "Fantom", icon: "/src/assets/fantom.png" },
-  // Add more networks as needed
-];
+const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({ onClose, isSource }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sourceNetwork, setSourceNetworkState] = useState<string>('');
 
-const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({
-  onClose,
-}) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedNetwork, setSelectedNetwork] = useState<string | null>(null);
+  useEffect(() => {
+    const subscription = state.subscribe((state) => {
+      setSourceNetworkState(state.sourceNetwork);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
-  const filteredNetworks = networkList.filter((network) =>
+  const networkList = isSource ? ApiService.getSourceNetworks() : ApiService.getDestinationNetworks(sourceNetwork);
+
+  const filteredNetworks = networkList.filter(network =>
     network.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleNetworkSelect = (networkName: string) => {
+    if (isSource) {
+      setSourceNetwork(networkName);
+    } else {
+      setDestinationNetwork(networkName);
+    }
+    onClose();
+  };
+
   return (
-    <GenericModal title="Select Destination Chain" onClose={onClose}>
+    <GenericModal title="Select Network" onClose={onClose}>
       <input
         type="text"
         placeholder="Search chain by name or chain ID"
@@ -35,19 +45,13 @@ const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <p className="text-sm text-gray-400 mb-4">
-        Below shows the destination chains that enable at least one token
-        transfer from Flow Mainnet. More chains can be found if you select other
-        source chains.
-      </p>
       <div className="grid grid-cols-2 gap-4">
         {filteredNetworks.map((network) => (
           <NetworkLabel
             key={network.name}
             icon={network.icon}
             name={network.name}
-            selected={selectedNetwork === network.name}
-            onClick={() => setSelectedNetwork(network.name)}
+            onClick={() => handleNetworkSelect(network.name)}
           />
         ))}
       </div>
