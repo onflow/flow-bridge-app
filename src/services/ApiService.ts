@@ -43,14 +43,15 @@ class ApiService {
     return networkDestinations[sourceNetwork] || [];
   }
 
-  getBridgeRate(sourceNetwork: string, destinationNetwork: string, amount: number): string {
+  getBridgeRate(sourceNetwork: string, destinationNetwork: string, amount: string): string {
     // Stubbed bridge rate
     return `1 ${amount} USDC on ${sourceNetwork} = ${amount} USDC on ${destinationNetwork}`;
   }
 
-  getFee(sourceNetwork: string, destinationNetwork: string, amount: number): string {
-    // Stubbed fee
-    return `${amount * 0.01} USDC`; // 1% fee
+  getFee(sourceNetwork: string, destinationNetwork: string, amount: string): string {
+    // convert amount to a number and add a 1% fee
+    const fAmount = parseFloat(amount);
+    return `${(fAmount) * 0.01} USDC`; // 1% fee
   }
 
   getEstimatedTimeOfArrival(): string {
@@ -58,7 +59,7 @@ class ApiService {
     return '10 minutes';
   }
 
-  updateStoreForBridge(sourceNetwork: string, destinationNetwork: string, amount: number) {
+  updateStoreForBridge(sourceNetwork: string, destinationNetwork: string, amount: string) {
     setSourceNetwork(sourceNetwork);
     setDestinationNetwork(destinationNetwork);
     setBridgeRate(this.getBridgeRate(sourceNetwork, destinationNetwork, amount));

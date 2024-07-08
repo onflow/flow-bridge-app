@@ -1,5 +1,4 @@
-// src/BridgeForm.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import "./index.css";
 import Dropdown from "./components/Dropdown";
 import NetworkSelectorModal from "./components/NetworkSelectorModal";
@@ -14,9 +13,10 @@ const BridgeForm: React.FC = () => {
   const [isDestinationModalOpen, setDestinationModalOpen] = useState(false);
   const [sourceNetwork, setSourceNetwork] = useState<string>("");
   const [destinationNetwork, setDestinationNetwork] = useState<string>("");
-  const [amount, setAmount] = useState<number>(0.0);
-  const [amountReceive, setAmountReceive] = useState<number>(0.0);
+  const [amount, setAmount] = useState<string>("0.0");
+  const [amountReceive, setAmountReceive] = useState<string>("0.0");
   const [destinationAddress, setDestinationAddress] = useState<string>("0x");
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     const subscription = state.subscribe((state) => {
@@ -36,6 +36,16 @@ const BridgeForm: React.FC = () => {
     ApiService.updateStoreForBridge(sourceNetwork, destinationNetwork, amount);
   };
 
+  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+      setAmount(value);
+    if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+      setError("");
+    } else {
+      setError("Please enter a valid number");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
       <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-600">
@@ -43,7 +53,7 @@ const BridgeForm: React.FC = () => {
           <label className="block text-sm font-medium mr-4">From</label>
           <Dropdown label={sourceNetwork} onClick={openSourceModal} />
         </div>
-        <div className="bg-card p-4 rounded-xlg">
+        <div className={`bg-card p-4 rounded-xlg ${error ? 'border border-red-500' : ''}`}>
           <div className="flex justify-between items-center mb-4">
             <label className="block text-sm font-medium text-gray-400">
               Send:
@@ -52,14 +62,15 @@ const BridgeForm: React.FC = () => {
           </div>
           <div className="flex items-center mb-4 bg-card">
             <input
-              type="number"
-              className="w-full mt-1 p-2 rounded text-white bg-card"
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
+              type="text"
+              className="w-full mt-1 p-2 rounded text-white bg-card focus:outline-none focus:ring-0"
+              value={amount || "0.0"}
+              onChange={handleAmountChange}
             />
             <Dropdown label="USDC" onClick={openSourceModal} />
           </div>
         </div>
+          {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         <div className="flex justify-center items-center">
           <button className="bg-transparent p-2 rounded">
             <SwapIcon />
