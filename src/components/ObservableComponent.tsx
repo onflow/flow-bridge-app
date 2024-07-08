@@ -29,7 +29,6 @@ const ObservableComponent: React.FC = () => {
   return (
     <div className="bg-card p-6 rounded-lg shadow-md w-full max-w-lg mt-6">
       <div className="mb-4">
-        <h2 className="text-xl mb-2">Application Details</h2>
         <p><strong>Source Network:</strong> {appState.sourceNetwork}</p>
         <p><strong>Destination Network:</strong> {appState.destinationNetwork}</p>
         <p><strong>Bridge Rate:</strong> {appState.bridgeRate}</p>

@@ -1,21 +1,25 @@
 // src/BridgeForm.tsx
-import React, { useState, useEffect } from 'react';
-import './index.css';
-import Dropdown from './components/Dropdown';
-import NetworkSelectorModal from './components/NetworkSelectorModal';
-import ObservableComponent from './components/ObservableComponent';
-import { state } from './store';
-import ApiService from './services/ApiService';
+import React, { useState, useEffect } from "react";
+import "./index.css";
+import Dropdown from "./components/Dropdown";
+import NetworkSelectorModal from "./components/NetworkSelectorModal";
+import ObservableComponent from "./components/ObservableComponent";
+import { state } from "./store";
+import ApiService from "./services/ApiService";
+import SwapIcon from "./components/SwapIcon";
+import InfoIcon from "./components/InfoIcon";
 
 const BridgeForm: React.FC = () => {
   const [isSourceModalOpen, setSourceModalOpen] = useState(false);
   const [isDestinationModalOpen, setDestinationModalOpen] = useState(false);
-  const [sourceNetwork, setSourceNetwork] = useState<string>('');
-  const [destinationNetwork, setDestinationNetwork] = useState<string>('');
-  const [amount, setAmount] = useState<number>(0);
+  const [sourceNetwork, setSourceNetwork] = useState<string>("");
+  const [destinationNetwork, setDestinationNetwork] = useState<string>("");
+  const [amount, setAmount] = useState<number>(0.0);
+  const [amountReceive, setAmountReceive] = useState<number>(0.0);
+  const [destinationAddress, setDestinationAddress] = useState<string>("0x");
 
   useEffect(() => {
-    const subscription = state.subscribe(state => {
+    const subscription = state.subscribe((state) => {
       setSourceNetwork(state.sourceNetwork);
       setDestinationNetwork(state.destinationNetwork);
     });
@@ -33,52 +37,103 @@ const BridgeForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen w-full bg-background text-white p-4">
-      <div className="bg-card p-6 rounded-lg shadow-md w-full max-w-lg">
+    <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
+      <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-600">
         <div className="flex justify-start mb-4 items-center">
           <label className="block text-sm font-medium mr-4">From</label>
           <Dropdown label={sourceNetwork} onClick={openSourceModal} />
         </div>
-        <div className="flex justify-between items-center mb-4">
-          <label className="block text-sm font-medium">Send:</label>
-          <span className="text-sm">Max: --</span>
+        <div className="bg-card p-4 rounded-xlg">
+          <div className="flex justify-between items-center mb-4">
+            <label className="block text-sm font-medium text-gray-400">
+              Send:
+            </label>
+            <span className="text-sm text-gray-400">Max: --</span>
+          </div>
+          <div className="flex items-center mb-4 bg-card">
+            <input
+              type="number"
+              className="w-full mt-1 p-2 rounded text-white bg-card"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+            />
+            <Dropdown label="USDC" onClick={openSourceModal} />
+          </div>
         </div>
-        <div className="flex items-center mb-4">
-          <input 
-            type="number" 
-            className="w-full mt-1 p-2 rounded bg-secondary text-white" 
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-          />
-          <Dropdown label="USDC" onClick={openSourceModal} />
-        </div>
-        <div className="flex justify-center items-center mb-4">
-          <button className="bg-secondary p-2 rounded">
-            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11H9v2H5v2h4v2h2v-2h4v-2h-4V7z" clipRule="evenodd" />
-            </svg>
+        <div className="flex justify-center items-center">
+          <button className="bg-transparent p-2 rounded">
+            <SwapIcon />
           </button>
         </div>
+
         <div className="flex items-center mb-4">
-          <label className="block text-sm font-medium mr-4">To</label>
+          <label className="block text-sm font-medium mr-2">To</label>
           <Dropdown label={destinationNetwork} onClick={openDestinationModal} />
         </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium">Receive (estimated):</label>
-          <input type="number" className="w-full mt-1 p-2 rounded bg-secondary text-white" disabled />
+        <div className="bg-card p-4 rounded-xlg">
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-400">
+              Receive (estimated):
+            </label>
+            <input
+              type="number"
+              value={amountReceive}
+              className="w-full mt-1 p-2 rounded bg-card text-white"
+              disabled
+            />
+          </div>
         </div>
-        <div className="p-4 mb-4 bg-secondary rounded">
-          <ObservableComponent />
+        <div className="bg-card p-4 rounded-xlg mt-4">
+          <div className="flex items-center mb-4">
+            <label className="block text-sm font-medium mr-2 text-gray-400">
+              Recipient address on {destinationNetwork} (do NOT send funds to
+              exchanges)
+            </label>
+          </div>
+          <div className="mb-4">{destinationAddress}</div>
         </div>
-        <button 
-          className="w-full py-2 bg-primary text-white rounded hover:border-0"
+
+        <div className="bg-card p-4 rounded-xlg mt-4">
+          <div className="text-white rounded-md flex flex-col gap-4">
+            <div className="col-span-1 flex justify-between">
+              <p className="text-gray-400">Bridge Rate</p>
+              <p>
+                1 USDC on <span className="text-green-500">Flow</span> = 1 USDC on{" "}
+                <span className="text-blue-500">Ethereum</span>
+              </p>
+            </div>
+            <div className="flex justify-between">
+              <p className="text-gray-400 flex items-center">
+                Fee <span className="ml-1 text-gray-500"><InfoIcon /></span>
+              </p>
+              <p>- USDC</p>
+            </div>
+            <div className="flex justify-between">
+              <p className="text-gray-400">Estimated Time of Arrival</p>
+              <p>15 minutes</p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          className="w-full mt-4 py-2 bg-primary-highlight text-action rounded-lg hover:border-0"
           onClick={handleTransferClick}
         >
           Transfer
         </button>
       </div>
-      {isSourceModalOpen && <NetworkSelectorModal onClose={closeSourceModal} isSource />}
-      {isDestinationModalOpen && <NetworkSelectorModal onClose={closeDestinationModal} isSource={false} />}
+      {isSourceModalOpen && (
+        <NetworkSelectorModal onClose={closeSourceModal} isSource />
+      )}
+      {isDestinationModalOpen && (
+        <NetworkSelectorModal
+          onClose={closeDestinationModal}
+          isSource={false}
+        />
+      )}
+      <div className="p-4 mt-4 rounded">
+        <ObservableComponent />
+      </div>
     </div>
   );
 };

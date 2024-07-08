@@ -12,7 +12,7 @@ const App = () => {
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background text-white">
-      <header className="top-bar bg-card flex justify-between items-center p-4 w-full">
+      <header className="top-bar bg-background flex justify-between items-center p-4 w-full">
         <div className="flex align-center">
           <img
             className="w-8 h-8 mr-1"
