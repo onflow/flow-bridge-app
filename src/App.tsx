@@ -1,5 +1,5 @@
 // src/App.jsx
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import BridgeForm from "./BridgeForm";
 import "./index.css";

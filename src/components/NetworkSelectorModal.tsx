@@ -4,6 +4,8 @@ import GenericModal from './GenericModal';
 import NetworkLabel from './NetworkLabel';
 import { setSourceNetwork, setDestinationNetwork, state } from '../store';
 import ApiService from '../services/ApiService';
+import { useInitialization } from '../InitializationContext';
+import { NetworkInfo } from '../services/AxelarService';
 
 interface NetworkSelectorModalProps {
   onClose: () => void;
@@ -12,8 +14,9 @@ interface NetworkSelectorModalProps {
 
 const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({ onClose, isSource }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [sourceNetwork, setSourceNetworkState] = useState<string>('');
-
+  const [sourceNetwork, setSourceNetworkState] = useState<NetworkInfo>();
+  const { networks, loading, error } = useInitialization();
+  
   useEffect(() => {
     const subscription = state.subscribe((state) => {
       setSourceNetworkState(state.sourceNetwork);
@@ -21,17 +24,15 @@ const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({ onClose, is
     return () => subscription.unsubscribe();
   }, []);
 
-  const networkList = isSource ? ApiService.getSourceNetworks() : ApiService.getDestinationNetworks(sourceNetwork);
-
-  const filteredNetworks = networkList.filter(network =>
+  const filteredNetworks = networks.filter(network =>
     network.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleNetworkSelect = (networkName: string) => {
+  const handleNetworkSelect = (network: NetworkInfo) => {
     if (isSource) {
-      setSourceNetwork(networkName);
+      setSourceNetwork(network);
     } else {
-      setDestinationNetwork(networkName);
+      setDestinationNetwork(network);
     }
     onClose();
   };
@@ -41,17 +42,17 @@ const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({ onClose, is
       <input
         type="text"
         placeholder="Search chain by name or chain ID"
-        className="w-full p-2 mb-4 rounded bg-secondary text-white"
+        className="w-full p-2 mb-4 rounded bg-secondary text-white focus:outline-none focus:ring-primary focus:ring-opacity-50"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         {filteredNetworks.map((network) => (
           <NetworkLabel
             key={network.name}
             icon={network.icon}
             name={network.name}
-            onClick={() => handleNetworkSelect(network.name)}
+            onClick={() => handleNetworkSelect(network)}
           />
         ))}
       </div>

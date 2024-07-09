@@ -1,32 +1,34 @@
 // src/store.ts
-import { BehaviorSubject } from 'rxjs';
-import ApiService from './services/ApiService';
+import { BehaviorSubject } from "rxjs";
+import { AxelarService, NetworkInfo } from "./services/AxelarService";
 
-interface AppState {
-  sourceNetwork: string;
-  destinationNetwork: string;
-  tokenBalances: Record<string, string>;  // Updated to string
+export interface AppState {
+  sourceNetwork: NetworkInfo;
+  destinationNetwork: NetworkInfo;
+  tokenBalances: Record<string, string>;
   bridgeRate: string;
   fee: string;
   estimatedTimeOfArrival: string;
+  networks: NetworkInfo[]; // Add networks to the state
 }
 
 const initialState: AppState = {
-  sourceNetwork: 'Flow Mainnet',
-  destinationNetwork: 'Ethereum Mainnet',
+  sourceNetwork: {name: "Flow Mainnet", icon: ""},
+  destinationNetwork: {name: "Ethereum Mainnet", icon: ""},
   tokenBalances: {},
-  bridgeRate: '1 USDC on Flow = 1 USDC on Ethereum',
-  fee: '- USDC',
-  estimatedTimeOfArrival: '10 minutes',
+  bridgeRate: "1 USDC on Flow = 1 USDC on Ethereum",
+  fee: "- USDC",
+  estimatedTimeOfArrival: "10 minutes",
+  networks: [], // Initialize networks as an empty array
 };
 
 const state$ = new BehaviorSubject<AppState>(initialState);
 
-export const setSourceNetwork = (network: string) => {
+export const setSourceNetwork = (network: NetworkInfo) => {
   state$.next({ ...state$.value, sourceNetwork: network });
 };
 
-export const setDestinationNetwork = (network: string) => {
+export const setDestinationNetwork = (network: NetworkInfo) => {
   state$.next({ ...state$.value, destinationNetwork: network });
 };
 
@@ -47,6 +49,3 @@ export const setEstimatedTimeOfArrival = (time: string) => {
 };
 
 export const state = state$.asObservable();
-
-// Initialize the store with default values
-ApiService.updateStoreForBridge('Flow Mainnet', 'Ethereum Mainnet', 100);

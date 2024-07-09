@@ -5,11 +5,11 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "./build",
-    "rootDir": "./src",
-    "jsx": "react-jsx",
-    "moduleResolution": "node",
+    "outDir": "../../build/api",
+    "rootDir": ".",
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
   },
-  "include": ["src/**/*.ts", "api/**/*.ts"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules"]
 }

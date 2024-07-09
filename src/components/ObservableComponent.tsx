@@ -1,10 +1,11 @@
 // src/components/ObservableComponent.tsx
 import React, { useEffect, useState } from 'react';
 import { state } from '../store';
+import { NetworkInfo } from '../services/AxelarService';
 
 interface AppState {
-  sourceNetwork: string;
-  destinationNetwork: string;
+  sourceNetwork: NetworkInfo;
+  destinationNetwork: NetworkInfo;
   tokenBalances: Record<string, string>;
   bridgeRate: string;
   fee: string;
@@ -13,8 +14,8 @@ interface AppState {
 
 const ObservableComponent: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({
-    sourceNetwork: '',
-    destinationNetwork: '',
+    sourceNetwork: {name: "Flow Mainnet", icon: ""},
+    destinationNetwork: {name: "Ethereum Mainnet", icon: ""},
     tokenBalances: {},
     bridgeRate: '',
     fee: '',
@@ -29,8 +30,8 @@ const ObservableComponent: React.FC = () => {
   return (
     <div className="bg-card p-6 rounded-lg shadow-md w-full max-w-lg mt-6">
       <div className="mb-4">
-        <p><strong>Source Network:</strong> {appState.sourceNetwork}</p>
-        <p><strong>Destination Network:</strong> {appState.destinationNetwork}</p>
+        <p><strong>Source Network:</strong> {appState.sourceNetwork?.name}</p>
+        <p><strong>Destination Network:</strong> {appState.destinationNetwork?.name}</p>
         <p><strong>Bridge Rate:</strong> {appState.bridgeRate}</p>
         <p><strong>Fee:</strong> {appState.fee}</p>
         <p><strong>Estimated Time of Arrival:</strong> {appState.estimatedTimeOfArrival}</p>

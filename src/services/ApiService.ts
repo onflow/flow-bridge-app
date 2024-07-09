@@ -6,66 +6,71 @@ import {
   setBridgeRate,
   setFee,
   setEstimatedTimeOfArrival,
-} from '../store';
-
-interface Network {
-  name: string;
-  icon: string;
-}
-
-const sourceNetworks: Network[] = [
-  { name: 'Flow Mainnet', icon: '/src/assets/flow.png' },
-  { name: 'Ethereum Mainnet', icon: '/src/assets/ethereum.png' },
-  { name: 'BNB Chain', icon: '/src/assets/bnb.png' },
-];
-
-const networkDestinations: Record<string, Network[]> = {
-  'Flow Mainnet': [
-    { name: 'Ethereum Mainnet', icon: '/src/assets/ethereum.png' },
-    { name: 'BNB Chain', icon: '/src/assets/bnb.png' },
-  ],
-  'Ethereum Mainnet': [
-    { name: 'Flow Mainnet', icon: '/src/assets/flow.png' },
-    { name: 'BNB Chain', icon: '/src/assets/bnb.png' },
-  ],
-  'BNB Chain': [
-    { name: 'Flow Mainnet', icon: '/src/assets/flow.png' },
-    { name: 'Ethereum Mainnet', icon: '/src/assets/ethereum.png' },
-  ],
-};
+  state,
+  AppState,
+} from "../store";
+import { BehaviorSubject } from "rxjs";
+import { AxelarService, NetworkInfo } from "./AxelarService";
 
 class ApiService {
-  getSourceNetworks(): Network[] {
-    return sourceNetworks;
+  async fetchAndSetNetworks(): Promise<NetworkInfo[]> {
+    let networks: NetworkInfo[] = [];
+    try {
+      const axelarService = new AxelarService();
+      await axelarService.init();
+      const nets = await axelarService.getSupportedNetworks();
+      networks = Object.values(nets);
+    } catch (error) {
+      console.error("Failed to fetch and set networks:", error);
+    }
+    return networks;
   }
 
-  getDestinationNetworks(sourceNetwork: string): Network[] {
-    return networkDestinations[sourceNetwork] || [];
+  async getSourceNetworks(): Promise<NetworkInfo[]> {
+    const currentState = (state as BehaviorSubject<AppState>).value;
+    return Object.values(currentState.networks);
   }
 
-  getBridgeRate(sourceNetwork: string, destinationNetwork: string, amount: string): string {
-    // Stubbed bridge rate
+  async getDestinationNetworks(sourceNetwork: string): Promise<NetworkInfo[]> {
+    const currentState = (state as BehaviorSubject<AppState>).value;
+    return Object.values(currentState.networks) || [];
+  }
+
+  getBridgeRate(
+    sourceNetwork: NetworkInfo,
+    destinationNetwork: NetworkInfo,
+    amount: string
+  ): string {
     return `1 ${amount} USDC on ${sourceNetwork} = ${amount} USDC on ${destinationNetwork}`;
   }
 
-  getFee(sourceNetwork: string, destinationNetwork: string, amount: string): string {
-    // convert amount to a number and add a 1% fee
+  getFee(
+    sourceNetwork: NetworkInfo,
+    destinationNetwork: NetworkInfo,
+    amount: string
+  ): string {
     const fAmount = parseFloat(amount);
-    return `${(fAmount) * 0.01} USDC`; // 1% fee
+    return `${fAmount * 0.01} USDC`;
   }
 
   getEstimatedTimeOfArrival(): string {
-    // Stubbed ETA
-    return '10 minutes';
+    return "10 minutes";
   }
 
-  updateStoreForBridge(sourceNetwork: string, destinationNetwork: string, amount: string) {
+  async updateStoreForBridge(
+    sourceNetwork: NetworkInfo,
+    destinationNetwork: NetworkInfo,
+    amount: string
+  ) {
+    await this.fetchAndSetNetworks();
     setSourceNetwork(sourceNetwork);
     setDestinationNetwork(destinationNetwork);
-    setBridgeRate(this.getBridgeRate(sourceNetwork, destinationNetwork, amount));
+    setBridgeRate(
+      this.getBridgeRate(sourceNetwork, destinationNetwork, amount)
+    );
     setFee(this.getFee(sourceNetwork, destinationNetwork, amount));
     setEstimatedTimeOfArrival(this.getEstimatedTimeOfArrival());
-    setTokenBalances({ USDC: '1000' }); // Stubbed token balance
+    setTokenBalances({ USDC: "1000" });
   }
 }
 
