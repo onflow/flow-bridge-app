@@ -1,7 +1,7 @@
 // src/components/ObservableComponent.tsx
-import React, { useEffect, useState } from 'react';
-import { state } from '../store';
-import { NetworkInfo } from '../services/AxelarService';
+import React, { useEffect, useState } from "react";
+import { state } from "../store";
+import { NetworkInfo } from "../services/AxelarService";
 
 interface AppState {
   sourceNetwork: NetworkInfo;
@@ -14,12 +14,17 @@ interface AppState {
 
 const ObservableComponent: React.FC = () => {
   const [appState, setAppState] = useState<AppState>({
-    sourceNetwork: {name: "Flow Mainnet", icon: ""},
-    destinationNetwork: {name: "Ethereum Mainnet", icon: ""},
+    sourceNetwork: { name: "Flow Mainnet", icon: "", id: 0, assets: {} },
+    destinationNetwork: {
+      name: "Ethereum Mainnet",
+      icon: "",
+      id: 0,
+      assets: {},
+    },
     tokenBalances: {},
-    bridgeRate: '',
-    fee: '',
-    estimatedTimeOfArrival: '',
+    bridgeRate: "",
+    fee: "",
+    estimatedTimeOfArrival: "",
   });
 
   useEffect(() => {
@@ -30,15 +35,29 @@ const ObservableComponent: React.FC = () => {
   return (
     <div className="bg-card p-6 rounded-lg shadow-md w-full max-w-lg mt-6">
       <div className="mb-4">
-        <p><strong>Source Network:</strong> {appState.sourceNetwork?.name}</p>
-        <p><strong>Destination Network:</strong> {appState.destinationNetwork?.name}</p>
-        <p><strong>Bridge Rate:</strong> {appState.bridgeRate}</p>
-        <p><strong>Fee:</strong> {appState.fee}</p>
-        <p><strong>Estimated Time of Arrival:</strong> {appState.estimatedTimeOfArrival}</p>
+        <p>
+          <strong>Source Network:</strong> {appState.sourceNetwork?.name}
+        </p>
+        <p>
+          <strong>Destination Network:</strong>{" "}
+          {appState.destinationNetwork?.name}
+        </p>
+        <p>
+          <strong>Bridge Rate:</strong> {appState.bridgeRate}
+        </p>
+        <p>
+          <strong>Fee:</strong> {appState.fee}
+        </p>
+        <p>
+          <strong>Estimated Time of Arrival:</strong>{" "}
+          {appState.estimatedTimeOfArrival}
+        </p>
         <h3 className="text-lg mt-4">Token Balances:</h3>
         <ul>
           {Object.entries(appState.tokenBalances).map(([token, balance]) => (
-            <li key={token}>{token}: {balance}</li>
+            <li key={token}>
+              {token}: {balance}
+            </li>
           ))}
         </ul>
       </div>

@@ -8,6 +8,9 @@ interface DropdownProps {
 }
 
 const Dropdown: React.FC<DropdownProps> = ({ icon, label, onClick }) => {
+  if (!icon || !label) {
+    return  <div className="relative"><span></span></div>;
+  }
   return (
     <div className="relative">
       <button

@@ -1,7 +1,11 @@
+import { parse } from "path";
+
 interface ChainConfig {
   displayName: string;
   iconUrl: string;
   chainType: string;
+  externalChainId: string;
+  assets: { [key: string]: string };
 }
 
 interface AxelarConfigs {
@@ -16,6 +20,8 @@ interface AxelarConfigs {
 export interface NetworkInfo {
   name: string;
   icon: string;
+  id: number;
+  assets: { [key: string]: string };
 }
 
 interface SupportedNetworks {
@@ -56,6 +62,8 @@ export class AxelarService {
         result[key] = {
           name: value.displayName,
           icon: `${this.assetUrl}${value.iconUrl}`,
+          id: parseInt(value?.externalChainId),
+          assets: value.assets,
         };
       }
     });

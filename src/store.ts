@@ -13,8 +13,8 @@ export interface AppState {
 }
 
 const initialState: AppState = {
-  sourceNetwork: {name: "Flow Mainnet", icon: ""},
-  destinationNetwork: {name: "Ethereum Mainnet", icon: ""},
+  sourceNetwork: { name: "Flow Mainnet", icon: "", id: 0, assets: {} },
+  destinationNetwork: { name: "Ethereum Mainnet", icon: "", id: 0, assets: {} },
   tokenBalances: {},
   bridgeRate: "1 USDC on Flow = 1 USDC on Ethereum",
   fee: "- USDC",

@@ -2,44 +2,51 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import "./index.css";
 import Dropdown from "./components/Dropdown";
 import NetworkSelectorModal from "./components/NetworkSelectorModal";
-import ObservableComponent from "./components/ObservableComponent";
-import { state } from "./store";
-import ApiService from "./services/ApiService";
+import { isAddress } from "viem";
 import SwapIcon from "./components/SwapIcon";
 import InfoIcon from "./components/InfoIcon";
-import { NetworkInfo } from "./services/AxelarService";
+import { useInitialization } from "./InitializationContext";
 
 const BridgeForm: React.FC = () => {
   const [isSourceModalOpen, setSourceModalOpen] = useState(false);
   const [isDestinationModalOpen, setDestinationModalOpen] = useState(false);
-  const [sourceNetwork, setSourceNetwork] = useState<NetworkInfo>();
-  const [destinationNetwork, setDestinationNetwork] = useState<NetworkInfo>();
-  const [amount, setAmount] = useState<string>("0.0");
-  const [amountReceive, setAmountReceive] = useState<string>("0.0");
-  const [destinationAddress, setDestinationAddress] = useState<string>("0x");
+
   const [error, setError] = useState<string>("");
+  const [destAddrError, setDestAddrError] = useState<string>("");
+  const {
+    sourceNetwork,
+    destinationAddress,
+    destinationNetwork,
+    setDestinationAddress,
+    setAmount,
+    amount,
+    setApproval,
+    sendTokens,
+    isApproved,
+    amountReceive,
+    isApproving,
+    isSending,
+    canSend,
+    isCheckingApproval,
+  } = useInitialization();
 
-  useEffect(() => {
-    const subscription = state.subscribe((state) => {
-      setSourceNetwork(state.sourceNetwork);
-      setDestinationNetwork(state.destinationNetwork);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
+  console.log("in form", isApproved, isApproving, isSending);
   const openSourceModal = () => setSourceModalOpen(true);
   const closeSourceModal = () => setSourceModalOpen(false);
 
   const openDestinationModal = () => setDestinationModalOpen(true);
   const closeDestinationModal = () => setDestinationModalOpen(false);
 
+  const handleApprovalClick = () => {
+    if (sourceNetwork && amount) {
+      setApproval();
+    } else {
+      console.error("Source and amount must be selected");
+    }
+  };
   const handleTransferClick = () => {
-    if (sourceNetwork && destinationNetwork) {
-      ApiService.updateStoreForBridge(
-        sourceNetwork,
-        destinationNetwork,
-        amount
-      );
+    if (sourceNetwork && destinationNetwork && amount && destinationAddress) {
+      sendTokens();
     } else {
       console.error("Source and destination networks must be selected");
     }
@@ -52,6 +59,16 @@ const BridgeForm: React.FC = () => {
       setError("");
     } else {
       setError("Please enter a valid number");
+    }
+  };
+
+  const handleDestinationAddressChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDestinationAddress(value);
+    if (isAddress(value)) {
+      setDestAddrError("");
+    } else {
+      setDestAddrError("Please enter a valid address");
     }
   };
 
@@ -95,7 +112,7 @@ const BridgeForm: React.FC = () => {
         </div>
 
         <div className="flex items-center mb-4">
-          <label className="block text-sm font-medium mr-2">To</label>
+          <label className="block text-sm font-medium mr-8">To</label>
           <Dropdown
             icon={destinationNetwork?.icon}
             label={destinationNetwork?.name}
@@ -122,9 +139,16 @@ const BridgeForm: React.FC = () => {
               to exchanges)
             </label>
           </div>
-          <div className="mb-4">{destinationAddress}</div>
+          <input
+            type="text"
+            className="mb-4 text-white bg-card w-full focus:outline-none focus:ring-0"
+            value={destinationAddress}
+            onChange={handleDestinationAddressChange}
+          />
         </div>
-
+        {destAddrError && (
+          <p className="text-red-500 text-sm mt-1">{destAddrError}</p>
+        )}
         <div className="bg-card p-4 rounded-xlg mt-4">
           <div className="text-white rounded-md flex flex-col gap-4">
             <div className="col-span-1 flex justify-between">
@@ -149,14 +173,40 @@ const BridgeForm: React.FC = () => {
             </div>
           </div>
         </div>
+        {isCheckingApproval && (
+          <p className="text-gray-400 text-sm mt-4">
+            Checking approval status...
+          </p>
+        )}
+        {!isApproved && (
+          <button
+            className={`w-full mt-4 py-2 bg-primary-highlight text-action rounded-lg ${
+              isApproving
+                ? "disabled:opacity-50 disabled:cursor-not-allowed"
+                : "hover:bg-primary-highlight-dark"
+            }`}
+            onClick={handleApprovalClick}
+            disabled={isApproving}
+          >
+            {isApproving ? "Approving ..." : "Approve"}
+          </button>
+        )}
 
-        <button
-          className="w-full mt-4 py-2 bg-primary-highlight text-action rounded-lg"
-          onClick={handleTransferClick}
-        >
-          Transfer
-        </button>
+        {isApproved && (
+          <button
+            className={`w-full mt-4 py-2 bg-primary-highlight text-action rounded-lg ${
+              canSend
+                ? "hover:bg-primary-highlight-dark"
+                : "disabled:opacity-50 disabled:cursor-not-allowed"
+            }`}
+            onClick={handleTransferClick}
+            disabled={!canSend}
+          >
+            {isSending ? "Transferring ..." : "Transfer"}
+          </button>
+        )}
       </div>
+
       {isSourceModalOpen && (
         <NetworkSelectorModal onClose={closeSourceModal} isSource />
       )}
@@ -166,9 +216,6 @@ const BridgeForm: React.FC = () => {
           isSource={false}
         />
       )}
-      <div className="p-4 mt-4 rounded">
-        <ObservableComponent />
-      </div>
     </div>
   );
 };

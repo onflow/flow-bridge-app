@@ -11,8 +11,41 @@ import {
 } from "../store";
 import { BehaviorSubject } from "rxjs";
 import { AxelarService, NetworkInfo } from "./AxelarService";
+import { Network } from "hardhat/types";
 
 class ApiService {
+  async checkApproval(
+    sourceChain: NetworkInfo,
+    amount: string
+  ): Promise<boolean> {
+    if (!amount) return Promise.resolve(false);
+    // sleep for 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    // TODO: need bridge contract address for source network
+    return Promise.resolve(false);
+  }
+
+  async setApproval(
+    sourceChain: NetworkInfo,
+    destinationChain: NetworkInfo,
+    amount: string
+  ): Promise<void> {
+    // sleep for 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    return Promise.resolve();
+  }
+  
+  async sendTokens(
+    sourceChain: NetworkInfo,
+    destinatinoChain: NetworkInfo,
+    amount: string,
+    destinationAddress: string
+  ): Promise<void> {
+    // sleep for 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    return Promise.resolve();
+  }
+
   async fetchAndSetNetworks(): Promise<NetworkInfo[]> {
     let networks: NetworkInfo[] = [];
     try {
