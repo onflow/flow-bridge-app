@@ -20,10 +20,16 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { flowDarkTheme } from "./FlowDarkTheme"; // Import your custom theme
 import { InitializationProvider } from "./InitializationContext";
 
+const c = {
+  ...flowPreviewnet,
+  name: "Flow",
+  iconUrl: "/src/assets/flow.png",
+}
+
 const config = getDefaultConfig({
   appName: "Flow Bridge App",
   projectId: "YOUR_PROJECT_ID",
-  chains: [mainnet, polygon, optimism, arbitrum, base, flowPreviewnet],
+  chains: [mainnet, polygon, optimism, arbitrum, base, c],
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 
