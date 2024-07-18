@@ -12,8 +12,21 @@ import {
 import { BehaviorSubject } from "rxjs";
 import { AxelarService, NetworkInfo } from "./AxelarService";
 import { Network } from "hardhat/types";
+import { ethers } from "ethers";
+import { AxelarAssetTransfer, Environment, SendTokenParams } from "@axelar-network/axelarjs-sdk";
 
+export type Asset = {
+  denom: string,
+  decimals: number,
+}
+
+const FLOW_RPC_ENDPOINT = "https://previewnet.evm.nodes.onflow.org";
 class ApiService {
+  private provider = new ethers.providers.JsonRpcProvider(FLOW_RPC_ENDPOINT);
+  private assetTransfer = new AxelarAssetTransfer({
+    environment: Environment.MAINNET,
+  })
+
   async checkApproval(
     sourceChain: NetworkInfo,
     amount: string
@@ -34,16 +47,33 @@ class ApiService {
     await new Promise((resolve) => setTimeout(resolve, 5000));
     return Promise.resolve();
   }
-  
+
   async sendTokens(
     sourceChain: NetworkInfo,
     destinatinoChain: NetworkInfo,
+    destinationAddress: string,
+    asset: Asset,
     amount: string,
-    destinationAddress: string
-  ): Promise<void> {
-    // sleep for 5 seconds
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    return Promise.resolve();
+  ): Promise<ethers.providers.TransactionResponse> {
+    const amountInAtomicUnits = ethers.utils
+      .parseUnits(amount.toString(), asset.decimals).toString();
+    const signer = this.provider.getSigner();
+    const requestOptions: SendTokenParams = {
+      fromChain: sourceChain.name,
+      toChain: destinatinoChain.name,
+      destinationAddress,
+      asset: { denom: asset.denom },
+      amountInAtomicUnits,
+      options: {
+        evmOptions: {
+          signer,
+          provider: this.provider,
+          approveSendForMe: true,
+        }
+      }
+    }
+    const result = await this.assetTransfer.sendToken(requestOptions) as ethers.providers.TransactionResponse
+    return result
   }
 
   async fetchAndSetNetworks(): Promise<NetworkInfo[]> {

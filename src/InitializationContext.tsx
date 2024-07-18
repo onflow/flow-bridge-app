@@ -1,6 +1,6 @@
 // src/contexts/InitializationContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
-import ApiService from "./services/ApiService";
+import ApiService, { Asset } from "./services/ApiService";
 import { NetworkInfo } from "./services/AxelarService";
 import { useAccount } from "wagmi";
 
@@ -20,6 +20,7 @@ interface InitializationContextType {
   setSourceNetwork: React.Dispatch<
     React.SetStateAction<NetworkInfo | undefined>
   >;
+  setAsset: React.Dispatch<React.SetStateAction<Asset | undefined>>;
   destinationNetwork: NetworkInfo | undefined;
   sourceNetwork: NetworkInfo | undefined;
   amount: string;
@@ -55,6 +56,7 @@ export const InitializationProvider: React.FC<{
   const [isApproved, setIsApproved] = useState<boolean>(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [asset, setAsset] = useState<Asset>();
 
   const { isConnected, address: account, chain } = useAccount();
 
@@ -127,13 +129,21 @@ export const InitializationProvider: React.FC<{
       );
       return;
     }
+
+    if (!asset) {
+      console.error(
+        "Asset should be selected",
+      )
+      return;
+    }
     setIsSending(true);
     try {
       const tx = await ApiService.sendTokens(
         sourceNetwork,
         destinationNetwork,
+        destinationAddress,
+        asset,
         amount,
-        destinationAddress
       );
       console.log(tx);
     } catch (error) {
@@ -194,6 +204,7 @@ export const InitializationProvider: React.FC<{
         setAmount,
         amountReceive,
         setApproval,
+        setAsset,
         sendTokens,
         isApproved,
         isApproving,
