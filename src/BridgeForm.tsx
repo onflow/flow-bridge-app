@@ -6,10 +6,12 @@ import { isAddress } from "viem";
 import SwapIcon from "./components/SwapIcon";
 import InfoIcon from "./components/InfoIcon";
 import { useInitialization } from "./InitializationContext";
+import SelectTokenModal from "./components/SelectTokenModal";
 
 const BridgeForm: React.FC = () => {
   const [isSourceModalOpen, setSourceModalOpen] = useState(false);
   const [isDestinationModalOpen, setDestinationModalOpen] = useState(false);
+  const [isSelectTokenModalOpen, setSelectTokenModalOpen] = useState(false);
 
   const [error, setError] = useState<string>("");
   const [destAddrError, setDestAddrError] = useState<string>("");
@@ -28,14 +30,18 @@ const BridgeForm: React.FC = () => {
     isSending,
     canSend,
     isCheckingApproval,
+    sourceToken,
+    displayUserBalance,
   } = useInitialization();
 
-  console.log("in form", isApproved, isApproving, isSending);
   const openSourceModal = () => setSourceModalOpen(true);
   const closeSourceModal = () => setSourceModalOpen(false);
 
   const openDestinationModal = () => setDestinationModalOpen(true);
   const closeDestinationModal = () => setDestinationModalOpen(false);
+
+  const openSelectTokenModal = () => setSelectTokenModalOpen(true);
+  const closeSelectTokenModal = () => setSelectTokenModalOpen(false);
 
   const handleApprovalClick = () => {
     if (sourceNetwork && amount) {
@@ -92,7 +98,12 @@ const BridgeForm: React.FC = () => {
             <label className="block text-sm font-medium text-gray-400">
               Send:
             </label>
-            <span className="text-sm text-gray-400">Max: --</span>
+            <span
+              className="text-sm text-gray-400 cursor-pointer"
+              onClick={() => setAmount(displayUserBalance())}
+            >
+              Max: {displayUserBalance()}
+            </span>
           </div>
           <div className="flex items-center mb-4 bg-card">
             <input
@@ -101,7 +112,11 @@ const BridgeForm: React.FC = () => {
               value={amount || "0.0"}
               onChange={handleAmountChange}
             />
-            <Dropdown icon={"TODO"} label="USDC" onClick={openSourceModal} />
+            <Dropdown
+              icon={sourceToken?.icon}
+              label={sourceToken?.name}
+              onClick={openSelectTokenModal}
+            />
           </div>
         </div>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
@@ -215,6 +230,9 @@ const BridgeForm: React.FC = () => {
           onClose={closeDestinationModal}
           isSource={false}
         />
+      )}
+      {isSelectTokenModalOpen && (
+        <SelectTokenModal onClose={closeSelectTokenModal} />
       )}
     </div>
   );

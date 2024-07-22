@@ -2,8 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import GenericModal from './GenericModal';
 import NetworkLabel from './NetworkLabel';
-import { setSourceNetwork, setDestinationNetwork, state } from '../store';
-import ApiService from '../services/ApiService';
 import { useInitialization } from '../InitializationContext';
 import { NetworkInfo } from '../services/AxelarService';
 
@@ -14,15 +12,7 @@ interface NetworkSelectorModalProps {
 
 const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({ onClose, isSource }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [sourceNetwork, setSourceNetworkState] = useState<NetworkInfo>();
-  const { networks, loading, error } = useInitialization();
-  
-  useEffect(() => {
-    const subscription = state.subscribe((state) => {
-      setSourceNetworkState(state.sourceNetwork);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
+  const { networks, loading, error, setSourceNetwork, setDestinationNetwork } = useInitialization();
 
   const filteredNetworks = networks.filter(network =>
     network.name.toLowerCase().includes(searchTerm.toLowerCase())

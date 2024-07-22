@@ -1,5 +1,12 @@
-import { parse } from "path";
-import { AxelarAssetTransfer, AxelarQueryAPI, Environment, CHAINS, SendTokenParams } from "@axelar-network/axelarjs-sdk";
+import {
+  AxelarAssetTransfer,
+  AxelarQueryAPI,
+  Environment,
+  CHAINS,
+  // @ts-ignore
+  SendTokenParams,
+} from "@axelar-network/axelarjs-sdk";
+
 import { ethers, Signer } from "ethers";
 
 interface ChainConfig {
@@ -9,13 +16,30 @@ interface ChainConfig {
   externalChainId: string;
   assets: { [key: string]: string };
 }
+export interface TokenConfig {
+  id: string;
+  prettySymbol: string;
+  name: string;
+  coinGeckoId: string;
+  symbol: string;
+  decimals: number;
+  icon: string;
+  address: string;
+  denom : string;
+}
 
+interface AxelarTokenConfig extends TokenConfig {
+  iconUrl: string;
+}
 interface AxelarConfigs {
   chains: {
     [key: string]: ChainConfig;
   };
   resources: {
     staticAssetHost: string;
+  };
+  assets: {
+    [key: string]: AxelarTokenConfig;
   };
 }
 
@@ -31,15 +55,15 @@ interface SupportedNetworks {
 }
 
 type Asset = {
-  denom: string,
-  decimals: number,
-}
+  denom: string;
+  decimals: number;
+};
 
 type CommonArgs = {
   fromChain: keyof typeof CHAINS.MAINNET;
   toChain: keyof typeof CHAINS.MAINNET;
-  asset: Asset
-}
+  asset: Asset;
+};
 
 const FLOW_RPC_ENDPOINT = "https://previewnet.evm.nodes.onflow.org";
 
@@ -50,13 +74,23 @@ export class AxelarService {
   private assetUrl = "";
   private provider = new ethers.providers.JsonRpcProvider(FLOW_RPC_ENDPOINT);
   private networks: NetworkInfo[] = [];
+
   private querySdk = new AxelarQueryAPI({
     environment: Environment.MAINNET,
   });
+
   private assetTransfer = new AxelarAssetTransfer({
     environment: Environment.MAINNET,
-  })
-  constructor() { }
+  });
+
+  constructor() {
+    console.log("AxelarService constructor");
+    this.init();
+  }
+
+  public isInitialized(): boolean {
+    return this.configs !== null;
+  }
 
   async init() {
     try {
@@ -92,17 +126,50 @@ export class AxelarService {
 
     return result;
   }
-  public async getTransferFee({ fromChain, toChain, asset, amount }: CommonArgs & { amount: number }) {
-    const fee = await this.querySdk.getTransferFee(fromChain, toChain, asset.denom, amount);
-    return fee
+  public async getTransferFee({
+    fromChain,
+    toChain,
+    asset,
+    amount,
+  }: CommonArgs & { amount: number }) {
+    const fee = await this.querySdk.getTransferFee(
+      fromChain,
+      toChain,
+      asset.denom,
+      amount
+    );
+    return fee;
   }
-  public async getEstimatedGasFee({ fromChain, toChain, gasLimit }: CommonArgs & { gasLimit: number }) {
-    const gasFee = await this.querySdk.estimateGasFee(fromChain, toChain, gasLimit)
-    return gasFee
+
+  public async getEstimatedGasFee({
+    fromChain,
+    toChain,
+    gasLimit,
+  }: CommonArgs & { gasLimit: number }) {
+    const gasFee = await this.querySdk.estimateGasFee(
+      fromChain,
+      toChain,
+      String(gasLimit)
+    );
+    return gasFee;
   }
-  public async transfer({ fromChain, toChain, asset, amount, destinationAddress, signer }: CommonArgs & { destinationAddress: string, signer: Signer, amount: number }) {
+
+  public async transfer({
+    fromChain,
+    toChain,
+    asset,
+    amount,
+    destinationAddress,
+    signer,
+  }: CommonArgs & {
+    destinationAddress: string;
+    signer: Signer;
+    amount: number;
+  }) {
     const amountInAtomicUnits = ethers.utils
-      .parseUnits(amount.toString(), asset.decimals).toString();
+      .parseUnits(amount.toString(), asset.decimals)
+      .toString();
+
     const requestOptions: SendTokenParams = {
       fromChain,
       toChain,
@@ -114,9 +181,54 @@ export class AxelarService {
           signer,
           provider: this.provider,
           approveSendForMe: true,
-        }
-      }
+        },
+      },
+    };
+    //@ts-ignore
+    return this.assetTransfer.sendToken(requestOptions);
+  }
+
+  public getTokensForChain(chainName: string): TokenConfig[] {
+    if (!this.configs) {
+      throw new Error("AxelarService is not initialized yet.");
     }
-    return this.assetTransfer.sendToken(requestOptions)
+    const chainId = chainName.toLowerCase();
+    const chainConfig = this.configs.chains[chainId];
+    if (!chainConfig) {
+      throw new Error(`Chain ${chainId} not supported`);
+    }
+
+    const tokens: TokenConfig[] = [];
+    Object.entries(chainConfig.assets).map(([key, address]) => {
+      // TODO: only show supported tokens
+      //    if (!SupportedTokens.includes(key)) {
+      //     return null;
+      //   }
+      const tokenInfo = this.getTokenInfoFromKey(key, address);
+      if (!tokenInfo) return null;
+      tokens.push({
+        ...tokenInfo,
+        address,
+      });
+    });
+
+    return tokens;
+  }
+
+  private getTokenInfoFromKey(
+    key: string,
+    address: string
+  ): TokenConfig | null {
+    // Implement the logic to parse the key and return the token information.
+    // This might require additional mapping if the key does not directly correspond to the token information.
+    // For example:
+    const token: AxelarTokenConfig | undefined = this.configs?.assets?.[key];
+    if (!token) return null;
+
+    console.log("building tokens", token);  
+    return {
+      ...token,
+      icon: `${this.assetUrl}${token.iconUrl}`,
+    };
   }
 }

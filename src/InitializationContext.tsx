@@ -1,8 +1,9 @@
 // src/contexts/InitializationContext.tsx
 import React, { createContext, useContext, useEffect, useState } from "react";
-import ApiService, { Asset } from "./services/ApiService";
-import { NetworkInfo } from "./services/AxelarService";
-import { useAccount } from "wagmi";
+import ApiService from "./services/ApiService";
+import { NetworkInfo, TokenConfig } from "./services/AxelarService";
+import { useAccount, useSwitchChain, useClient as useConfig } from "wagmi";
+import { formatUnits } from "viem";
 
 interface InitializationContextType {
   initialized: boolean;
@@ -17,12 +18,12 @@ interface InitializationContextType {
   setDestinationAddress: React.Dispatch<
     React.SetStateAction<string | undefined>
   >;
-  setSourceNetwork: React.Dispatch<
-    React.SetStateAction<NetworkInfo | undefined>
-  >;
-  setAsset: React.Dispatch<React.SetStateAction<Asset | undefined>>;
+  setSourceNetwork: (network: NetworkInfo) => void;
+  setToken: (token: TokenConfig) => void;
+  sourceToken: TokenConfig | undefined;
   destinationNetwork: NetworkInfo | undefined;
   sourceNetwork: NetworkInfo | undefined;
+  sourceNetworkTokens: TokenConfig[];
   amount: string;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   amountReceive: string;
@@ -33,6 +34,7 @@ interface InitializationContextType {
   isSending: boolean;
   canSend: boolean;
   isCheckingApproval: boolean;
+  displayUserBalance: () => string;
 }
 
 const InitializationContext = createContext<
@@ -42,21 +44,27 @@ const InitializationContext = createContext<
 export const InitializationProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
+  const { switchChain } = useSwitchChain();
+  const config = useConfig();
   const [initialized, setInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [networks, setNetworks] = useState<NetworkInfo[]>([]);
   const [error, setError] = useState<string | undefined>();
   const [address, setAddress] = useState<string | undefined>();
-  const [sourceNetwork, setSourceNetwork] = useState<NetworkInfo>();
+  const [originNetwork, setOriginNetwork] = useState<NetworkInfo>();
+  const [sourceNetworkTokens, setSourceNetworkTokens] = useState<TokenConfig[]>(
+    []
+  );
+  const [sourceToken, setSourceToken] = useState<TokenConfig>();
   const [destinationNetwork, setDestinationNetwork] = useState<NetworkInfo>();
   const [destinationAddress, setDestinationAddress] = useState<string>();
   const [amount, setAmount] = useState<string>("0.0");
   const [amountReceive, setAmountReceive] = useState<string>("0.0");
+  const [userBalance, setUserBalance] = useState<bigint>(BigInt(0));
   const [isCheckingApproval, setIsCheckingApproval] = useState<boolean>(false);
   const [isApproved, setIsApproved] = useState<boolean>(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
-  const [asset, setAsset] = useState<Asset>();
 
   const { isConnected, address: account, chain } = useAccount();
 
@@ -71,6 +79,12 @@ export const InitializationProvider: React.FC<{
 
     const initialize = async () => {
       try {
+        console.log("initializing");
+        // TODO need better bootup logic than testing initialized
+        while (!ApiService.isInitialized()) {
+          console.log("waiting for initialization");
+          await new Promise((resolve) => setTimeout(resolve, 500));
+        }
         const fetchedNetworks = await ApiService.fetchAndSetNetworks();
         setNetworks(fetchedNetworks);
         setInitialized(true);
@@ -97,19 +111,18 @@ export const InitializationProvider: React.FC<{
       }
     };
 
-    console.log("initializing");
     initialize();
   }, [chain?.id, isConnected, account]);
 
   const setApproval = async () => {
-    if (!sourceNetwork || !destinationNetwork) {
+    if (!originNetwork || !destinationNetwork) {
       console.error("Source and destination networks must be selected");
       return;
     }
     setIsApproving(true);
     try {
       const tx = await ApiService.setApproval(
-        sourceNetwork,
+        originNetwork,
         destinationNetwork,
         amount
       );
@@ -123,26 +136,26 @@ export const InitializationProvider: React.FC<{
   };
 
   const sendTokens = async () => {
-    if (!sourceNetwork || !destinationNetwork || !destinationAddress) {
+    if (!originNetwork || !destinationNetwork || !destinationAddress) {
       console.error(
         "Source and destination networks must be selected, destination address must be provided"
       );
       return;
     }
 
-    if (!asset) {
+    if (!sourceToken) {
       console.error(
-        "Asset should be selected",
+        "Transfer token should be selected",
       )
       return;
     }
     setIsSending(true);
     try {
       const tx = await ApiService.sendTokens(
-        sourceNetwork,
+        originNetwork,
         destinationNetwork,
         destinationAddress,
-        asset,
+        sourceToken,
         amount,
       );
       console.log(tx);
@@ -155,14 +168,14 @@ export const InitializationProvider: React.FC<{
 
   // set amount and test for approval status on source network only
   useEffect(() => {
-    if (!sourceNetwork || !amount || amount === "0.0") {
+    if (!originNetwork || !amount || amount === "0.0") {
       return;
     }
 
     const checkApproval = async () => {
       setIsCheckingApproval(true);
       try {
-        const approved = await ApiService.checkApproval(sourceNetwork, amount);
+        const approved = await ApiService.checkApproval(originNetwork, amount);
         setIsApproved(approved);
       } catch (error) {
         console.error("Failed to check approval:", error);
@@ -172,20 +185,42 @@ export const InitializationProvider: React.FC<{
     };
 
     checkApproval();
-  }, [sourceNetwork, amount]);
+  }, [originNetwork, amount]);
 
-  const canSend = isApproved && !isApproving && !isSending && amount !== "0.0" && destinationAddress !== undefined;
+  const setSourceNetwork = (network: NetworkInfo) => {
+    // set tokens for network
+    const tokens = ApiService.getSupportedChainTokens(String(network.name));
+    setSourceNetworkTokens(tokens);
+    setOriginNetwork(network);
+    // Could configure to have a specific default token per network
+    const defaultToken = ApiService.DefaultToken;
+    const defToken = tokens.find((token) => token.id === defaultToken);
+    const t = defToken || tokens[0] || sourceToken;
+    setToken(t);
+    switchChain({ chainId: Number(network.id) });
+  };
 
-  console.log(
-    "isConnected",
-    isConnected,
-    isApproved,
-    amount,
-    isApproving,
-    isSending,
-    "canSend:",
-    canSend,
-  );
+  const setToken = async (token: TokenConfig) => {
+    setSourceToken(token);
+    const balance = await ApiService.getTokenBalance(
+      token,
+      account,
+      config
+    );
+    setUserBalance(balance);
+  };
+
+  const displayUserBalance = () => {
+    return formatUnits(userBalance, Number(sourceToken?.decimals) || 18);
+  };
+
+  const canSend =
+    isApproved &&
+    !isApproving &&
+    !isSending &&
+    amount !== "0.0" &&
+    destinationAddress !== undefined;
+
   return (
     <InitializationContext.Provider
       value={{
@@ -194,23 +229,26 @@ export const InitializationProvider: React.FC<{
         loading,
         error,
         address,
-        sourceNetwork,
+        sourceNetwork: originNetwork,
         destinationNetwork,
         destinationAddress,
         setDestinationNetwork,
         setDestinationAddress,
         setSourceNetwork,
+        sourceNetworkTokens,
+        setToken,
+        sourceToken,
         amount,
         setAmount,
         amountReceive,
         setApproval,
-        setAsset,
         sendTokens,
         isApproved,
         isApproving,
         isSending,
         canSend,
         isCheckingApproval,
+        displayUserBalance,
       }}
     >
       {children}

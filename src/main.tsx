@@ -24,7 +24,7 @@ const c = {
   ...flowPreviewnet,
   name: "Flow",
   iconUrl: "/src/assets/flow.png",
-}
+};
 
 const config = getDefaultConfig({
   appName: "Flow Bridge App",
@@ -33,7 +33,13 @@ const config = getDefaultConfig({
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      gcTime: 1_000 * 60 * 60 * 24, // 24 hours
+    },
+  },
+});
 
 const container = document.getElementById("root");
 if (!container) throw new Error("Root container missing in index.html");
@@ -44,7 +50,10 @@ root.render(
     <Router>
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider theme={flowDarkTheme}>
+          <RainbowKitProvider
+            showRecentTransactions={true}
+            theme={flowDarkTheme}
+          >
             <InitializationProvider>
               <App />
             </InitializationProvider>

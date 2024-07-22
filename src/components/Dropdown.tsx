@@ -9,13 +9,13 @@ interface DropdownProps {
 
 const Dropdown: React.FC<DropdownProps> = ({ icon, label, onClick }) => {
   if (!icon || !label) {
-    return  <div className="relative"><span></span></div>;
+    return  <div className="relative" />
   }
   return (
     <div className="relative">
       <button
         onClick={onClick}
-        className="rounded-xlg bg-secondary text-white py-2 px-4 rounded inline-flex items-center w-full"
+        className="rounded-xlg bg-secondary text-white py-2 px-4 rounded inline-flex items-center w-full whitespace-nowrap"
       >
         <img src={icon} alt={`${label} icon`} className="w-6 h-6 mr-2" />
 
