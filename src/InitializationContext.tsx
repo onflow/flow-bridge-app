@@ -214,13 +214,13 @@ export const InitializationProvider: React.FC<{
     return formatUnits(userBalance, Number(sourceToken?.decimals) || 18);
   };
 
-  const canSend =
-    isApproved &&
+  const canSend = true;
+/*    isApproved &&
     !isApproving &&
     !isSending &&
     amount !== "0.0" &&
     destinationAddress !== undefined;
-
+*/
   return (
     <InitializationContext.Provider
       value={{

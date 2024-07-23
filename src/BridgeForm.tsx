@@ -7,11 +7,14 @@ import SwapIcon from "./components/SwapIcon";
 import InfoIcon from "./components/InfoIcon";
 import { useInitialization } from "./InitializationContext";
 import SelectTokenModal from "./components/SelectTokenModal";
+import TransactionConfirmationModal from "./components/TransactionConfirmationModal";
+import RateInfoPanel from "./components/RateInfoPanel";
 
 const BridgeForm: React.FC = () => {
   const [isSourceModalOpen, setSourceModalOpen] = useState(false);
   const [isDestinationModalOpen, setDestinationModalOpen] = useState(false);
   const [isSelectTokenModalOpen, setSelectTokenModalOpen] = useState(false);
+  const [isTransferringTokenModalOpen, setTransferringTokenModalOpen] = useState(false);
 
   const [error, setError] = useState<string>("");
   const [destAddrError, setDestAddrError] = useState<string>("");
@@ -43,6 +46,8 @@ const BridgeForm: React.FC = () => {
   const openSelectTokenModal = () => setSelectTokenModalOpen(true);
   const closeSelectTokenModal = () => setSelectTokenModalOpen(false);
 
+  const closeTransferringTokenModal = () => setTransferringTokenModalOpen(false);
+
   const handleApprovalClick = () => {
     if (sourceNetwork && amount) {
       setApproval();
@@ -50,9 +55,10 @@ const BridgeForm: React.FC = () => {
       console.error("Source and amount must be selected");
     }
   };
+
   const handleTransferClick = () => {
     if (sourceNetwork && destinationNetwork && amount && destinationAddress) {
-      sendTokens();
+      setTransferringTokenModalOpen(true);
     } else {
       console.error("Source and destination networks must be selected");
     }
@@ -164,30 +170,7 @@ const BridgeForm: React.FC = () => {
         {destAddrError && (
           <p className="text-red-500 text-sm mt-1">{destAddrError}</p>
         )}
-        <div className="bg-card p-4 rounded-xlg mt-4">
-          <div className="text-white rounded-md flex flex-col gap-4">
-            <div className="col-span-1 flex justify-between">
-              <p className="text-gray-400">Bridge Rate</p>
-              <p>
-                1 USDC on <span className="text-green-500">Flow</span> = 1 USDC
-                on <span className="text-blue-500">Ethereum</span>
-              </p>
-            </div>
-            <div className="flex justify-between">
-              <p className="text-gray-400 flex items-center">
-                Fee{" "}
-                <span className="ml-1 text-gray-500">
-                  <InfoIcon />
-                </span>
-              </p>
-              <p>- USDC</p>
-            </div>
-            <div className="flex justify-between">
-              <p className="text-gray-400">Estimated Time of Arrival</p>
-              <p>15 minutes</p>
-            </div>
-          </div>
-        </div>
+       <RateInfoPanel /> 
         {isCheckingApproval && (
           <p className="text-gray-400 text-sm mt-4">
             Checking approval status...
@@ -233,6 +216,9 @@ const BridgeForm: React.FC = () => {
       )}
       {isSelectTokenModalOpen && (
         <SelectTokenModal onClose={closeSelectTokenModal} />
+      )}
+     {isTransferringTokenModalOpen && (
+        <TransactionConfirmationModal onClose={closeTransferringTokenModal} />
       )}
     </div>
   );

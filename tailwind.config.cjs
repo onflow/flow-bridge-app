@@ -21,6 +21,7 @@ export default {
         accent: "#657786",
         background: "#00000",
         card: "#17171A",
+        modal: "#232530"
       },
     },
   },

@@ -16,6 +16,12 @@ interface ChainConfig {
   externalChainId: string;
   assets: { [key: string]: string };
 }
+export interface ChainTokenConfig {
+  details: { fullDenomPath: string },
+  name: string;
+  prettySymbol: string;
+  tokenAddress: string;
+}
 export interface TokenConfig {
   id: string;
   prettySymbol: string;
@@ -26,6 +32,7 @@ export interface TokenConfig {
   icon: string;
   address: string;
   denom : string;
+  chains: { [chainName: string]: ChainTokenConfig };
 }
 
 interface AxelarTokenConfig extends TokenConfig {
@@ -54,15 +61,10 @@ interface SupportedNetworks {
   [key: string]: NetworkInfo;
 }
 
-type Asset = {
-  denom: string;
-  decimals: number;
-};
-
 type CommonArgs = {
   fromChain: keyof typeof CHAINS.MAINNET;
   toChain: keyof typeof CHAINS.MAINNET;
-  asset: Asset;
+  asset: TokenConfig;
 };
 
 const FLOW_RPC_ENDPOINT = "https://previewnet.evm.nodes.onflow.org";
@@ -71,6 +73,8 @@ export class AxelarService {
   private configs: AxelarConfigs | null = null;
   private configUrl =
     "https://axelar-mainnet.s3.us-east-2.amazonaws.com/configs/mainnet-config-1.x.json";
+
+//  private configUrl = "https://axelar-testnet.s3.us-east-2.amazonaws.com/configs/testnet-config-1.x.json";
   private assetUrl = "";
   private provider = new ethers.providers.JsonRpcProvider(FLOW_RPC_ENDPOINT);
   private networks: NetworkInfo[] = [];

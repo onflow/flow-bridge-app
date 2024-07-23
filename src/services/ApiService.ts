@@ -19,11 +19,6 @@ import {
 import { parseUnits } from "viem";
 import { ethers } from "ethers";
 
-export type Asset = {
-  denom: string;
-  decimals: number;
-};
-
 const FLOW_RPC_ENDPOINT = "https://previewnet.evm.nodes.onflow.org";
 
 import { AxelarService, NetworkInfo, TokenConfig } from "./AxelarService";
