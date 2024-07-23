@@ -21,8 +21,8 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
   } = useInitialization();
 
   return (
-    <div className="bg-card p-4 rounded-xlg mt-4">
-      <div className="text-white rounded-md flex flex-col gap-4">
+    <div className="bg-card p-4 rounded-xlg mt-4 text-sm">
+      <div className="text-white rounded-lg flex flex-col gap-4">
         <div className="col-span-1 flex justify-between">
           <p className="text-gray-400">Bridge Rate</p>
           <p>
@@ -31,7 +31,7 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
           </p>
         </div>
         <div className="flex justify-between">
-          <p className="text-gray-400 flex items-center">
+          <p className="flex items-center text-gray-400">
             Fee{" "}
             <span className="ml-1 text-gray-500">
               <InfoIcon />

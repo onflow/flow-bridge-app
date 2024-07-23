@@ -18,12 +18,12 @@ const GenericModal: React.FC<GenericModalProps> = ({ title, onClose, children })
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center"
       onClick={handleBackdropClick}
     >
       <div
         ref={modalRef}
-        className="bg-card p-6 rounded-lg w-full max-w-lg min-w-[200px] min-h-[300px] h-[50%] flex flex-col"
+        className="bg-gray-800 p-6 rounded-lg w-full max-w-lg min-w-[200px] min-h-[300px] h-[50%] flex flex-col"
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl">{title}</h2>
