@@ -6,8 +6,8 @@ import App from "./App";
 import "./index.css";
 
 import "@rainbow-me/rainbowkit/styles.css";
-import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { WagmiProvider } from "wagmi";
+import { RainbowKitProvider, connectorsForWallets } from "@rainbow-me/rainbowkit";
+import { createConfig, WagmiProvider } from "wagmi";
 import {
   mainnet,
   polygon,
@@ -19,6 +19,9 @@ import {
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { flowDarkTheme } from "./FlowDarkTheme"; // Import your custom theme
 import { InitializationProvider } from "./InitializationContext";
+import { metaMaskWallet, rainbowWallet, walletConnectWallet, injectedWallet } from "@rainbow-me/rainbowkit/wallets";
+import { flowWallet } from "./flow-wallet";
+import { createClient, http } from "viem";
 
 const c = {
   ...flowPreviewnet,
@@ -26,11 +29,28 @@ const c = {
   iconUrl: "/src/assets/flow.png",
 };
 
-const config = getDefaultConfig({
-  appName: "Flow Bridge App",
-  projectId: "YOUR_PROJECT_ID",
+const PROJECT_ID = "YOUR_PROJECT_ID"
+const APP_NAME = "Flow Bridge App"
+
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Recommended',
+      wallets: [flowWallet, rainbowWallet, walletConnectWallet, metaMaskWallet, walletConnectWallet],
+    },
+  ],
+  {
+    appName: APP_NAME,
+    projectId: PROJECT_ID,
+  }
+);
+
+const config = createConfig({
+  connectors,
   chains: [mainnet, polygon, optimism, arbitrum, base, c],
-  ssr: true, // If your dApp uses server side rendering (SSR)
+  client({chain}) {
+    return createClient({chain, transport: http()})
+  }
 });
 
 const queryClient = new QueryClient({
