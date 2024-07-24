@@ -5,7 +5,10 @@ import {
   CHAINS,
   // @ts-ignore
   SendTokenParams,
+  // @ts-ignore
+  TransferFeeResponse,
 } from "@axelar-network/axelarjs-sdk";
+
 
 import { ethers, Signer } from "ethers";
 
@@ -16,8 +19,9 @@ interface ChainConfig {
   externalChainId: string;
   assets: { [key: string]: string };
 }
+
 export interface ChainTokenConfig {
-  details: { fullDenomPath: string },
+  details: { fullDenomPath: string };
   name: string;
   prettySymbol: string;
   tokenAddress: string;
@@ -31,7 +35,7 @@ export interface TokenConfig {
   decimals: number;
   icon: string;
   address: string;
-  denom : string;
+  denom: string;
   chains: { [chainName: string]: ChainTokenConfig };
 }
 
@@ -74,10 +78,9 @@ export class AxelarService {
   private configUrl =
     "https://axelar-mainnet.s3.us-east-2.amazonaws.com/configs/mainnet-config-1.x.json";
 
-//  private configUrl = "https://axelar-testnet.s3.us-east-2.amazonaws.com/configs/testnet-config-1.x.json";
+  //  private configUrl = "https://axelar-testnet.s3.us-east-2.amazonaws.com/configs/testnet-config-1.x.json";
   private assetUrl = "";
   private provider = new ethers.providers.JsonRpcProvider(FLOW_RPC_ENDPOINT);
-  private networks: NetworkInfo[] = [];
 
   private querySdk = new AxelarQueryAPI({
     environment: Environment.MAINNET,
@@ -130,31 +133,44 @@ export class AxelarService {
 
     return result;
   }
-  public async getTransferFee({
-    fromChain,
-    toChain,
-    asset,
-    amount,
-  }: CommonArgs & { amount: number }) {
-    const fee = await this.querySdk.getTransferFee(
+
+  // keyof typeof CHAINS.MAINNET
+  public async getTransferFee(
+    fromChain: string,
+    toChain: string,
+    token: TokenConfig,
+    amount: string
+  ): Promise<TransferFeeResponse> {
+    // convert string to keyof CHAINS.MAINNET
+    // get denom for token from chain
+    // convert amount to denom units
+    const denom = await this.getTokenDenom(fromChain, token);
+    if (!denom) { 
+      throw new Error(`Token denom not found for token ${token.name}`);
+    }
+
+    console.log("amount", amount);
+    const result = await this.querySdk.getTransferFee(
       fromChain,
       toChain,
-      asset.denom,
-      amount
+      denom,
+      Number(amount)
     );
-    return fee;
+    return result?.fee;
   }
 
-  public async getEstimatedGasFee({
-    fromChain,
-    toChain,
-    gasLimit,
-  }: CommonArgs & { gasLimit: number }) {
+  public async getEstimatedGasFee(
+    fromChain: string,
+    toChain: string,
+    gasLimit: string,
+  ) {
+    
     const gasFee = await this.querySdk.estimateGasFee(
       fromChain,
       toChain,
-      String(gasLimit)
+      gasLimit
     );
+
     return gasFee;
   }
 
@@ -229,10 +245,16 @@ export class AxelarService {
     const token: AxelarTokenConfig | undefined = this.configs?.assets?.[key];
     if (!token) return null;
 
-    console.log("building tokens", token);  
     return {
       ...token,
       icon: `${this.assetUrl}${token.iconUrl}`,
     };
+  }
+
+  public async getTokenDenom(chainName: string, token: TokenConfig): Promise<string | null> {
+    if (!this.configs) {
+      throw new Error("AxelarService is not initialized yet.");
+    }
+    return await this.querySdk.getDenomFromSymbol(token?.symbol, chainName);
   }
 }

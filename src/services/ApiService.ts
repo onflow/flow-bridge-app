@@ -25,6 +25,11 @@ import { AxelarService, NetworkInfo, TokenConfig } from "./AxelarService";
 import { readContract } from "viem/actions";
 import { formatUnits } from "viem";
 
+export interface TransferFee {
+  amount: string;
+  denom: string;
+}
+
 const BalanceOfAbi = [
   {
     type: "function",
@@ -153,17 +158,27 @@ class ApiService {
     sourceNetwork: NetworkInfo,
     destinationNetwork: NetworkInfo,
     amount: string
-  ): string {
-    return `1 ${amount} USDC on ${sourceNetwork} = ${amount} USDC on ${destinationNetwork}`;
+  ): Promise<string> {
+    return Promise.resolve(
+      `1 ${amount} USDC on ${sourceNetwork} = ${amount} USDC on ${destinationNetwork}`
+    );
   }
 
-  getFee(
+  async getBridgingFee(
     sourceNetwork: NetworkInfo,
     destinationNetwork: NetworkInfo,
+    token: TokenConfig,
     amount: string
-  ): string {
+  ): Promise<TransferFee> {
     const fAmount = parseFloat(amount);
-    return `${fAmount * 0.01} USDC`;
+
+    const result = await this.axelarService.getTransferFee(
+      sourceNetwork.name,
+      destinationNetwork.name,
+      token,
+      amount
+    );
+    return result;
   }
 
   getEstimatedTimeOfArrival(): string {
@@ -172,22 +187,6 @@ class ApiService {
 
   getSupportedChainTokens(chainName: string): TokenConfig[] {
     return this.axelarService.getTokensForChain(chainName);
-  }
-
-  async updateStoreForBridge(
-    sourceNetwork: NetworkInfo,
-    destinationNetwork: NetworkInfo,
-    amount: string
-  ) {
-    await this.fetchAndSetNetworks();
-    setSourceNetwork(sourceNetwork);
-    setDestinationNetwork(destinationNetwork);
-    setBridgeRate(
-      this.getBridgeRate(sourceNetwork, destinationNetwork, amount)
-    );
-    setFee(this.getFee(sourceNetwork, destinationNetwork, amount));
-    setEstimatedTimeOfArrival(this.getEstimatedTimeOfArrival());
-    setTokenBalances({ USDC: "1000" });
   }
 }
 

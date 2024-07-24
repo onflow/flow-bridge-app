@@ -23,7 +23,6 @@ const BridgeForm: React.FC = () => {
     destinationAddress,
     destinationNetwork,
     setDestinationAddress,
-    setAmount,
     amount,
     setApproval,
     sendTokens,
@@ -36,6 +35,7 @@ const BridgeForm: React.FC = () => {
     sourceToken,
     displayUserBalance,
     swapNetworks,
+    updateSendAmount,
   } = useInitialization();
 
   const openSourceModal = () => setSourceModalOpen(true);
@@ -67,7 +67,7 @@ const BridgeForm: React.FC = () => {
 
   const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setAmount(value);
+    updateSendAmount(value);
     if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
       setError("");
     } else {
@@ -115,7 +115,7 @@ const BridgeForm: React.FC = () => {
             </label>
             <span
               className="text-sm text-gray-400 cursor-pointer"
-              onClick={() => setAmount(displayUserBalance())}
+              onClick={() => updateSendAmount(displayUserBalance())}
             >
               Max: {displayUserBalance()}
             </span>

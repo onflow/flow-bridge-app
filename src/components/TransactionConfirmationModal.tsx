@@ -24,12 +24,13 @@ const TransactionConfirmationModal: React.FC<
     sourceToken,
     destinationAddress,
     address: account,
+    sendTokens,
   } = useInitialization();
 
   console.log("token", sourceToken);
   const handleTransferClick = () => {
     // monitor transaction and add animation
-    
+    // sendTokens();
   };
 
   return (

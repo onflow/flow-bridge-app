@@ -18,6 +18,7 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
     amount,
     amountReceive,
     sourceToken,
+    bridgingFee,
   } = useInitialization();
 
   return (
@@ -37,7 +38,7 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
               <InfoIcon />
             </span>
           </p>
-          <p>- USDC</p>
+          <p>{bridgingFee}</p>
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Estimated Time of Arrival</p>

@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import ApiService from "./services/ApiService";
 import { NetworkInfo, TokenConfig } from "./services/AxelarService";
 import { useAccount, useSwitchChain, useClient as useConfig } from "wagmi";
-import { formatUnits } from "viem";
+import { formatUnits, parseUnits } from "viem";
 
 interface InitializationContextType {
   initialized: boolean;
@@ -36,6 +36,8 @@ interface InitializationContextType {
   isCheckingApproval: boolean;
   displayUserBalance: () => string;
   swapNetworks: () => void;
+  updateSendAmount: (value: string) => void;
+  bridgingFee: string;
 }
 
 const InitializationContext = createContext<
@@ -66,6 +68,7 @@ export const InitializationProvider: React.FC<{
   const [isApproved, setIsApproved] = useState<boolean>(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
+  const [bridgingFee, setBridgingFee] = useState<string>("0.0");
 
   const { isConnected, address: account, chain } = useAccount();
 
@@ -224,6 +227,29 @@ export const InitializationProvider: React.FC<{
   const displayUserBalance = () => {
     return formatUnits(userBalance, Number(sourceToken?.decimals) || 18);
   };
+ 
+  const updateSendAmount = async (value: string) => {
+    // set amount
+    setAmount(value);
+    // calculate amount receive
+    const rate = await ApiService.getBridgeRate(
+      originNetwork as NetworkInfo,
+      destinationNetwork as NetworkInfo,
+      value
+    );
+
+    const feeResponse = await ApiService.getBridgingFee(
+      originNetwork as NetworkInfo,
+      destinationNetwork as NetworkInfo,
+      sourceToken as TokenConfig,
+      value
+    );
+
+    const vFee = formatUnits(BigInt(feeResponse.amount), Number(sourceToken?.decimals) || 18);
+    const toBeReceived = Number(value) - Number(vFee);
+    setAmountReceive(String(toBeReceived));
+    setBridgingFee(`$${vFee} ${feeResponse.denom}`);
+  }
 
   const canSend = true;
 /*    isApproved &&
@@ -261,6 +287,8 @@ export const InitializationProvider: React.FC<{
         isCheckingApproval,
         displayUserBalance,
         swapNetworks,
+        updateSendAmount,
+        bridgingFee,
       }}
     >
       {children}
