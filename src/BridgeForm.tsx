@@ -35,6 +35,7 @@ const BridgeForm: React.FC = () => {
     isCheckingApproval,
     sourceToken,
     displayUserBalance,
+    swapNetworks,
   } = useInitialization();
 
   const openSourceModal = () => setSourceModalOpen(true);
@@ -83,10 +84,18 @@ const BridgeForm: React.FC = () => {
       setDestAddrError("Please enter a valid address");
     }
   };
+ 
+  const handleSwapNetworks = () => {
+    if (!sourceNetwork || !destinationNetwork) {
+      console.error("Source and destination networks must be selected");
+      return;
+    }
+    swapNetworks();
+  }
 
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
-      <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-600">
+      <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-700">
         <div className="flex justify-start mb-4 items-center">
           <label className="block text-sm font-medium mr-4">From</label>
           <Dropdown
@@ -127,7 +136,7 @@ const BridgeForm: React.FC = () => {
         </div>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         <div className="flex justify-center items-center">
-          <button className="bg-transparent p-2 rounded">
+          <button className="bg-transparent p-2 rounded" onClick={handleSwapNetworks}>
             <SwapIcon />
           </button>
         </div>

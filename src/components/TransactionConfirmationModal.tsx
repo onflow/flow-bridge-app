@@ -29,6 +29,7 @@ const TransactionConfirmationModal: React.FC<
   console.log("token", sourceToken);
   const handleTransferClick = () => {
     // monitor transaction and add animation
+    
   };
 
   return (
@@ -37,14 +38,14 @@ const TransactionConfirmationModal: React.FC<
         icon={sourceNetwork?.icon}
         name={sourceNetwork?.name}
         subLabel={"Source Chain"}
-        amount={amount}
+        amount={`-${amount}`}
         amountLabel={sourceToken?.prettySymbol}
       />
       <NetworkBalance
         icon={destinationNetwork?.icon}
         name={destinationNetwork?.name}
         subLabel={"Destination Chain"}
-        amount={amountReceive}
+        amount={`+${amountReceive}`}
         amountLabel={`(estimated) ${sourceToken?.prettySymbol}`}
       />
       
@@ -59,9 +60,9 @@ const TransactionConfirmationModal: React.FC<
         </div>
       </div>
       <RateInfoPanel />
-      <div className="">
+      <div className="mt-auto">
         <button
-          className={`w-full mt-4 py-2 bg-primary-highlight text-action rounded-lg ${
+          className={`w-full mt-4 p-4 bg-primary-highlight text-action rounded-lg ${
             canSend
               ? "hover:bg-primary-highlight-dark"
               : "disabled:opacity-50 disabled:cursor-not-allowed"
@@ -69,7 +70,7 @@ const TransactionConfirmationModal: React.FC<
           onClick={handleTransferClick}
           disabled={!canSend}
         >
-          {isSending ? "Transferring ..." : "Transfer"}
+          {isSending ? "Transferring ..." : "Confirm Transfer"}
         </button>
       </div>
     </GenericModal>

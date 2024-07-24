@@ -35,6 +35,7 @@ interface InitializationContextType {
   canSend: boolean;
   isCheckingApproval: boolean;
   displayUserBalance: () => string;
+  swapNetworks: () => void;
 }
 
 const InitializationContext = createContext<
@@ -103,7 +104,7 @@ export const InitializationProvider: React.FC<{
         });
 
         setSourceNetwork(source);
-        setDestinationNetwork(destination);
+        if (!destinationNetwork) setDestinationNetwork(destination);
       } catch (err) {
         setError("Failed to initialize application");
       } finally {
@@ -210,6 +211,16 @@ export const InitializationProvider: React.FC<{
     setUserBalance(balance);
   };
 
+  const swapNetworks = () => {
+    if (!originNetwork || !destinationNetwork) {
+      console.error("Source and destination networks must be selected");
+      return;
+    }
+    const source = originNetwork; 
+    setSourceNetwork(destinationNetwork);
+    setDestinationNetwork(source);
+  }
+
   const displayUserBalance = () => {
     return formatUnits(userBalance, Number(sourceToken?.decimals) || 18);
   };
@@ -249,6 +260,7 @@ export const InitializationProvider: React.FC<{
         canSend,
         isCheckingApproval,
         displayUserBalance,
+        swapNetworks,
       }}
     >
       {children}
