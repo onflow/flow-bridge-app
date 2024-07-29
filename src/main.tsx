@@ -36,7 +36,7 @@ const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended',
-      wallets: [flowWallet, rainbowWallet, walletConnectWallet, metaMaskWallet, walletConnectWallet],
+      wallets: [flowWallet, rainbowWallet, walletConnectWallet, metaMaskWallet, walletConnectWallet, injectedWallet],
     },
   ],
   {
