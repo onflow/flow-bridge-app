@@ -9,13 +9,8 @@ interface RateInfoPanelProps {}
 
 const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
   const {
-    loading,
-    error,
-    canSend,
-    isSending,
     sourceNetwork,
     destinationNetwork,
-    amount,
     amountReceive,
     sourceToken,
     bridgingFee,
@@ -51,7 +46,7 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Estimated Time of Arrival</p>
-          <p>15 minutes</p>
+          <p>{sourceNetwork?.approxFinalityWaitTime} minutes</p>
         </div>
       </div>
     </div>

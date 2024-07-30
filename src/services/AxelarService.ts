@@ -89,12 +89,18 @@ export class AxelarService {
 
     Object.entries(networks).forEach(([key, value]) => {
       if (value.chainType === "evm") {
+        const explorer = value?.blockExplorers?.[0];
         result[key] = {
           name: value.displayName,
           icon: `${this.assetUrl}${value.iconUrl}`,
           id: parseInt(value?.externalChainId),
           assets: value.assets,
+          approxFinalityWaitTime: value.config.approxFinalityWaitTime,
           gatewayAddress: value.config.contracts.AxelarGateway?.address as Address,
+          blockExplorer: { // grab the first block explorer
+            name: explorer?.name,
+            url: explorer?.url,
+          },
         };
       }
     });

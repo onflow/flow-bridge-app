@@ -5,7 +5,7 @@ import { TokenConfig, NetworkInfo } from "../services/ApiService";
 import IAxelarGateway from "@axelar-network/axelar-gmp-sdk-solidity/artifacts/contracts/interfaces/IAxelarGateway.sol/IAxelarGateway.json";
 
 export const useBridgeTokens = () => {
-  const { writeContract, isSuccess, data, error, isError } = useWriteContract();
+  const { writeContract, isSuccess, data, error, isError, status } = useWriteContract();
 
   // add estimate transaction method
 
@@ -17,17 +17,25 @@ export const useBridgeTokens = () => {
     destinationAddress: string,
     denom: string
   ) => {
-    if (!fromNetwork || !toChain || !token || !amount || !destinationAddress) {
+    if (
+      !fromNetwork ||
+      !toChain ||
+      !token ||
+      !amount ||
+      !destinationAddress ||
+      !denom ||
+      amount === "0"
+    ) {
       return;
     }
 
-    console.log("IAxelarGateway", IAxelarGateway.abi);
+    //    console.log("IAxelarGateway", IAxelarGateway.abi);
     const amountInAtomicUnits = parseUnits(
       amount.toString(),
       token.decimals
     ).toString();
 
-    console.log("from chain", fromNetwork.name, fromNetwork.gatewayAddress, denom, amountInAtomicUnits);
+    //   console.log("from chain", fromNetwork.name, fromNetwork.gatewayAddress, denom, amountInAtomicUnits);
     writeContract({
       address: fromNetwork.gatewayAddress as Address,
       abi: IAxelarGateway.abi,
@@ -42,5 +50,6 @@ export const useBridgeTokens = () => {
     error: error,
     isError: isError,
     isSuccess: isSuccess,
+    status,
   };
 };

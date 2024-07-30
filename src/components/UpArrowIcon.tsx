@@ -2,7 +2,7 @@
 
 import React from "react";
 
-const UpArrowIcon = () => (
+export const UpArrowIcon = () => (
   <svg
     width="63"
     height="62"
@@ -19,5 +19,3 @@ const UpArrowIcon = () => (
     <circle cx="31.14" cy="31" r="29.5" stroke="#02D87E" stroke-width="3" />
   </svg>
 );
-
-export default UpArrowIcon;

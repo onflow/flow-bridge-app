@@ -11,11 +11,13 @@ export interface ChainConfig {
   externalChainId: string;
   assets: { [key: string]: string };
   config: {
+    approxFinalityWaitTime: number;
     contracts: {
       AxelarGateway: { address: string };
       Multisig: { address: string };
     };
   };
+  blockExplorers: { name: string; url: string }[];
 }
 export interface TokenConfig {
   id: string;
@@ -30,8 +32,10 @@ export interface NetworkInfo {
   name: string;
   icon: string;
   id: number;
+  approxFinalityWaitTime: number;
   assets: { [key: string]: string };
   gatewayAddress: Address;
+  blockExplorer: { name: string; url: string };
 }
 
 export interface SupportedNetworks {
@@ -161,8 +165,6 @@ class ApiService {
     token: TokenConfig,
     amount: string
   ): Promise<BridgingTransferFee> {
-    const fAmount = parseFloat(amount);
-
     const transferFee = await this.axelarService.getTransferFee(
       sourceNetwork.name,
       destinationNetwork.name,
@@ -178,6 +180,9 @@ class ApiService {
     console.log("chainFees", chainFees);
     console.log("transferFee", transferFee);
 
+    if (transferFee.fee?.denom === token.id) {
+      transferFee.fee.denom = token.prettySymbol;
+    }
     // get tokenConfig for source chain
     const fees = {
       transferFee: {

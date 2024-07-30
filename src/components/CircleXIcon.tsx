@@ -1,8 +1,6 @@
-// MySvgIcon.jsx
-
 import React from "react";
 
-const CircleXIcon = () => (
+export const CircleXIcon = () => (
   <svg
     width="63"
     height="62"
@@ -25,4 +23,3 @@ const CircleXIcon = () => (
   </svg>
 );
 
-export default CircleXIcon;

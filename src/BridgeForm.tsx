@@ -1,14 +1,14 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useEffect } from "react";
 import "./index.css";
 import Dropdown from "./components/Dropdown";
 import NetworkSelectorModal from "./components/NetworkSelectorModal";
 import { isAddress } from "viem";
 import SwapIcon from "./components/SwapIcon";
-import InfoIcon from "./components/InfoIcon";
 import { useInitialization } from "./InitializationContext";
 import SelectTokenModal from "./components/SelectTokenModal";
 import TransactionConfirmationModal from "./components/TransactionConfirmationModal";
 import RateInfoPanel from "./components/RateInfoPanel";
+import { ActionButton } from "./components/ActionButton";
 
 const BridgeForm: React.FC = () => {
   const [isSourceModalOpen, setSourceModalOpen] = useState(false);
@@ -25,18 +25,12 @@ const BridgeForm: React.FC = () => {
     destinationNetwork,
     setDestinationAddress,
     amount,
-    setApproval,
-    sendTokens,
-    isApproved,
     amountReceive,
-    isApproving,
-    isSending,
-    canSend,
-    isCheckingApproval,
     sourceToken,
     displayUserBalance,
     swapNetworks,
     setAmount,
+    canSend,
   } = useInitialization();
 
   const openSourceModal = () => setSourceModalOpen(true);
@@ -51,14 +45,6 @@ const BridgeForm: React.FC = () => {
   const closeTransferringTokenModal = () =>
     setTransferringTokenModalOpen(false);
 
-  const handleApprovalClick = () => {
-    if (sourceNetwork && amount) {
-      setApproval();
-    } else {
-      console.error("Source and amount must be selected");
-    }
-  };
-
   const handleTransferClick = () => {
     if (sourceNetwork && destinationNetwork && amount && destinationAddress) {
       setTransferringTokenModalOpen(true);
@@ -67,13 +53,19 @@ const BridgeForm: React.FC = () => {
     }
   };
 
-  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleAmountChange = (value) => {
     setAmount(value);
-    if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
-      setError("");
-    } else {
+    if (!/^[0-9]*\.?[0-9]*$/.test(amount)) {
       setError("Please enter a valid number");
+    } else if (Number(amount) > Number(displayUserBalance())) {
+      setError("Amount greater than balance");
+    } else {
+      setError("");
+    }
+
+    // need to tell the user receive amount is negative
+    if (Number(amountReceive) < 0) {
+      setError("Receive amount is negative");
     }
   };
 
@@ -117,7 +109,7 @@ const BridgeForm: React.FC = () => {
             </label>
             <span
               className="text-sm text-gray-400 cursor-pointer"
-              onClick={() => setAmount(displayUserBalance())}
+              onClick={() => handleAmountChange(displayUserBalance())}
             >
               Max: {displayUserBalance()}
             </span>
@@ -127,7 +119,7 @@ const BridgeForm: React.FC = () => {
               type="text"
               className="w-full mt-1 p-2 rounded text-white bg-card focus:outline-none focus:ring-0"
               value={amount || "0.0"}
-              onChange={handleAmountChange}
+              onChange={(e) => handleAmountChange(e.target.value)}
             />
             <Dropdown
               icon={sourceToken?.icon}
@@ -145,7 +137,6 @@ const BridgeForm: React.FC = () => {
             <SwapIcon />
           </button>
         </div>
-
         <div className="flex items-center mb-4">
           <label className="block text-sm font-medium mr-8">To</label>
           <Dropdown
@@ -193,38 +184,11 @@ const BridgeForm: React.FC = () => {
           <p className="text-red-500 text-sm mt-1">{destAddrError}</p>
         )}
         <RateInfoPanel />
-        {isCheckingApproval && (
-          <p className="text-gray-400 text-sm mt-4">
-            Checking approval status...
-          </p>
-        )}
-        {!isApproved && (
-          <button
-            className={`w-full mt-4 py-2 bg-primary-highlight text-action rounded-lg ${
-              isApproving
-                ? "disabled:opacity-50 disabled:cursor-not-allowed"
-                : "hover:bg-primary-highlight-dark"
-            }`}
-            onClick={handleApprovalClick}
-            disabled={isApproving}
-          >
-            {isApproving ? "Approving ..." : "Approve"}
-          </button>
-        )}
-
-        {isApproved && (
-          <button
-            className={`w-full mt-4 py-4 bg-primary-highlight text-action rounded-lg ${
-              canSend
-                ? "hover:bg-primary-highlight-dark"
-                : "disabled:opacity-50 disabled:cursor-not-allowed"
-            }`}
-            onClick={handleTransferClick}
-            disabled={!canSend}
-          >
-            {isSending ? "Transferring ..." : "Transfer"}
-          </button>
-        )}
+        <ActionButton
+          title="Transfer"
+          handler={handleTransferClick}
+          disabled={!canSend}
+        />
       </div>
 
       {isSourceModalOpen && (
