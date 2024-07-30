@@ -27,10 +27,9 @@ const TransactionConfirmationModal: React.FC<
     sendTokens,
   } = useInitialization();
 
-  console.log("token", sourceToken);
   const handleTransferClick = () => {
     // monitor transaction and add animation
-    // sendTokens();
+    sendTokens();
   };
 
   return (
@@ -49,7 +48,7 @@ const TransactionConfirmationModal: React.FC<
         amount={`+${amountReceive}`}
         amountLabel={`(estimated) ${sourceToken?.prettySymbol}`}
       />
-      
+
       <div className="flex flex-col w-full py-4 gap-2">
         <div className="flex rounded-lg px-2 py-1 text-sm justify-between bg-black">
           <span>Source:</span>

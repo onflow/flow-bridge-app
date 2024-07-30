@@ -1,33 +1,57 @@
-// src/services/ApiService.ts
-import {
-  setSourceNetwork,
-  setDestinationNetwork,
-  setTokenBalances,
-  setBridgeRate,
-  setFee,
-  setEstimatedTimeOfArrival,
-  state,
-  AppState,
-} from "../store";
-import { BehaviorSubject } from "rxjs";
-import {
-  AxelarAssetTransfer,
-  Environment,
-  // @ts-ignore
-  SendTokenParams,
-} from "@axelar-network/axelarjs-sdk";
-import { parseUnits } from "viem";
-import { ethers } from "ethers";
+import { Address, Client, parseUnits } from "viem";
 
-const FLOW_RPC_ENDPOINT = "https://previewnet.evm.nodes.onflow.org";
-
-import { AxelarService, NetworkInfo, TokenConfig } from "./AxelarService";
+import { AxelarService } from "./AxelarService";
 import { readContract } from "viem/actions";
-import { formatUnits } from "viem";
+import { Config } from "wagmi";
 
-export interface TransferFee {
-  amount: string;
-  denom: string;
+export interface ChainConfig {
+  displayName: string;
+  iconUrl: string;
+  chainType: string;
+  externalChainId: string;
+  assets: { [key: string]: string };
+  config: {
+    contracts: {
+      AxelarGateway: { address: string };
+      Multisig: { address: string };
+    };
+  };
+}
+export interface TokenConfig {
+  id: string;
+  prettySymbol: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  icon: string;
+  address: string;
+}
+export interface NetworkInfo {
+  name: string;
+  icon: string;
+  id: number;
+  assets: { [key: string]: string };
+  gatewayAddress: Address;
+}
+
+export interface SupportedNetworks {
+  [key: string]: NetworkInfo;
+}
+
+export interface BridgingRate {
+  chain: string;
+  token: TokenConfig;
+  feeRate: bigint;
+  minFee: bigint;
+  maxFee: bigint;
+}
+
+export interface BridgingTransferFee {
+  transferFee: {
+    amount: string;
+    denom: string | undefined;
+  };
+  bridgingRate: BridgingRate;
 }
 
 const BalanceOfAbi = [
@@ -43,11 +67,6 @@ class ApiService {
   // create global instance of AxelarService
   private axelarService = new AxelarService();
   public DefaultToken: string = "uusdc";
-
-  private provider = new ethers.providers.JsonRpcProvider(FLOW_RPC_ENDPOINT);
-  private assetTransfer = new AxelarAssetTransfer({
-    environment: Environment.MAINNET,
-  });
 
   constructor() {
     console.log("ApiService constructor");
@@ -80,35 +99,27 @@ class ApiService {
 
   async sendTokens(
     sourceChain: NetworkInfo,
-    destinatinoChain: NetworkInfo,
+    destinationChain: NetworkInfo,
     destinationAddress: string,
     token: TokenConfig,
-    amount: string
-  ): Promise<ethers.providers.TransactionResponse> {
+    amount: string,
+    config: Config
+  ): Promise<string> {
     const amountInAtomicUnits = parseUnits(
       amount.toString(),
       token.decimals
     ).toString();
-    const signer = this.provider.getSigner();
-    const requestOptions: SendTokenParams = {
-      fromChain: sourceChain.name,
-      toChain: destinatinoChain.name,
-      destinationAddress,
-      asset: { denom: token.denom },
+
+    const tx = this.axelarService.transfer(
+      sourceChain.gatewayAddress,
+      sourceChain.name,
+      destinationChain.name,
+      token,
       amountInAtomicUnits,
-      options: {
-        evmOptions: {
-          signer,
-          provider: this.provider,
-          approveSendForMe: true,
-        },
-      },
-    };
-    // @ts-ignore
-    const result = (await this.assetTransfer.sendToken(
-      requestOptions
-    )) as ethers.providers.TransactionResponse;
-    return result;
+      destinationAddress,
+      config
+    );
+    return tx;
   }
 
   async fetchAndSetNetworks(): Promise<NetworkInfo[]> {
@@ -122,20 +133,10 @@ class ApiService {
     return networks;
   }
 
-  async getSourceNetworks(): Promise<NetworkInfo[]> {
-    const currentState = (state as BehaviorSubject<AppState>).value;
-    return Object.values(currentState.networks);
-  }
-
-  async getDestinationNetworks(sourceNetwork: string): Promise<NetworkInfo[]> {
-    const currentState = (state as BehaviorSubject<AppState>).value;
-    return Object.values(currentState.networks) || [];
-  }
-
   async getTokenBalance(
     token: TokenConfig | undefined,
     account: string | undefined,
-    config: any
+    config: Client | undefined
   ): Promise<bigint> {
     let bal = BigInt(0);
     if (!token || !config || !account) return bal;
@@ -146,7 +147,7 @@ class ApiService {
         functionName: "balanceOf",
         args: [account],
       })) as bigint;
-      console.log("result", result);
+      console.log("user balance:", result);
       bal = BigInt(result.toString());
     } catch (error) {
       console.error("Failed to get token balance:", error);
@@ -154,31 +155,44 @@ class ApiService {
     return bal;
   }
 
-  getBridgeRate(
-    sourceNetwork: NetworkInfo,
-    destinationNetwork: NetworkInfo,
-    amount: string
-  ): Promise<string> {
-    return Promise.resolve(
-      `1 ${amount} USDC on ${sourceNetwork} = ${amount} USDC on ${destinationNetwork}`
-    );
-  }
-
   async getBridgingFee(
     sourceNetwork: NetworkInfo,
     destinationNetwork: NetworkInfo,
     token: TokenConfig,
     amount: string
-  ): Promise<TransferFee> {
+  ): Promise<BridgingTransferFee> {
     const fAmount = parseFloat(amount);
 
-    const result = await this.axelarService.getTransferFee(
+    const transferFee = await this.axelarService.getTransferFee(
       sourceNetwork.name,
       destinationNetwork.name,
       token,
       amount
     );
-    return result;
+
+    const chainFees = await this.axelarService.getFeeForChainAndAsset(
+      sourceNetwork.name,
+      token
+    );
+
+    console.log("chainFees", chainFees);
+    console.log("transferFee", transferFee);
+
+    // get tokenConfig for source chain
+    const fees = {
+      transferFee: {
+        amount: transferFee?.fee?.amount || "0",
+        denom: transferFee?.fee?.denom,
+      },
+      bridgingRate: {
+        chain: sourceNetwork.name,
+        token,
+        feeRate: this.uint8ArrayToBigInt(chainFees.feeInfo?.feeRate),
+        minFee: this.uint8ArrayToBigInt(chainFees.feeInfo?.minFee),
+        maxFee: this.uint8ArrayToBigInt(chainFees.feeInfo?.maxFee),
+      },
+    };
+    return fees;
   }
 
   getEstimatedTimeOfArrival(): string {
@@ -187,6 +201,15 @@ class ApiService {
 
   getSupportedChainTokens(chainName: string): TokenConfig[] {
     return this.axelarService.getTokensForChain(chainName);
+  }
+
+  uint8ArrayToBigInt(uint8Array: Uint8Array | undefined): bigint {
+    let result = BigInt(0);
+    if (!uint8Array) return result;
+    for (let byte of uint8Array) {
+      result = (result << BigInt(8)) + BigInt(byte);
+    }
+    return result;
   }
 }
 

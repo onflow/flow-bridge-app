@@ -1,9 +1,34 @@
 // src/contexts/InitializationContext.tsx
-import React, { createContext, useContext, useEffect, useState } from "react";
-import ApiService from "./services/ApiService";
-import { NetworkInfo, TokenConfig } from "./services/AxelarService";
-import { useAccount, useSwitchChain, useClient as useConfig } from "wagmi";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import ApiService, {
+  BridgingRate,
+  NetworkInfo,
+  TokenConfig,
+} from "./services/ApiService";
+import {
+  useAccount,
+  useSwitchChain,
+  useClient,
+  useWalletClient,
+  useConfig,
+} from "wagmi";
+import { type Config, getClient } from "@wagmi/core";
+import { getWalletClient } from "@wagmi/core";
+import { providers, getDefaultProvider } from "ethers";
+import { useSendErc20 } from "./hooks/useSendErc20";
+import { useEthersSigner } from "./hooks/useEthersSigner";
+import { useEthersProvider } from "./hooks/useEthersProvider";
+import { useBridgeTokens } from "./hooks/useBridgeTokens";
+import { useTokenApproval } from "./hooks/useTokenApproval";
+import type { Client, Chain, Transport, Account, Address } from "viem";
 import { formatUnits, parseUnits } from "viem";
+import { parse } from "path";
 
 interface InitializationContextType {
   initialized: boolean;
@@ -36,8 +61,8 @@ interface InitializationContextType {
   isCheckingApproval: boolean;
   displayUserBalance: () => string;
   swapNetworks: () => void;
-  updateSendAmount: (value: string) => void;
-  bridgingFee: string;
+  bridgingFee: BridgingRate | undefined;
+  transferFee: string;
 }
 
 const InitializationContext = createContext<
@@ -48,6 +73,7 @@ export const InitializationProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const { switchChain } = useSwitchChain();
+  const client = useClient();
   const config = useConfig();
   const [initialized, setInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -68,9 +94,30 @@ export const InitializationProvider: React.FC<{
   const [isApproved, setIsApproved] = useState<boolean>(true);
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
-  const [bridgingFee, setBridgingFee] = useState<string>("0.0");
+  const [bridgingFee, setBridgingFee] = useState<BridgingRate>();
+  const [transferFee, setTransferFee] = useState<string>("0.0");
 
   const { isConnected, address: account, chain } = useAccount();
+  const { data: walletClient } = useWalletClient({
+    chainId: originNetwork?.id,
+  });
+  const { sendTransfer } = useSendErc20(originNetwork?.id);
+  const {
+    bridgeTokens,
+    error: bridgeError,
+    isError,
+    isSuccess,
+    transactionHash,
+  } = useBridgeTokens();
+  const {
+    allowance,
+    approveToken,
+    error: approvalError,
+    isError: approvalIsError,
+  } = useTokenApproval(sourceToken, account as Address, originNetwork);
+
+  console.log("bridgeError", bridgeError, isError, isSuccess, transactionHash);
+  console.log("approvalError", approvalError, approvalIsError, allowance);
 
   useEffect(() => {
     if (!isConnected || !account || !chain?.id) {
@@ -148,19 +195,34 @@ export const InitializationProvider: React.FC<{
     }
 
     if (!sourceToken) {
-      console.error(
-        "Transfer token should be selected",
-      )
+      console.error("Transfer token should be selected");
       return;
     }
     setIsSending(true);
     try {
-      const tx = await ApiService.sendTokens(
-        originNetwork,
-        destinationNetwork,
-        destinationAddress,
+      /*  
+      sendTransfer(
         sourceToken,
         amount,
+        destinationAddress,
+      );
+*/
+
+      const all = formatUnits(allowance || BigInt("0"), sourceToken.decimals);
+      console.log("need approval", all, amount,  Number(all) < Number(amount));
+
+      if (!allowance || allowance === BigInt("0") || Number(all) < Number(amount)) {
+        const approvalTx = await approveToken(amount);
+        console.log(approvalTx);
+      }
+
+      const tx = await bridgeTokens(
+        originNetwork,
+        destinationNetwork.name,
+        sourceToken,
+        amount,
+        destinationAddress,
+        sourceToken.symbol // might need to get denom from axelar service
       );
       console.log(tx);
     } catch (error) {
@@ -206,11 +268,10 @@ export const InitializationProvider: React.FC<{
 
   const setToken = async (token: TokenConfig) => {
     setSourceToken(token);
-    const balance = await ApiService.getTokenBalance(
-      token,
-      account,
-      config
-    );
+    if (!account) {
+      return;
+    }
+    const balance = await ApiService.getTokenBalance(token, account, client);
     setUserBalance(balance);
   };
 
@@ -219,40 +280,49 @@ export const InitializationProvider: React.FC<{
       console.error("Source and destination networks must be selected");
       return;
     }
-    const source = originNetwork; 
+    const source = originNetwork;
     setSourceNetwork(destinationNetwork);
     setDestinationNetwork(source);
-  }
+  };
 
   const displayUserBalance = () => {
     return formatUnits(userBalance, Number(sourceToken?.decimals) || 18);
   };
- 
-  const updateSendAmount = async (value: string) => {
-    // set amount
-    setAmount(value);
-    // calculate amount receive
-    const rate = await ApiService.getBridgeRate(
-      originNetwork as NetworkInfo,
-      destinationNetwork as NetworkInfo,
-      value
-    );
 
-    const feeResponse = await ApiService.getBridgingFee(
+  useMemo(async () => {
+    if (
+      !originNetwork ||
+      !destinationNetwork ||
+      !sourceToken ||
+      !amount ||
+      amount === "0.0"
+    ) {
+      return;
+    }
+    const { transferFee, bridgingRate } = await ApiService.getBridgingFee(
       originNetwork as NetworkInfo,
       destinationNetwork as NetworkInfo,
       sourceToken as TokenConfig,
-      value
+      amount
     );
 
-    const vFee = formatUnits(BigInt(feeResponse.amount), Number(sourceToken?.decimals) || 18);
-    const toBeReceived = Number(value) - Number(vFee);
+    console.log("transferFee", transferFee);
+    console.log("bridgingRate", bridgingRate);
+
+    const vFee = formatUnits(
+      BigInt(transferFee.amount),
+      Number(sourceToken?.decimals) || 18
+    );
+    const toBeReceived = Number(amount) - Number(vFee);
     setAmountReceive(String(toBeReceived));
-    setBridgingFee(`$${vFee} ${feeResponse.denom}`);
-  }
+    //    const bridgeFee = formatUnits(bridgingRate.feeRate, Number(sourceToken?.decimals) || 18);
+    setBridgingFee(bridgingRate);
+
+    setTransferFee(`$${vFee} ${transferFee.denom}`);
+  }, [amount, sourceToken, originNetwork, destinationNetwork]);
 
   const canSend = true;
-/*    isApproved &&
+  /*    isApproved &&
     !isApproving &&
     !isSending &&
     amount !== "0.0" &&
@@ -287,8 +357,8 @@ export const InitializationProvider: React.FC<{
         isCheckingApproval,
         displayUserBalance,
         swapNetworks,
-        updateSendAmount,
         bridgingFee,
+        transferFee,
       }}
     >
       {children}

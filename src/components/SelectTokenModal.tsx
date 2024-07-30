@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import GenericModal from "./GenericModal";
 import NetworkLabel from "./NetworkLabel";
 import { useInitialization } from "../InitializationContext";
-import { TokenConfig } from "../services/AxelarService";
+import { TokenConfig } from "../services/ApiService";
 
 interface SelectTokenModalProps {
   onClose: () => void;

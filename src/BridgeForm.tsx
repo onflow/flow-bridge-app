@@ -14,7 +14,8 @@ const BridgeForm: React.FC = () => {
   const [isSourceModalOpen, setSourceModalOpen] = useState(false);
   const [isDestinationModalOpen, setDestinationModalOpen] = useState(false);
   const [isSelectTokenModalOpen, setSelectTokenModalOpen] = useState(false);
-  const [isTransferringTokenModalOpen, setTransferringTokenModalOpen] = useState(false);
+  const [isTransferringTokenModalOpen, setTransferringTokenModalOpen] =
+    useState(false);
 
   const [error, setError] = useState<string>("");
   const [destAddrError, setDestAddrError] = useState<string>("");
@@ -35,7 +36,7 @@ const BridgeForm: React.FC = () => {
     sourceToken,
     displayUserBalance,
     swapNetworks,
-    updateSendAmount,
+    setAmount,
   } = useInitialization();
 
   const openSourceModal = () => setSourceModalOpen(true);
@@ -47,7 +48,8 @@ const BridgeForm: React.FC = () => {
   const openSelectTokenModal = () => setSelectTokenModalOpen(true);
   const closeSelectTokenModal = () => setSelectTokenModalOpen(false);
 
-  const closeTransferringTokenModal = () => setTransferringTokenModalOpen(false);
+  const closeTransferringTokenModal = () =>
+    setTransferringTokenModalOpen(false);
 
   const handleApprovalClick = () => {
     if (sourceNetwork && amount) {
@@ -67,7 +69,7 @@ const BridgeForm: React.FC = () => {
 
   const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    updateSendAmount(value);
+    setAmount(value);
     if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
       setError("");
     } else {
@@ -84,14 +86,14 @@ const BridgeForm: React.FC = () => {
       setDestAddrError("Please enter a valid address");
     }
   };
- 
+
   const handleSwapNetworks = () => {
     if (!sourceNetwork || !destinationNetwork) {
       console.error("Source and destination networks must be selected");
       return;
     }
     swapNetworks();
-  }
+  };
 
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
@@ -115,7 +117,7 @@ const BridgeForm: React.FC = () => {
             </label>
             <span
               className="text-sm text-gray-400 cursor-pointer"
-              onClick={() => updateSendAmount(displayUserBalance())}
+              onClick={() => setAmount(displayUserBalance())}
             >
               Max: {displayUserBalance()}
             </span>
@@ -129,14 +131,17 @@ const BridgeForm: React.FC = () => {
             />
             <Dropdown
               icon={sourceToken?.icon}
-              label={sourceToken?.name}
+              label={sourceToken?.prettySymbol}
               onClick={openSelectTokenModal}
             />
           </div>
         </div>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
         <div className="flex justify-center items-center">
-          <button className="bg-transparent p-2 rounded" onClick={handleSwapNetworks}>
+          <button
+            className="bg-transparent p-2 rounded"
+            onClick={handleSwapNetworks}
+          >
             <SwapIcon />
           </button>
         </div>
@@ -154,12 +159,20 @@ const BridgeForm: React.FC = () => {
             <label className="block text-sm font-medium text-gray-400">
               Receive (estimated):
             </label>
-            <input
-              type="number"
-              value={amountReceive}
-              className="w-full mt-1 p-2 rounded bg-card text-white"
-              disabled
-            />
+            <div className="flex items-center mb-4 bg-card">
+              <input
+                type="number"
+                value={amountReceive}
+                className="w-full mt-1 p-2 rounded bg-card text-white"
+                disabled
+              />
+              <Dropdown
+                icon={sourceToken?.icon}
+                label={sourceToken?.prettySymbol}
+                onClick={openSelectTokenModal}
+                disabled
+              />
+            </div>
           </div>
         </div>
         <div className="bg-card p-4 rounded-xlg mt-4">
@@ -179,7 +192,7 @@ const BridgeForm: React.FC = () => {
         {destAddrError && (
           <p className="text-red-500 text-sm mt-1">{destAddrError}</p>
         )}
-       <RateInfoPanel /> 
+        <RateInfoPanel />
         {isCheckingApproval && (
           <p className="text-gray-400 text-sm mt-4">
             Checking approval status...
@@ -201,7 +214,7 @@ const BridgeForm: React.FC = () => {
 
         {isApproved && (
           <button
-            className={`w-full mt-4 py-2 bg-primary-highlight text-action rounded-lg ${
+            className={`w-full mt-4 py-4 bg-primary-highlight text-action rounded-lg ${
               canSend
                 ? "hover:bg-primary-highlight-dark"
                 : "disabled:opacity-50 disabled:cursor-not-allowed"
@@ -226,7 +239,7 @@ const BridgeForm: React.FC = () => {
       {isSelectTokenModalOpen && (
         <SelectTokenModal onClose={closeSelectTokenModal} />
       )}
-     {isTransferringTokenModalOpen && (
+      {isTransferringTokenModalOpen && (
         <TransactionConfirmationModal onClose={closeTransferringTokenModal} />
       )}
     </div>

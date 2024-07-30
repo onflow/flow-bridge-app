@@ -5,9 +5,10 @@ interface DropdownProps {
   label: string | undefined;
   icon: string | undefined;
   onClick: () => void;
+  disabled?: boolean;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ icon, label, onClick }) => {
+const Dropdown: React.FC<DropdownProps> = ({ icon, label, onClick, disabled }) => {
   if (!icon || !label) {
     return  <div className="relative" />
   }
@@ -16,6 +17,7 @@ const Dropdown: React.FC<DropdownProps> = ({ icon, label, onClick }) => {
       <button
         onClick={onClick}
         className="rounded-xlg bg-secondary text-white py-2 px-4 rounded inline-flex items-center w-full whitespace-nowrap"
+        disabled={disabled}
       >
         <img src={icon} alt={`${label} icon`} className="w-6 h-6 mr-2" />
 
