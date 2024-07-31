@@ -147,11 +147,11 @@ const BridgeForm: React.FC = () => {
           />
         </div>
         <div className="bg-card p-4 rounded-xlg">
-          <div className="mb-4">
+          <div>
             <label className="block text-sm font-medium text-gray-400">
               Receive (estimated):
             </label>
-            <div className="flex items-center mb-4 bg-card">
+            <div className="flex items-center bg-card">
               <input
                 type="number"
                 value={amountReceive}
@@ -177,7 +177,7 @@ const BridgeForm: React.FC = () => {
           </div>
           <input
             type="text"
-            className="mb-4 text-white bg-card w-full focus:outline-none focus:ring-0"
+            className="text-white bg-card w-full focus:outline-none focus:ring-0"
             value={destinationAddress}
             onChange={handleDestinationAddressChange}
           />
