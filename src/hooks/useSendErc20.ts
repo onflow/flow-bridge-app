@@ -2,8 +2,6 @@ import { Address, parseUnits, erc20Abi } from "viem";
 import {
   useBlockNumber,
   useWriteContract,
-  useAccount,
-  useSimulateContract,
 } from "wagmi";
 import { TokenConfig } from "../services/ApiService";
 

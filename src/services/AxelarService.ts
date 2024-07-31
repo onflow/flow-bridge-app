@@ -41,6 +41,7 @@ interface AxelarConfigs {
   };
 }
 
+const SupportedTokens = ["uusdc", "weth-wei", "dai-wei", "wbtc-satoshi"] 
 export class AxelarService {
   private configs: AxelarConfigs | null = null;
   private configUrl =
@@ -213,10 +214,9 @@ export class AxelarService {
 
     const tokens: TokenConfig[] = [];
     Object.entries(chainConfig.assets).map(([key, address]) => {
-      // TODO: only show supported tokens
-      //    if (!SupportedTokens.includes(key)) {
-      //     return null;
-      //   }
+          if (!SupportedTokens.includes(key)) {
+           return null;
+         }
       const tokenInfo = this.getTokenInfoForChain(key, address, chainName);
       if (!tokenInfo) return null;
       tokens.push(tokenInfo);

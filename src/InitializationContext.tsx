@@ -23,6 +23,10 @@ import { useTokenApproval } from "./hooks/useTokenApproval";
 import type { Address } from "viem";
 import { formatUnits, parseUnits } from "viem";
 
+interface TransferFee {
+  fee: string;
+  denom: string;
+}
 interface InitializationContextType {
   initialized: boolean;
   networks: NetworkInfo[];
@@ -53,7 +57,7 @@ interface InitializationContextType {
   swapNetworks: () => void;
   bridgingFee: BridgingRate | undefined;
   canSend: boolean;
-  transferFee: string;
+  transferFee: TransferFee | undefined;
   approveTokenAmount: (amount: string) => void;
   approvalTxHash: `0x${string}` | undefined;
   transferTxHash: `0x${string}` | undefined;
@@ -90,7 +94,7 @@ export const InitializationProvider: React.FC<{
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [bridgingFee, setBridgingFee] = useState<BridgingRate>();
-  const [transferFee, setTransferFee] = useState<string>("0.0");
+  const [transferFee, setTransferFee] = useState<TransferFee>();
 
   const { isConnected, address: account, chain } = useAccount();
 
@@ -303,7 +307,10 @@ export const InitializationProvider: React.FC<{
     setBridgingFee(bridgingRate);
 
     vFee = formatToCurrency(vFee);
-    setTransferFee(`${vFee} ${transferFee.denom}`);
+    setTransferFee({
+      fee: vFee,
+      denom: transferFee.denom || sourceToken?.prettySymbol ,
+    });
   }, [amount, sourceToken, originNetwork, destinationNetwork]);
 
   const canSend =

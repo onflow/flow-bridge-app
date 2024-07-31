@@ -42,7 +42,7 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
               <InfoIcon />
             </span>
           </p>
-          <p>{transferFee}</p>
+          <p>{transferFee?.fee} {transferFee?.denom}</p>
         </div>
         <div className="flex justify-between">
           <p className="text-gray-400">Estimated Time of Arrival</p>
