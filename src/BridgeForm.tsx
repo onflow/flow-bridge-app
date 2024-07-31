@@ -99,7 +99,7 @@ const BridgeForm: React.FC = () => {
           />
         </div>
         <div
-          className={`bg-card p-4 rounded-xlg ${
+          className={`flex flex-col bg-card p-4 rounded-xlg ${
             error ? "border border-red-500" : ""
           }`}
         >
@@ -114,10 +114,10 @@ const BridgeForm: React.FC = () => {
               Max: {displayUserBalance()}
             </span>
           </div>
-          <div className="flex items-center mb-4 bg-card">
+          <div className="flex items-center bg-card">
             <input
               type="text"
-              className="w-full mt-1 p-2 rounded text-white bg-card focus:outline-none focus:ring-0"
+              className="w-full rounded text-white bg-card focus:outline-none focus:ring-0"
               value={amount || "0.0"}
               onChange={(e) => handleAmountChange(e.target.value)}
             />
@@ -125,6 +125,7 @@ const BridgeForm: React.FC = () => {
               icon={sourceToken?.icon}
               label={sourceToken?.prettySymbol}
               onClick={openSelectTokenModal}
+              className="flex justify-end"
             />
           </div>
         </div>
@@ -154,13 +155,14 @@ const BridgeForm: React.FC = () => {
               <input
                 type="number"
                 value={amountReceive}
-                className="w-full mt-1 p-2 rounded bg-card text-white"
+                className="w-full mt-1 rounded bg-card text-white"
                 disabled
               />
               <Dropdown
                 icon={sourceToken?.icon}
                 label={sourceToken?.prettySymbol}
                 onClick={openSelectTokenModal}
+                className="flex justify-end"
                 disabled
               />
             </div>
