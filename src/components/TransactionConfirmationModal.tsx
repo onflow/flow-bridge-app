@@ -7,6 +7,8 @@ import RateInfoPanel from "./RateInfoPanel";
 import { useWaitForTransactionReceipt } from "wagmi";
 import { ActionButton } from "./ActionButton";
 import TransactionResultModal from "./TransactionResultModal";
+import { useBridgeTokens } from "../hooks/useBridgeTokens";
+import { NetworkInfo } from "../services/ApiService";
 
 interface TransactionConfirmationModalProps {
   onClose: () => void;
@@ -15,6 +17,10 @@ interface TransactionConfirmationModalProps {
 const TransactionConfirmationModal: React.FC<
   TransactionConfirmationModalProps
 > = ({ onClose }) => {
+  const [actionButtonTitle, setActionButtonTitle] = useState<string>(
+    "Transfer Confirmation"
+  );
+  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const {
     sourceNetwork,
     destinationNetwork,
@@ -23,72 +29,47 @@ const TransactionConfirmationModal: React.FC<
     sourceToken,
     destinationAddress,
     address: account,
-    isApproved,
-    sendTokens,
-    approveTokenAmount,
-    approvalTxHash,
-    transferTxHash,
-    config,
-    approvalStatus,
-    transferStatus,
   } = useInitialization();
 
-  const { error: approvalError } = useWaitForTransactionReceipt({
-    hash: approvalTxHash,
-    chainId: sourceNetwork?.id,
-    config,
-  });
+  const {
+    bridgeTokens,
+    transactionHash: transferTxHash,
+    status: transferStatus,
+    receipt,
+    error,
+  } = useBridgeTokens();
 
-  const { error: transferError } = useWaitForTransactionReceipt({
-    hash: transferTxHash,
-    chainId: sourceNetwork?.id,
-    config,
-  });
-
-  console.log("error", approvalError, transferError);
-  const handleTransferClick = () => {
-    // monitor transaction and add animation
-    sendTokens();
-  };
-
-  const handleApproveClick = () => {
-    // monitor transaction and add animation
-    approveTokenAmount(amount);
-  };
-
-  const approved = isApproved(amount);
-
-  const conf = {
-    title: "Transfer Confirmation",
-    handler: handleTransferClick,
-    disabled: !!transferTxHash,
-  };
-
-  if (!approved) {
-    conf.title = "Approve Transfer Amount";
-    conf.handler = handleApproveClick;
-    conf.disabled = !!approvalTxHash;
-
-    if (approvalStatus === "pending") {
-      conf.title = "Approving";
-    } else if (approvalStatus === "success") {
-      conf.title = "Approved";
-    } else if (approvalStatus === "error") {
-      conf.title = "Approval Failed";
-      console.error("Approval failed", approvalError);
-    }
-  }
-
-  if (approved) {
-    if (transferStatus === "pending") {
-      conf.title = "Transferring";
-    } else if (transferStatus === "success") {
-      conf.title = "Transfer Success";
+  useEffect(() => {
+    if (transferStatus === "success" && receipt?.blockNumber) {
+      setActionButtonTitle("Approved");
     } else if (transferStatus === "error") {
-      conf.title = "Transfer Failed";
-      console.error("Transfer failed", transferError);
+      setActionButtonTitle("Error Transferring");
+      console.error(error);
+    } else if (transferStatus === "pending") {
+      setActionButtonTitle("Transferring");
     }
-  }
+  }, [transferStatus, receipt]);
+
+  const handleTransferClick = () => {
+    if (!sourceNetwork || !destinationNetwork || !sourceToken || !account) {
+      return;
+    }
+    setIsDisabled(true);
+    try {
+      bridgeTokens(
+        sourceNetwork,
+        destinationNetwork?.name,
+        sourceToken,
+        amount,
+        destinationAddress as string,
+        sourceToken.symbol
+      );
+    } catch (e) {
+      setActionButtonTitle("Transfer Failed");
+    } finally {
+      setIsDisabled(false);
+    }
+  };
 
   return (
     <GenericModal title="Transfer Confirmation" onClose={onClose}>
@@ -118,22 +99,21 @@ const TransactionConfirmationModal: React.FC<
         </div>
       </div>
       <RateInfoPanel />
-      {!approved && (
-        <div className="text-center text-sm text-gray-400 p-4">
-          <p>
-            You need to approve the bridging contract in order to transfer{" "}
-            {amount} {sourceToken?.prettySymbol} before you can proceed.
-          </p>
-        </div>
-      )}
+
       <div className="mt-auto">
         <ActionButton
-          title={conf.title}
-          handler={conf.handler}
-          disabled={conf.disabled}
+          title={actionButtonTitle}
+          handler={handleTransferClick}
+          disabled={isDisabled}
+          errored={transferStatus === "error"}
         />
       </div>
-      {transferTxHash && <TransactionResultModal onClose={onClose} />}
+      {transferTxHash && transferStatus === "success" && (
+        <TransactionResultModal
+          onClose={onClose}
+          transactionHash={transferTxHash}
+        />
+      )}
     </GenericModal>
   );
 };

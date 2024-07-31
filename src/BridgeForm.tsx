@@ -2,13 +2,14 @@ import React, { useState, ChangeEvent, useEffect } from "react";
 import "./index.css";
 import Dropdown from "./components/Dropdown";
 import NetworkSelectorModal from "./components/NetworkSelectorModal";
-import { isAddress } from "viem";
+import { Address, isAddress } from "viem";
 import SwapIcon from "./components/SwapIcon";
 import { useInitialization } from "./InitializationContext";
 import SelectTokenModal from "./components/SelectTokenModal";
 import TransactionConfirmationModal from "./components/TransactionConfirmationModal";
 import RateInfoPanel from "./components/RateInfoPanel";
 import { ActionButton } from "./components/ActionButton";
+import { useTokenApproval } from "./hooks/useTokenApproval";
 
 interface ActionButtonProps {
   title: string;
@@ -22,22 +23,49 @@ const BridgeForm: React.FC = () => {
   const [isSelectTokenModalOpen, setSelectTokenModalOpen] = useState(false);
   const [isTransferringTokenModalOpen, setTransferringTokenModalOpen] =
     useState(false);
-  const [actionButtonProps, setActionButtonProps] = useState<ActionButtonProps>({ title: "", handler: () => {}, disabled: false });
+  const [actionButtonProps, setActionButtonProps] = useState<ActionButtonProps>(
+    { title: "", handler: () => {}, disabled: false }
+  );
   const [error, setError] = useState<string>("");
   const [destAddrError, setDestAddrError] = useState<string>("");
+  const [estimatedAmount, setEstimatedAmount] = useState<string>("");
+  const [actionButtonTitle, setActionButtonTitle] = useState<string>(
+    "Approve Token for Transfer"
+  );
   const {
     sourceNetwork,
     destinationAddress,
     destinationNetwork,
     setDestinationAddress,
     amount,
-    amountReceive,
     sourceToken,
     displayUserBalance,
     swapNetworks,
     setAmount,
     canSend,
+    transferFee,
+    address,
+    config,
   } = useInitialization();
+
+  const {
+    isApproved,
+    approveToken,
+    receipt,
+    status: approvalStatus,
+  } = useTokenApproval(sourceToken, address as Address, sourceNetwork, config);
+
+  useEffect(() => {
+    if (transferFee?.fee) {
+      const estAmount = Number(amount) - Number(transferFee?.fee);
+      if (estAmount < 0 && error === "") {
+        setError("Receive amount is negative");
+      } else {
+        setError("");
+      }
+      setEstimatedAmount(String(estAmount));
+    }
+  }, [transferFee?.fee, amount]);
 
   const openSourceModal = () => setSourceModalOpen(true);
   const closeSourceModal = () => setSourceModalOpen(false);
@@ -51,6 +79,27 @@ const BridgeForm: React.FC = () => {
   const closeTransferringTokenModal = () =>
     setTransferringTokenModalOpen(false);
 
+  const handleApprovalClick = () => {
+    setActionButtonTitle("Waiting for signing");
+    try {
+      approveToken(amount);
+    } catch (error) {
+      console.error("Source and destination networks must be selected");
+    } finally {
+      setActionButtonTitle("Approving");
+    }
+  };
+
+  useEffect(() => {
+    if (approvalStatus === "success" && receipt?.blockNumber) {
+      setActionButtonTitle("Approved");
+    } else if (approvalStatus === "error") {
+      setActionButtonTitle("Error approving");
+    } else if (approvalStatus === "pending") {
+      setActionButtonTitle("Approving");
+    }
+  }, [approvalStatus, receipt]);
+
   const handleTransferClick = () => {
     if (sourceNetwork && destinationNetwork && amount && destinationAddress) {
       setTransferringTokenModalOpen(true);
@@ -61,18 +110,16 @@ const BridgeForm: React.FC = () => {
 
   const handleAmountChange = (value) => {
     setAmount(value);
-    if (!/^[0-9]*\.?[0-9]*$/.test(amount)) {
+    if (!/^[0-9]*\.?[0-9]*$/.test(value)) {
       setError("Please enter a valid number");
-    } else if (Number(amount) > Number(displayUserBalance())) {
+    } else if (Number(value) > Number(displayUserBalance())) {
       setError("Amount greater than balance");
     } else {
       setError("");
     }
 
-    // need to tell the user receive amount is negative
-    if (Number(amountReceive) < 0) {
-      setError("Receive amount is negative");
-    }
+    const estAmount = Number(value) - Number(transferFee?.fee || 0);
+    setEstimatedAmount(String(estAmount));
   };
 
   const handleDestinationAddressChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -93,6 +140,9 @@ const BridgeForm: React.FC = () => {
     swapNetworks();
   };
 
+  const needsApproval = !isApproved(amount);
+
+  console.log("rendering form", needsApproval);
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
       <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-700">
@@ -124,7 +174,8 @@ const BridgeForm: React.FC = () => {
             <input
               type="text"
               className="w-full rounded text-white bg-card focus:outline-none focus:ring-0"
-              value={amount || "0.0"}
+              value={amount}
+              placeholder="0.0"
               onChange={(e) => handleAmountChange(e.target.value)}
             />
             <Dropdown
@@ -159,8 +210,9 @@ const BridgeForm: React.FC = () => {
             </label>
             <div className="flex items-center bg-card">
               <input
-                type="number"
-                value={amountReceive}
+                type="string"
+                value={estimatedAmount}
+                placeholder="0.0"
                 className="w-full mt-1 rounded bg-card text-white"
                 disabled
               />
@@ -192,11 +244,20 @@ const BridgeForm: React.FC = () => {
           <p className="text-red-500 text-sm mt-1">{destAddrError}</p>
         )}
         <RateInfoPanel />
-        <ActionButton
-          title="Transfer"
-          handler={handleTransferClick}
-          disabled={!canSend}
-        />
+        {needsApproval && (
+          <ActionButton
+            title={actionButtonTitle}
+            handler={handleApprovalClick}
+            disabled={!canSend}
+          />
+        )}
+        {!needsApproval && (
+          <ActionButton
+            title="Transfer"
+            handler={handleTransferClick}
+            disabled={!canSend}
+          />
+        )}
       </div>
 
       {isSourceModalOpen && (

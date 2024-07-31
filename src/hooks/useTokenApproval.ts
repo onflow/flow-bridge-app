@@ -2,6 +2,7 @@ import { Address, parseUnits, erc20Abi } from "viem";
 import {
   useWriteContract,
   useTransactionConfirmations,
+  useWaitForTransactionReceipt,
   Config,
 } from "wagmi";
 import { NetworkInfo, TokenConfig } from "../services/ApiService";
@@ -14,9 +15,12 @@ export const useTokenApproval = (
   fromChain: NetworkInfo | undefined,
   config: Config
 ) => {
+  const [confirmed, setConfirmed] = useState<boolean>(false);
   const [allowance, setAllowance] = useState<bigint>(BigInt(0));
-  const { writeContract, isSuccess, status, data, error, isError } = useWriteContract();
-  const {data: confirmations} = useTransactionConfirmations({ hash: data });
+  const { writeContract, isSuccess, status, data, error, isError } =
+    useWriteContract();
+  const { data: confirmations } = useTransactionConfirmations({ hash: data });
+  const { data: receipt } = useWaitForTransactionReceipt({ hash: data });
 
   useEffect(() => {
     if (!token || !fromChain || !owner) {
@@ -35,6 +39,7 @@ export const useTokenApproval = (
   }, [token, owner, fromChain, config, confirmations]);
 
   const approveToken = (amount: string) => {
+    setConfirmed(false);
     const value = parseUnits(amount ? amount : "0", token?.decimals ?? 0);
     const spender = fromChain?.gatewayAddress as Address;
     if (!token || !spender) {
@@ -55,10 +60,18 @@ export const useTokenApproval = (
     return allowance >= BigInt(value);
   };
 
+  console.log("useTokenApproval",
+    allowance,
+    receipt,
+    data,
+    status
+  );
+
   return {
     isApproved,
     approveToken,
     allowance,
+    receipt,
     transactionHash: data,
     error,
     isSuccess,

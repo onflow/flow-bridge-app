@@ -177,9 +177,6 @@ class ApiService {
       token
     );
 
-    console.log("chainFees", chainFees);
-    console.log("transferFee", transferFee);
-
     if (transferFee.fee?.denom === token.id) {
       transferFee.fee.denom = token.prettySymbol;
     }

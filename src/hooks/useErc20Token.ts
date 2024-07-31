@@ -12,8 +12,6 @@ export const useErc20Token = (token: TokenConfig) => {
     args: [address as Address],
   });
 
-  console.log("token balance", token?.name, result?.data?.toString());
-  // convert result to readable balance
   const balance = formatUnits(result?.data || BigInt(0), token.decimals);
 
   return {

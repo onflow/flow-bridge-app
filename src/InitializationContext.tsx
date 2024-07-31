@@ -88,8 +88,8 @@ export const InitializationProvider: React.FC<{
   const [sourceToken, setSourceToken] = useState<TokenConfig>();
   const [destinationNetwork, setDestinationNetwork] = useState<NetworkInfo>();
   const [destinationAddress, setDestinationAddress] = useState<string>();
-  const [amount, setAmount] = useState<string>("0.0");
-  const [amountReceive, setAmountReceive] = useState<string>("0.0");
+  const [amount, setAmount] = useState<string>("");
+  const [amountReceive, setAmountReceive] = useState<string>("");
   const [userBalance, setUserBalance] = useState<bigint>(BigInt(0));
   const [isApproving, setIsApproving] = useState<boolean>(false);
   const [isSending, setIsSending] = useState<boolean>(false);
@@ -100,9 +100,6 @@ export const InitializationProvider: React.FC<{
 
   const {
     bridgeTokens,
-    error: bridgeError,
-    isError,
-    isSuccess,
     transactionHash: transferTxHash,
     status: transferStatus,
   } = useBridgeTokens();
@@ -111,14 +108,12 @@ export const InitializationProvider: React.FC<{
     allowance,
     isApproved,
     approveToken,
-    error: approvalError,
-    isError: approvalIsError,
     transactionHash: approvalTxHash,
     status: approvalStatus,
   } = useTokenApproval(sourceToken, account as Address, originNetwork, config);
 
-  console.log("bridging", bridgeError, isError, isSuccess, transferTxHash, transferStatus);
-  console.log("approving", approvalError, approvalIsError, allowance, approvalTxHash, approvalStatus);
+  //console.log("bridging", bridgeError, isError, isSuccess, transferTxHash, transferStatus);
+  //console.log("approving", approvalError, approvalIsError, allowance, approvalTxHash, approvalStatus);
 
   useEffect(() => {
     if (!isConnected || !account || !chain?.id) {
@@ -180,14 +175,7 @@ export const InitializationProvider: React.FC<{
     }
     setIsSending(true);
     try {
-      /*  
-      sendTransfer(
-        sourceToken,
-        amount,
-        destinationAddress,
-      );
-*/
-
+    
       const all = formatUnits(allowance || BigInt("0"), sourceToken.decimals);
       console.log("need approval", all, amount, Number(all) < Number(amount));
 
@@ -237,6 +225,7 @@ export const InitializationProvider: React.FC<{
     const tokens = ApiService.getSupportedChainTokens(String(network.name));
     setSourceNetworkTokens(tokens);
     setOriginNetwork(network);
+    setAmount(""); // reset amount
     // Could configure to have a specific default token per network
     const defaultToken = ApiService.DefaultToken;
     const defToken = tokens.find((token) => token.id === defaultToken);
@@ -247,6 +236,7 @@ export const InitializationProvider: React.FC<{
 
   const setToken = async (token: TokenConfig) => {
     setSourceToken(token);
+    setAmount("");
     if (!account) {
       return;
     }
@@ -256,12 +246,12 @@ export const InitializationProvider: React.FC<{
 
   const formatToCurrency = (value: string): string => {
     const number = Number(value);
-    return number.toLocaleString('en-US', {
+    return number.toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-      style: 'decimal',
+      style: "decimal",
     });
-  }
+  };
 
   const swapNetworks = () => {
     if (!originNetwork || !destinationNetwork) {
@@ -279,27 +269,24 @@ export const InitializationProvider: React.FC<{
 
   useMemo(async () => {
     if (
-      !originNetwork ||
-      !destinationNetwork ||
-      !sourceToken ||
-      !amount ||
-      amount === "0.0"
+      !originNetwork?.id ||
+      !destinationNetwork?.id ||
+      !sourceToken?.address ||
+      !amount
     ) {
       return;
     }
 
-    const { transferFee, bridgingRate } = await ApiService.getBridgingFee(
-      originNetwork as NetworkInfo,
-      destinationNetwork as NetworkInfo,
-      sourceToken as TokenConfig,
-      amount
-    );
-
-    console.log("transferFee", transferFee);
-    console.log("bridgingRate", bridgingRate);
+    const { transferFee: sendTokenFee, bridgingRate } =
+      await ApiService.getBridgingFee(
+        originNetwork as NetworkInfo,
+        destinationNetwork as NetworkInfo,
+        sourceToken as TokenConfig,
+        amount
+      );
 
     let vFee = formatUnits(
-      BigInt(transferFee.amount),
+      BigInt(sendTokenFee.amount),
       Number(sourceToken?.decimals) || 18
     );
     const toBeReceived = Number(amount) - Number(vFee);
@@ -309,9 +296,9 @@ export const InitializationProvider: React.FC<{
     vFee = formatToCurrency(vFee);
     setTransferFee({
       fee: vFee,
-      denom: transferFee.denom || sourceToken?.prettySymbol ,
+      denom: sendTokenFee.denom || sourceToken?.prettySymbol,
     });
-  }, [amount, sourceToken, originNetwork, destinationNetwork]);
+  }, [amount, sourceToken?.address, originNetwork?.id, destinationNetwork?.id]);
 
   const canSend =
     amount !== "0.0" &&

@@ -1,11 +1,12 @@
-import { Address, parseUnits, erc20Abi } from "viem";
-import { useWriteContract, useSimulateContract } from "wagmi";
+import { Address, parseUnits } from "viem";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { TokenConfig, NetworkInfo } from "../services/ApiService";
 // @ts-ignore
 import IAxelarGateway from "@axelar-network/axelar-gmp-sdk-solidity/artifacts/contracts/interfaces/IAxelarGateway.sol/IAxelarGateway.json";
 
 export const useBridgeTokens = () => {
   const { writeContract, isSuccess, data, error, isError, status } = useWriteContract();
+  const { data: receipt } = useWaitForTransactionReceipt({ hash: data });
 
   // add estimate transaction method
 
@@ -44,9 +45,16 @@ export const useBridgeTokens = () => {
     });
   };
 
+  console.log("useBridgeTokens",
+    receipt,
+    data,
+    status
+  );
+
   return {
     bridgeTokens,
     transactionHash: data,
+    receipt,
     error: error,
     isError: isError,
     isSuccess: isSuccess,
