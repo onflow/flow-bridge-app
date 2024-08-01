@@ -20,7 +20,6 @@ const TransactionConfirmationModal: React.FC<
   const [actionButtonTitle, setActionButtonTitle] = useState<string>(
     "Transfer Confirmation"
   );
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const {
     sourceNetwork,
     destinationNetwork,
@@ -54,7 +53,6 @@ const TransactionConfirmationModal: React.FC<
     if (!sourceNetwork || !destinationNetwork || !sourceToken || !account) {
       return;
     }
-    setIsDisabled(true);
     try {
       bridgeTokens(
         sourceNetwork,
@@ -67,7 +65,6 @@ const TransactionConfirmationModal: React.FC<
     } catch (e) {
       setActionButtonTitle("Transfer Failed");
     } finally {
-      setIsDisabled(false);
     }
   };
 
@@ -104,7 +101,7 @@ const TransactionConfirmationModal: React.FC<
         <ActionButton
           title={actionButtonTitle}
           handler={handleTransferClick}
-          disabled={isDisabled}
+          disabled={transferStatus === "pending" || transferStatus === "success"}
           errored={transferStatus === "error"}
         />
       </div>

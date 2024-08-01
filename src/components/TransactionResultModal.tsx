@@ -19,16 +19,20 @@ interface TransactionConfirmationModalProps {
 const TransactionConfirmationModal: React.FC<
   TransactionConfirmationModalProps
 > = ({ onClose, transactionHash, transferStatus, error }) => {
-  const { sourceNetwork } = useInitialization();
+  const { sourceNetwork, destinationNetwork, destinationAddress } =
+    useInitialization();
 
   let icon = <CircleXIcon />;
   let link = "";
+  let destLink = "";
 
   if (transactionHash) {
     icon = <UpArrowIcon />;
-    link = `${sourceNetwork?.blockExplorer}/tx/${transactionHash}`;
+    link = `${sourceNetwork?.blockExplorer?.url}/tx/${transactionHash}`;
+    destLink = `${destinationNetwork?.blockExplorer?.url}/address/${destinationAddress}`;
   }
 
+  console.log(sourceNetwork?.blockExplorer);
   return (
     <GenericModal title="" onClose={onClose}>
       <div className="flex flex-col h-full text-center">
@@ -41,27 +45,45 @@ const TransactionConfirmationModal: React.FC<
         <p className="mb-8 text-md">
           {link &&
             `Please allow ${sourceNetwork?.approxFinalityWaitTime} minutes for the funds to arrive at your wallet on
-          ${sourceNetwork?.name}.`}
+          ${destinationNetwork?.name}.`}
           {transferStatus === "error" && (
             <div className="flex flex-col gap-4">
               <span>
                 An error has occurred, Please start over to try again.
               </span>
               <span className="text-lg text-error">
-                <DisplayErrorMessage error={error} text={"Error transferring tokens"} />
+                <DisplayErrorMessage
+                  error={error}
+                  text={"Error transferring tokens"}
+                />
               </span>
             </div>
           )}
         </p>
         {link && (
           <span className="mb-8 flex items-center gap-1 justify-center">
+            {`${sourceNetwork?.name} block explorer:`}
             <a
               href={link}
               className="text-green-500 hover:underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              View the transaction in the block explorer
+              {`View the transaction`}
+            </a>
+            <ExternalLinkIcon />
+          </span>
+        )}
+        {destLink && (
+          <span className="mb-8 flex items-center gap-1 justify-center">
+            {`${destinationNetwork?.name} block explorer:`}
+            <a
+              href={destLink}
+              className="text-green-500 hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {`View destination address`}
             </a>
             <ExternalLinkIcon />
           </span>
