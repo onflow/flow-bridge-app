@@ -10,6 +10,7 @@ import TransactionConfirmationModal from "./components/TransactionConfirmationMo
 import RateInfoPanel from "./components/RateInfoPanel";
 import { ActionButton } from "./components/ActionButton";
 import { useTokenApproval } from "./hooks/useTokenApproval";
+import { DisplayErrorMessage } from "./components/DisplayErrorMessage";
 
 interface ActionButtonProps {
   title: string;
@@ -53,6 +54,7 @@ const BridgeForm: React.FC = () => {
     approveToken,
     receipt,
     status: approvalStatus,
+    error: approvalError,
   } = useTokenApproval(sourceToken, address as Address, sourceNetwork, config);
 
   useEffect(() => {
@@ -94,7 +96,7 @@ const BridgeForm: React.FC = () => {
     if (approvalStatus === "success" && receipt?.blockNumber) {
       setActionButtonTitle("Approved");
     } else if (approvalStatus === "error") {
-      setActionButtonTitle("Error approving");
+      setActionButtonTitle("Approve Token for Transfer");
     } else if (approvalStatus === "pending") {
       setActionButtonTitle("Approving");
     }
@@ -142,7 +144,12 @@ const BridgeForm: React.FC = () => {
 
   const needsApproval = !isApproved(amount);
 
-  console.log("rendering form", needsApproval);
+  console.log(
+    "rendering form",
+    needsApproval,
+    approvalError?.message,
+    approvalError
+  );
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
       <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-700">
@@ -244,11 +251,19 @@ const BridgeForm: React.FC = () => {
           <p className="text-red-500 text-sm mt-1">{destAddrError}</p>
         )}
         <RateInfoPanel />
+        {approvalStatus === "error" && (
+          <div className="mt-2">
+            <DisplayErrorMessage
+              error={approvalError}
+              text={"Error approving token, try again"}
+            />
+          </div>
+        )}
         {needsApproval && (
           <ActionButton
             title={actionButtonTitle}
             handler={handleApprovalClick}
-            disabled={!canSend}
+            disabled={!canSend || approvalStatus === "pending"}
           />
         )}
         {!needsApproval && (

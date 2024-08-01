@@ -8,6 +8,7 @@ export default {
         primary: "#8F9BB3",
         secondary: "#ffffff",
         action: '#151515',
+        error: "#FD5C3F"
       },
       borderRadius: {
         xlg: "16px",
@@ -21,7 +22,7 @@ export default {
         accent: "#657786",
         background: "#00000",
         card: "#17171A",
-        modal: "#232530"
+        modal: "#232530",
       },
     },
   },

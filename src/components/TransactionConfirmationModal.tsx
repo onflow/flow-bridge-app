@@ -108,10 +108,12 @@ const TransactionConfirmationModal: React.FC<
           errored={transferStatus === "error"}
         />
       </div>
-      {transferTxHash && transferStatus === "success" && (
+      {(transferStatus === "error" || transferStatus === "success") && (
         <TransactionResultModal
           onClose={onClose}
           transactionHash={transferTxHash}
+          transferStatus={transferStatus}
+          error={error}
         />
       )}
     </GenericModal>
