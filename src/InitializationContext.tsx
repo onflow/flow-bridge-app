@@ -49,7 +49,6 @@ interface InitializationContextType {
   amount: string;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   amountReceive: string;
-  sendTokens: () => Promise<void>;
   isApproved: (amount: string) => boolean;
   isApproving: boolean;
   isSending: boolean;
@@ -77,7 +76,7 @@ export const InitializationProvider: React.FC<{
   const client = useClient();
   const config = useConfig();
   const [initialized, setInitialized] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [networks, setNetworks] = useState<NetworkInfo[]>([]);
   const [error, setError] = useState<string | undefined>();
   const [address, setAddress] = useState<string | undefined>();
@@ -126,6 +125,7 @@ export const InitializationProvider: React.FC<{
 
     const initialize = async () => {
       try {
+        setLoading(true);
         console.log("initializing");
         // TODO need better bootup logic than testing initialized
         while (!ApiService.isInitialized()) {
@@ -161,49 +161,6 @@ export const InitializationProvider: React.FC<{
     initialize();
   }, [chain?.id, isConnected, account]);
 
-  const sendTokens = async () => {
-    if (!originNetwork || !destinationNetwork || !destinationAddress) {
-      console.error(
-        "Source and destination networks must be selected, destination address must be provided"
-      );
-      return;
-    }
-
-    if (!sourceToken) {
-      console.error("Transfer token should be selected");
-      return;
-    }
-    setIsSending(true);
-    try {
-    
-      const all = formatUnits(allowance || BigInt("0"), sourceToken.decimals);
-      console.log("need approval", all, amount, Number(all) < Number(amount));
-
-      if (
-        !allowance ||
-        allowance === BigInt("0") ||
-        Number(all) < Number(amount)
-      ) {
-        const approvalTx = await approveToken(amount);
-        console.log(approvalTx);
-      }
-
-      const tx = await bridgeTokens(
-        originNetwork,
-        destinationNetwork.name,
-        sourceToken,
-        amount,
-        destinationAddress,
-        sourceToken.symbol // might need to get denom from axelar service
-      );
-      console.log(tx);
-    } catch (error) {
-      console.error("Failed to send tokens:", error);
-    } finally {
-      setIsSending(false);
-    }
-  };
-
   const approveTokenAmount = async (amount: string) => {
     if (!sourceToken) {
       console.error("Transfer token should be selected");
@@ -221,17 +178,22 @@ export const InitializationProvider: React.FC<{
   };
 
   const setSourceNetwork = (network: NetworkInfo) => {
-    // set tokens for network
-    const tokens = ApiService.getSupportedChainTokens(String(network.name));
-    setSourceNetworkTokens(tokens);
-    setOriginNetwork(network);
-    setAmount(""); // reset amount
-    // Could configure to have a specific default token per network
-    const defaultToken = ApiService.DefaultToken;
-    const defToken = tokens.find((token) => token.id === defaultToken);
-    const t = defToken || tokens[0] || sourceToken;
-    setToken(t);
-    switchChain({ chainId: Number(network.id) });
+    setLoading(true);
+    try {
+      // set tokens for network
+      const tokens = ApiService.getSupportedChainTokens(String(network.name));
+      setSourceNetworkTokens(tokens);
+      setOriginNetwork(network);
+      setAmount(""); // reset amount
+      // Could configure to have a specific default token per network
+      const defaultToken = ApiService.DefaultToken;
+      const defToken = tokens.find((token) => token.id === defaultToken);
+      const t = defToken || tokens[0] || sourceToken;
+      setToken(t);
+      switchChain({ chainId: Number(network.id) });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const setToken = async (token: TokenConfig) => {
@@ -277,27 +239,32 @@ export const InitializationProvider: React.FC<{
       return;
     }
 
-    const { transferFee: sendTokenFee, bridgingRate } =
-      await ApiService.getBridgingFee(
-        originNetwork as NetworkInfo,
-        destinationNetwork as NetworkInfo,
-        sourceToken as TokenConfig,
-        amount
+    try {
+      setLoading(true);
+      const { transferFee: sendTokenFee, bridgingRate } =
+        await ApiService.getBridgingFee(
+          originNetwork as NetworkInfo,
+          destinationNetwork as NetworkInfo,
+          sourceToken as TokenConfig,
+          amount
+        );
+
+      let vFee = formatUnits(
+        BigInt(sendTokenFee.amount),
+        Number(sourceToken?.decimals) || 18
       );
+      const toBeReceived = Number(amount) - Number(vFee);
+      setAmountReceive(String(toBeReceived));
+      setBridgingFee(bridgingRate);
 
-    let vFee = formatUnits(
-      BigInt(sendTokenFee.amount),
-      Number(sourceToken?.decimals) || 18
-    );
-    const toBeReceived = Number(amount) - Number(vFee);
-    setAmountReceive(String(toBeReceived));
-    setBridgingFee(bridgingRate);
-
-    vFee = formatToCurrency(vFee);
-    setTransferFee({
-      fee: vFee,
-      denom: sendTokenFee.denom || sourceToken?.prettySymbol,
-    });
+      vFee = formatToCurrency(vFee);
+      setTransferFee({
+        fee: vFee,
+        denom: sendTokenFee.denom || sourceToken?.prettySymbol,
+      });
+    } finally {
+      setLoading(false);
+    }
   }, [amount, sourceToken?.address, originNetwork?.id, destinationNetwork?.id]);
 
   const canSend =
@@ -328,7 +295,6 @@ export const InitializationProvider: React.FC<{
         amount,
         setAmount,
         amountReceive,
-        sendTokens,
         isApproved,
         isApproving,
         isSending,

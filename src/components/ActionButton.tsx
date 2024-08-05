@@ -1,17 +1,20 @@
 import React from "react";
+import Spinner from "./Spinner";
 
 export const ActionButton = ({
   handler,
   title,
   disabled,
   errored,
+  loading,
 }: {
   title: string;
   handler: () => void;
   disabled?: boolean;
   errored?: boolean;
+  loading?: boolean;
 }) => {
-  let buttonClasses = "mt-4 w-full p-4 text-action rounded-lg";
+  let buttonClasses = "mt-4 w-full p-4 text-action rounded-lg relative";
 
   if (errored) {
     buttonClasses += " bg-red-500";
@@ -24,7 +27,8 @@ export const ActionButton = ({
 
   return (
     <button className={buttonClasses} onClick={handler} disabled={disabled}>
-      {title}
+      {loading && <Spinner />}
+      <span className={loading ? "opacity-0" : ""}>{title}</span>
     </button>
   );
 };

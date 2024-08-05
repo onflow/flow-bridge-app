@@ -9,7 +9,7 @@ interface TokenLabelProps {
 }
 
 const TokenLabel: React.FC<TokenLabelProps> = ({ token, onClick }) => {
-  const { name, symbol, icon } = token;
+  const { name, symbol, icon, address } = token;
   const { balance } = useErc20Token(token);
 
   return (
@@ -22,10 +22,13 @@ const TokenLabel: React.FC<TokenLabelProps> = ({ token, onClick }) => {
           <img src={icon} alt={`${name} icon`} className="w-6 h-6 mr-2" />
           <div className="flex flex-col items-start">
             {name && <span className="text-white">{name}</span>}
-            {symbol && <span className="text-xs text-gray-400">{symbol}</span>}
+            {symbol && <span className="text-xs text-gray-400">{symbol} </span>}
           </div>
         </div>
-        <span className="text-white">{balance}</span>
+        <div className="flex flex-col items-end">
+          <span className="text-white">{balance}</span>
+          {address && <span className="text-[0.5rem]">{address}</span>}
+        </div>
       </div>
     </button>
   );

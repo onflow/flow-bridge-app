@@ -60,13 +60,6 @@ export const useTokenApproval = (
     return allowance >= BigInt(value);
   };
 
-  console.log("useTokenApproval",
-    allowance,
-    receipt,
-    data,
-    status
-  );
-
   return {
     isApproved,
     approveToken,

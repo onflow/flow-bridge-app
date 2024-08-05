@@ -45,12 +45,6 @@ export const useBridgeTokens = () => {
     });
   };
 
-  console.log("useBridgeTokens",
-    receipt,
-    data,
-    status
-  );
-
   return {
     bridgeTokens,
     transactionHash: data,

@@ -1,5 +1,4 @@
 import {
-  AxelarAssetTransfer,
   AxelarQueryAPI,
   Environment,
 } from "@axelar-network/axelarjs-sdk";
@@ -15,15 +14,12 @@ import { Config } from "wagmi";
 import { SupportedNetworks, TokenConfig, ChainConfig } from "./ApiService";
 import { Address } from "viem";
 
-
-
 export interface ChainTokenConfig {
   name: string;
   prettySymbol: string;
   tokenAddress: string;
   symbol: string;
 }
-
 
 interface AxelarTokenConfig extends TokenConfig {
   iconUrl: string;
@@ -41,7 +37,7 @@ interface AxelarConfigs {
   };
 }
 
-const SupportedTokens = ["uusdc", "weth-wei", "dai-wei", "wbtc-satoshi"] 
+const SupportedTokens = ["uusdc", "weth-wei", "wbtc-satoshi"];
 export class AxelarService {
   private configs: AxelarConfigs | null = null;
   private configUrl =
@@ -51,10 +47,6 @@ export class AxelarService {
   private assetUrl = "";
 
   private querySdk = new AxelarQueryAPI({
-    environment: Environment.MAINNET,
-  });
-
-  private assetTransfer = new AxelarAssetTransfer({
     environment: Environment.MAINNET,
   });
 
@@ -97,10 +89,18 @@ export class AxelarService {
           id: parseInt(value?.externalChainId),
           assets: value.assets,
           approxFinalityWaitTime: value.config.approxFinalityWaitTime,
-          gatewayAddress: value.config.contracts.AxelarGateway?.address as Address,
-          blockExplorer: { // grab the first block explorer
+          gatewayAddress: value.config.contracts.AxelarGateway
+            ?.address as Address,
+          blockExplorer: {
+            // grab the first block explorer
             name: explorer?.name,
             url: explorer?.url,
+          },
+          nativeCurrency: {
+            name: value.nativeCurrency.name,
+            symbol: value.nativeCurrency.symbol,
+            decimals: value.nativeCurrency.decimals,
+            iconUrl: `${this.assetUrl}${value.nativeCurrency.iconUrl}`,
           },
         };
       }
@@ -147,13 +147,18 @@ export class AxelarService {
   public async getEstimatedGasFee(
     fromChain: string,
     toChain: string,
-    gasLimit: string
+    gasLimit: string,
+    token: string
   ) {
     const gasFee = await this.querySdk.estimateGasFee(
       fromChain,
       toChain,
-      gasLimit
+      gasLimit,
+      "auto",
+      token,
     );
+
+    console.log("gasFee", gasFee);
 
     return gasFee;
   }
@@ -214,9 +219,9 @@ export class AxelarService {
 
     const tokens: TokenConfig[] = [];
     Object.entries(chainConfig.assets).map(([key, address]) => {
-          if (!SupportedTokens.includes(key)) {
-           return null;
-         }
+      if (!SupportedTokens.includes(key)) {
+        return null;
+      }
       const tokenInfo = this.getTokenInfoForChain(key, address, chainName);
       if (!tokenInfo) return null;
       tokens.push(tokenInfo);

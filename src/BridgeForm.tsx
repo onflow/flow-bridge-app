@@ -12,21 +12,12 @@ import { ActionButton } from "./components/ActionButton";
 import { useTokenApproval } from "./hooks/useTokenApproval";
 import { DisplayErrorMessage } from "./components/DisplayErrorMessage";
 
-interface ActionButtonProps {
-  title: string;
-  handler: () => void;
-  disabled: boolean;
-}
-
 const BridgeForm: React.FC = () => {
   const [isSourceModalOpen, setSourceModalOpen] = useState(false);
   const [isDestinationModalOpen, setDestinationModalOpen] = useState(false);
   const [isSelectTokenModalOpen, setSelectTokenModalOpen] = useState(false);
   const [isTransferringTokenModalOpen, setTransferringTokenModalOpen] =
     useState(false);
-  const [actionButtonProps, setActionButtonProps] = useState<ActionButtonProps>(
-    { title: "", handler: () => {}, disabled: false }
-  );
   const [error, setError] = useState<string>("");
   const [destAddrError, setDestAddrError] = useState<string>("");
   const [estimatedAmount, setEstimatedAmount] = useState<string>("");
@@ -47,6 +38,7 @@ const BridgeForm: React.FC = () => {
     transferFee,
     address,
     config,
+    loading,
   } = useInitialization();
 
   const {
@@ -264,13 +256,15 @@ const BridgeForm: React.FC = () => {
             title={actionButtonTitle}
             handler={handleApprovalClick}
             disabled={!canSend || approvalStatus === "pending"}
+            loading={loading}
           />
         )}
         {!needsApproval && (
           <ActionButton
             title="Transfer"
             handler={handleTransferClick}
-            disabled={!canSend}
+            disabled={!canSend || loading}
+            loading={loading}
           />
         )}
       </div>
