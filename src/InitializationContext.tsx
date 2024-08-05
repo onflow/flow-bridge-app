@@ -49,6 +49,7 @@ interface InitializationContextType {
   amount: string;
   setAmount: React.Dispatch<React.SetStateAction<string>>;
   amountReceive: string;
+  setAmountReceive: React.Dispatch<React.SetStateAction<string>>;
   isApproved: (amount: string) => boolean;
   isApproving: boolean;
   isSending: boolean;
@@ -253,8 +254,6 @@ export const InitializationProvider: React.FC<{
         BigInt(sendTokenFee.amount),
         Number(sourceToken?.decimals) || 18
       );
-      const toBeReceived = Number(amount) - Number(vFee);
-      setAmountReceive(String(toBeReceived));
       setBridgingFee(bridgingRate);
 
       vFee = formatToCurrency(vFee);
@@ -295,6 +294,7 @@ export const InitializationProvider: React.FC<{
         amount,
         setAmount,
         amountReceive,
+        setAmountReceive,
         isApproved,
         isApproving,
         isSending,

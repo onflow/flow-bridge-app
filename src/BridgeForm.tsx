@@ -39,6 +39,7 @@ const BridgeForm: React.FC = () => {
     address,
     config,
     loading,
+    setAmountReceive
   } = useInitialization();
 
   const {
@@ -54,8 +55,6 @@ const BridgeForm: React.FC = () => {
       const estAmount = Number(amount) - Number(transferFee?.fee);
       if (estAmount < 0 && error === "") {
         setError("Receive amount is negative");
-      } else {
-        setError("");
       }
       setEstimatedAmount(String(estAmount));
     }
@@ -104,16 +103,19 @@ const BridgeForm: React.FC = () => {
 
   const handleAmountChange = (value) => {
     setAmount(value);
+    const bal = displayUserBalance()
+    let err = "";
+    console.log("bal", value, bal, Number(value) > Number(bal));
     if (!/^[0-9]*\.?[0-9]*$/.test(value)) {
-      setError("Please enter a valid number");
-    } else if (Number(value) > Number(displayUserBalance())) {
-      setError("Amount greater than balance");
-    } else {
-      setError("");
-    }
+      err = "Please enter a valid number";
+    } else if (Number(value) > Number(bal)) {
+      err = "Amount greater than balance";
+    } 
+    setError(err);
 
     const estAmount = Number(value) - Number(transferFee?.fee || 0);
     setEstimatedAmount(String(estAmount));
+    setAmountReceive(String(estAmount));
   };
 
   const handleDestinationAddressChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -140,8 +142,11 @@ const BridgeForm: React.FC = () => {
     "rendering form",
     needsApproval,
     approvalError?.message,
-    approvalError
+    approvalError,
+    "error", error
   );
+
+
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
       <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-700">
