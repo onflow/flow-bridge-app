@@ -9,9 +9,7 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
   const {
     sourceNetwork,
     destinationNetwork,
-    amountReceive,
     sourceToken,
-    bridgingFee,
     transferFee,
     loading,
   } = useInitialization();
@@ -44,7 +42,7 @@ const RateInfoPanel: React.FC<RateInfoPanelProps> = () => {
               </span>
             </p>
           </div>
-          <div className="relative flex items-center">
+          <div className="relative flex items-center w-full">
             {loading ? (
               <Spinner className="w-4 h-4 ml-auto" />
             ) : (
