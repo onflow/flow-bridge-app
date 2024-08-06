@@ -5,7 +5,6 @@ import IAxelarGateway from "@axelar-network/axelar-gmp-sdk-solidity/artifacts/co
 import { formatUnits } from "viem";
 import { RightArrowIcon } from "./RightArrowIcon";
 import { ExternalLinkLargeIcon } from "./ExternalLinkLargeIcon";
-import { time } from "console";
 
 interface TransactionDetails {
   input: string;

@@ -98,7 +98,7 @@ const TransactionConfirmationModal: React.FC<
           ))}
 
         {userBridgedTxs.length === 0 && (
-          <div className="flex justify-center mb-6">No Transactions Found</div>
+          <div className="flex justify-center mb-6 items-center m-20">No Transactions Found</div>
         )}
       </div>
     </GenericModal>
