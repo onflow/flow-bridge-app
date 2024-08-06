@@ -4,11 +4,9 @@ import GenericModal from "./GenericModal";
 import { useInitialization } from "../InitializationContext";
 import NetworkBalance from "./NetworkBalance";
 import RateInfoPanel from "./RateInfoPanel";
-import { useWaitForTransactionReceipt } from "wagmi";
 import { ActionButton } from "./ActionButton";
 import TransactionResultModal from "./TransactionResultModal";
 import { useBridgeTokens } from "../hooks/useBridgeTokens";
-import { NetworkInfo } from "../services/ApiService";
 
 interface TransactionConfirmationModalProps {
   onClose: () => void;

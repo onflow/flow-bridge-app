@@ -1,31 +1,25 @@
-// src/api/proxy.ts
-import { IncomingMessage, ServerResponse } from 'http';
-import { parse } from 'url';
+import express, { Request, Response } from 'express';
 import axios from 'axios';
 
-const server = async (req: IncomingMessage, res: ServerResponse) => {
-  const parsedUrl = parse(req.url || '', true);
-  const { url } = parsedUrl.query;
+const app = express();
+const PORT = 4000; // Ensure this matches the target port in Vite config
+
+app.get('/proxy', async (req: Request, res: Response) => {
+  const url = req.query.url as string;
 
   if (!url) {
-    res.statusCode = 400;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: 'URL is required' }));
+    res.status(400).json({ error: 'URL is required' });
     return;
   }
 
   try {
-    const response = await axios.get(`https://api.axelar.network${url}`);
-    const data = response.data;
-
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(data));
+    const response = await axios.get(url);
+    res.status(200).json(response.data);
   } catch (error) {
-    res.statusCode = 500;
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ error: 'Failed to fetch data' }));
+    res.status(500).json({ error: 'Failed to fetch data' });
   }
-};
+});
 
-export default server;
+app.listen(PORT, () => {
+  console.log(`Proxy server running on port ${PORT}`);
+});

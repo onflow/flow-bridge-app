@@ -5,7 +5,7 @@ import { useInitialization } from "../InitializationContext";
 import { CircleXIcon } from "./CircleXIcon";
 import { UpArrowIcon } from "./UpArrowIcon";
 import { ActionButton } from "./ActionButton";
-import { ExternalLinkIcon } from "./ExternalLink";
+import { ExternalLinkIcon } from "./ExternalLinkIcon";
 import { type WriteContractErrorType } from "@wagmi/core";
 import { DisplayErrorMessage } from "./DisplayErrorMessage";
 
