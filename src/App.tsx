@@ -20,7 +20,7 @@ const App = () => {
         <div className="flex align-center items-center">
           <img
             className="w-8 h-8 mr-1"
-            src={"/src/assets/flow.png"}
+            src={"/assets/flow.png"}
             alt="Flow"
           />
           <h1 className="text-xl font-bold">flow</h1>

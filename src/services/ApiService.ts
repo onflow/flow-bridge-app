@@ -154,7 +154,7 @@ class ApiService {
       destinationNetwork.nativeCurrency.symbol
     );
 
-    const gasFeeNativeToken = formatUnits(BigInt(gasFee as string), 18);
+    const gasFeeNativeToken = formatUnits(BigInt(gasFee || "0"), 18);
 
     if (transferFee.fee?.denom === token.id) {
       transferFee.fee.denom = token.prettySymbol;

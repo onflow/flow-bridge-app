@@ -1,7 +1,4 @@
-import {
-  AxelarQueryAPI,
-  Environment,
-} from "@axelar-network/axelarjs-sdk";
+import { AxelarQueryAPI, Environment } from "@axelar-network/axelarjs-sdk";
 import {
   FeeInfoResponse,
   TransferFeeResponse,
@@ -149,18 +146,15 @@ export class AxelarService {
     toChain: string,
     gasLimit: string,
     token: string
-  ) {
-    const gasFee = await this.querySdk.estimateGasFee(
-      fromChain,
-      toChain,
-      gasLimit,
-      "auto",
-      token,
-    );
-
+  ): Promise<string> {
+    const gasFee = await this.querySdk
+      .estimateGasFee(fromChain, toChain, gasLimit, "auto", token)
+      .catch((error) => {
+        console.error("Failed to estimate gas fee:", error);
+      });
     console.log("gasFee", gasFee);
 
-    return gasFee;
+    return gasFee as string;
   }
 
   public async transfer(
