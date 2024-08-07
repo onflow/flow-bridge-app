@@ -26,9 +26,9 @@ const App = () => {
           <h1 className="text-xl font-bold">flow</h1>
           <button
             onClick={() => setIsShowHistoryModal(!isShowHistory)}
-            className="ml-4 text-sm text-white bg-transparent text-xl font-semibold items-start"
+            className="ml-4 text-white bg-transparent items-start"
           >
-            History
+            <h1 className="text-xl font-bold">History</h1>
           </button>
         </div>
         <div className="connect-button">
