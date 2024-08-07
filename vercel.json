@@ -5,14 +5,14 @@
       "src": "src/api/proxy.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["dist/**"]
+        "includeFiles": ["build/**"]
       }
     },
     {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "build"
       }
     }
   ],
@@ -20,6 +20,9 @@
     {
       "src": "/api/(.*)",
       "dest": "/api/proxy.js"
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
