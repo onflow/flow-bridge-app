@@ -5,7 +5,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "outDir": "../../build/api",
+    "outDir": "../../dist/api",
     "rootDir": ".",
     "resolveJsonModule": true,
     "moduleResolution": "node"
