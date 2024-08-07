@@ -1,29 +1,29 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "src/api/proxy.ts",
-        "use": "@vercel/node",
-        "config": {
-          "includeFiles": ["build/**"]
-        }
-      },
-      {
-        "src": "vite.config.js",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "build"
-        }
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/api/proxy.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["build/**"]
       }
-    ],
-    "routes": [
-      {
-        "src": "/api/(.*)",
-        "dest": "src/api/proxy.ts"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/index.html"
+    },
+    {
+      "src": "vite.config.ts",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
       }
-    ]
-  }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/proxy.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
