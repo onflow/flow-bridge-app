@@ -9,7 +9,7 @@
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "node dist/api/proxy.js",
-    "build:server": "tsc -p src/api/tsconfig.json",
+    "build:server": "tsc -p tsconfig.api.json",
     "vercel-build": "npm run build && npm run build:server"
   },
   "engines": {
