@@ -7,20 +7,17 @@
     },
     {
       "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
     {
       "src": "/api/proxy",
-      "dest": "/dist/api/proxy.js"
+      "dest": "/api/proxy.js"
     },
     {
       "src": "/api/proxy/(.*)",
-      "dest": "/dist/api/proxy.js"
+      "dest": "/api/proxy.js"
     },
     {
       "handle": "filesystem"
