@@ -1,23 +1,14 @@
 import { Address, parseUnits, erc20Abi } from "viem";
-import {
-  useBlockNumber,
-  useWriteContract,
-} from "wagmi";
+import { useWriteContract } from "wagmi";
 import { TokenConfig } from "../services/ApiService";
 
-export function useSendErc20(
-  chainId: number | undefined,
-) {
-  const { data: blockNumber } = useBlockNumber({
-    chainId: chainId as number,
-  });
-
+export function useSendErc20() {
   const { writeContract, isSuccess, data, error } = useWriteContract();
 
   const sendTransfer = (
     token: TokenConfig,
     amount: string,
-    destinationAddress: string,
+    destinationAddress: string
   ) => {
     writeContract({
       address: token.address as Address,

@@ -1,6 +1,5 @@
 // MySvgIcon.jsx
 
-import React from "react";
 
 export const UpArrowIcon = () => (
   <svg

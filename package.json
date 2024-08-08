@@ -4,13 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"vite\" \"tsc -p tsconfig.api.json --watch\" \"nodemon dist/api/proxy.js\"",
-    "build": "vite build",
-    "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
+    "dev": "concurrently \"npm run dev:app\" \"npm run dev:api\"",
+    "dev:app": "vite",
+    "dev:api": "node --loader ts-node/esm src/api/proxy.ts",
+    "build": "tsc && vite build && tsc -p tsconfig.api.json",
     "start": "node dist/api/proxy.js",
-    "build:server": "tsc -p tsconfig.api.json",
-    "vercel-build": "npm run build && npm run build:server"
+    "preview": "vite preview"
   },
   "engines": {
     "node": ">=20"
@@ -24,15 +23,16 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.10",
-    "axios": "^1.7.2",
+    "axios": "^1.7.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^6.24.0",
-    "react-router-dom": "^6.24.0",
+    "react-router-dom": "6",
     "rxjs": "^7.8.1",
+    "ts-node-dev": "^2.0.0",
     "unfetch": "^5.0.0",
     "viem": "^2.18.2",
     "wagmi": "^2.12.1"
@@ -41,18 +41,18 @@
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/react-router": "^5.1.20",
-    "@types/react-router-dom": "^5.3.3",
+    "@types/react-router-dom": "5",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.2",
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-react-refresh": "^0.4.7",
+    "nodemon": "^2.0.7",
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.3",
-    "vite": "^5.3.1",
-    "concurrently": "^6.0.0",
-    "nodemon": "^2.0.7"
+    "vite": "^5.3.1"
   }
 }

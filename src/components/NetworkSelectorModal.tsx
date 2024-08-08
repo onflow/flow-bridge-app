@@ -1,9 +1,9 @@
 // src/components/NetworkSelectorModal.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import GenericModal from './GenericModal';
 import NetworkLabel from './NetworkLabel';
 import { useInitialization } from '../InitializationContext';
-import { NetworkInfo } from '../services/AxelarService';
+import { NetworkInfo } from '../services/ApiService';
 
 interface NetworkSelectorModalProps {
   onClose: () => void;
@@ -12,7 +12,7 @@ interface NetworkSelectorModalProps {
 
 const NetworkSelectorModal: React.FC<NetworkSelectorModalProps> = ({ onClose, isSource }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const { networks, loading, error, setSourceNetwork, setDestinationNetwork } = useInitialization();
+  const { networks, setSourceNetwork, setDestinationNetwork } = useInitialization();
 
   const filteredNetworks = networks.filter(network =>
     network.name.toLowerCase().includes(searchTerm.toLowerCase())

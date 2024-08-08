@@ -1,6 +1,3 @@
-// MySvgIcon.jsx
-
-import React from 'react';
 
 const SwapIcon = () => (
   <svg

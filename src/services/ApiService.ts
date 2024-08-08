@@ -1,4 +1,4 @@
-import { Address, Client, formatUnits, parseUnits } from "viem";
+import { Address, Client, formatUnits } from "viem";
 
 import { AxelarService } from "./AxelarService";
 import { readContract } from "viem/actions";

@@ -175,7 +175,7 @@ export class AxelarService {
 
     console.log("from chain", fromChain, fromChainGatewayAddress);
     const result = await writeContract(config, {
-      address: fromChainGatewayAddress,
+      address: fromChainGatewayAddress as Address,
       abi: IAxelarGateway.abi,
       functionName: "sendToken",
       args: [toChain, destinationAddress, denom, amountInAtomicUnits],

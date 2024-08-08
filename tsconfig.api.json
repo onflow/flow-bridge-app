@@ -1,9 +1,15 @@
 {
-    "extends": "./tsconfig.json",
     "compilerOptions": {
+      "target": "es2018",
+      "module": "ESNext",
+      "moduleResolution": "node",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
       "outDir": "./dist/api",
-      "rootDir": "./src/api",
+      "rootDir": "./src/api"
     },
-    "include": ["src/api/**/*.ts"],
+    "include": ["src/api/**/*"],
     "exclude": ["node_modules"]
   }

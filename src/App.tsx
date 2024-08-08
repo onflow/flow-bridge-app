@@ -1,9 +1,10 @@
 // src/App.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import BridgeForm from "./BridgeForm";
 import "./index.css";
 import TransactionHistoryModal from "./components/TransactionHistoryModal";
+import { Routes, Route } from "react-router-dom";
 
 const App = () => {
   useEffect(() => {
@@ -11,18 +12,13 @@ const App = () => {
     document.documentElement.classList.add("dark");
   }, []);
   const [isShowHistory, setIsShowHistoryModal] = useState(false);
-  const closeTransactionHistoryModal = () =>
-    setIsShowHistoryModal(false);
+  const closeTransactionHistoryModal = () => setIsShowHistoryModal(false);
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-background text-white">
       <header className="top-bar bg-background flex justify-between items-center p-4 w-full">
         <div className="flex align-center items-center">
-          <img
-            className="w-8 h-8 mr-1"
-            src={"/assets/flow.png"}
-            alt="Flow"
-          />
+          <img className="w-8 h-8 mr-1" src={"/assets/flow.png"} alt="Flow" />
           <h1 className="text-xl font-bold">flow</h1>
           <button
             onClick={() => setIsShowHistoryModal(!isShowHistory)}
@@ -36,8 +32,12 @@ const App = () => {
         </div>
       </header>
       <main className="p-4 w-full flex-1">
-        <BridgeForm />
-        {isShowHistory && <TransactionHistoryModal onClose={closeTransactionHistoryModal} />}
+        <Routes>
+          <Route path="/" element={<BridgeForm />} />
+        </Routes>
+        {isShowHistory && (
+          <TransactionHistoryModal onClose={closeTransactionHistoryModal} />
+        )}
       </main>
     </div>
   );

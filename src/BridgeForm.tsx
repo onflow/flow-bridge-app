@@ -101,7 +101,7 @@ const BridgeForm: React.FC = () => {
     }
   };
 
-  const handleAmountChange = (value) => {
+  const handleAmountChange = (value: string) => {
     setAmount(value);
     const bal = displayUserBalance()
     let err = "";

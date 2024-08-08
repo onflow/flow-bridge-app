@@ -52,7 +52,6 @@ interface InitializationContextType {
   setAmountReceive: React.Dispatch<React.SetStateAction<string>>;
   isApproved: (amount: string) => boolean;
   isApproving: boolean;
-  isSending: boolean;
   displayUserBalance: () => string;
   swapNetworks: () => void;
   bridgingFee: BridgingRate | undefined;
@@ -92,20 +91,17 @@ export const InitializationProvider: React.FC<{
   const [amountReceive, setAmountReceive] = useState<string>("");
   const [userBalance, setUserBalance] = useState<bigint>(BigInt(0));
   const [isApproving, setIsApproving] = useState<boolean>(false);
-  const [isSending, setIsSending] = useState<boolean>(false);
   const [bridgingFee, setBridgingFee] = useState<BridgingRate>();
   const [transferFee, setTransferFee] = useState<TransferFee>();
 
   const { isConnected, address: account, chain } = useAccount();
 
   const {
-    bridgeTokens,
     transactionHash: transferTxHash,
     status: transferStatus,
   } = useBridgeTokens();
 
   const {
-    allowance,
     isApproved,
     approveToken,
     transactionHash: approvalTxHash,
@@ -297,7 +293,6 @@ export const InitializationProvider: React.FC<{
         setAmountReceive,
         isApproved,
         isApproving,
-        isSending,
         displayUserBalance,
         swapNetworks,
         bridgingFee,

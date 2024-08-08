@@ -1,4 +1,3 @@
-import React from "react";
 import { NetworkInfo, TokenConfig } from "../services/ApiService";
 import { ethers } from "ethers";
 import IAxelarGateway from "@axelar-network/axelar-gmp-sdk-solidity/artifacts/contracts/interfaces/IAxelarGateway.sol/IAxelarGateway.json";
@@ -40,7 +39,7 @@ export const TransactionEntry = ({
 }) => {
   const { input, txreceipt_status, timeStamp } = tx;
 
-  function formatTimestamp(unixTimestamp) {
+  function formatTimestamp(unixTimestamp: string): string {
     const timestamp = parseInt(unixTimestamp, 10);
     const date = new Date(timestamp * 1000);
     const year = date.getFullYear();

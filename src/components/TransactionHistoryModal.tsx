@@ -2,8 +2,6 @@
 import React, { useEffect } from "react";
 import GenericModal from "./GenericModal";
 import { useInitialization } from "../InitializationContext";
-import { CircleXIcon } from "./CircleXIcon";
-import { UpArrowIcon } from "./UpArrowIcon";
 import Spinner from "./Spinner";
 import { useBlockNumber } from "wagmi";
 import axios from "axios";
@@ -14,7 +12,7 @@ interface TransactionConfirmationModalProps {
   onClose: () => void;
 }
 
-const blockExplorerApis = {
+const blockExplorerApis: { [key: string]: string } = {
   base: "https://api.basescan.org/api",
   polygon: "https://api.polygonscan.com/api",
   bsc: "https://api.bscscan.com/api",
@@ -31,8 +29,6 @@ const TransactionConfirmationModal: React.FC<
   const {
     address,
     sourceNetwork,
-    destinationNetwork,
-    destinationAddress,
     sourceNetworkTokens,
     networks,
   } = useInitialization();
@@ -41,17 +37,8 @@ const TransactionConfirmationModal: React.FC<
   const [noExplorer, setNoExplorer] = React.useState(true);
   const [userBridgedTxs, setUserBridgedTxs] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
-  let icon = <CircleXIcon />;
-  let link = "";
-  let destLink = "";
 
-  if (address) {
-    icon = <UpArrowIcon />;
-    link = `${sourceNetwork?.blockExplorer?.url}/address/${address}`;
-    destLink = `${destinationNetwork?.blockExplorer?.url}/address/${destinationAddress}`;
-  }
-
-  const getBlockExplorerApi = (network: NetworkInfo) => {
+  const getBlockExplorerApi = (network: NetworkInfo): string => {
     const name = network.name.toLowerCase();
     return blockExplorerApis[name];
   };
@@ -104,9 +91,14 @@ const TransactionConfirmationModal: React.FC<
             />
           ))}
         {loading && <Spinner />}
-        {userBridgedTxs.length === 0 && !loading && (
+        {userBridgedTxs.length === 0 && !loading && !noExplorer && (
           <div className="flex justify-center mb-6 items-center m-20">
             No Transactions Found
+          </div>
+        )}
+        {noExplorer && (
+          <div className="flex justify-center mb-6 items-center m-20">
+            No block explorer available for this network
           </div>
         )}
       </div>

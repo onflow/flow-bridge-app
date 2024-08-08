@@ -70,5 +70,6 @@ export const useTokenApproval = (
     isSuccess,
     isError,
     status,
+    confirmed,
   };
 };

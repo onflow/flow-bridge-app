@@ -11,7 +11,7 @@ interface SelectTokenModalProps {
 
 const SelectTokenModal: React.FC<SelectTokenModalProps> = ({ onClose }) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const { sourceNetworkTokens, loading, error, setToken } = useInitialization();
+  const { sourceNetworkTokens, setToken } = useInitialization();
 
   const filteredTokens = sourceNetworkTokens.filter((token) =>
     token.name.toLowerCase().includes(searchTerm.toLowerCase())

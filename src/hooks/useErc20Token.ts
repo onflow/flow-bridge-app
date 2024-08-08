@@ -1,4 +1,4 @@
-import { Address, parseUnits, erc20Abi, formatUnits } from "viem";
+import { Address, erc20Abi, formatUnits } from "viem";
 import { useReadContract, useAccount } from "wagmi";
 import { TokenConfig } from "../services/ApiService";
 

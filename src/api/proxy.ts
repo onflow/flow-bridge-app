@@ -1,25 +1,29 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import axios from 'axios';
+import cors from 'cors';
 
 const app = express();
-const PORT = 4000; // Ensure this matches the target port in Vite config
+const PORT = process.env.PORT || 3001;
 
-app.get('/proxy', async (req: Request, res: Response) => {
+app.use(cors());
+
+app.get('/proxy', async (req, res) => {
   const url = req.query.url as string;
-
   if (!url) {
-    res.status(400).json({ error: 'URL is required' });
-    return;
+    return res.status(400).json({ error: 'URL is required' });
   }
 
   try {
     const response = await axios.get(url);
-    res.status(200).json(response.data);
+    return res.status(200).json(response.data);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch data' });
+    console.error('Error occurred while fetching data:', error);
+    return res.status(500).json({ error: 'Failed to fetch data', details: error});
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Proxy server running on port ${PORT}`);
+  console.log(`API server running on http://localhost:${PORT}`);
 });
+
+export default app;

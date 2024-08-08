@@ -1,4 +1,5 @@
-import { Wallet, WalletDetailsParams, getWalletConnectConnector } from '@rainbow-me/rainbowkit';
+import { Wallet, getWalletConnectConnector } from '@rainbow-me/rainbowkit';
+// @ts-ignore
 import { DefaultWalletOptions } from '@rainbow-me/rainbowkit/dist/wallets/Wallet';
 
 export type FlowWalletOptions = DefaultWalletOptions;

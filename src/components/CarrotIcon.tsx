@@ -1,4 +1,3 @@
-import React from "react";
 
 export const CarrotIcon = () => (
     <svg className="ml-2 w-4 h-4" fill="#ffffff" viewBox="0 0 20 20">
