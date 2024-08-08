@@ -34,7 +34,7 @@ const TransactionConfirmationModal: React.FC<
   } = useInitialization();
 
   const blockNumber = useBlockNumber();
-  const [noExplorer, setNoExplorer] = React.useState(true);
+  const [noExplorer, setNoExplorer] = React.useState(false);
   const [userBridgedTxs, setUserBridgedTxs] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
 
