@@ -5,15 +5,15 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist',
-    assetsDir: 'assets', 
+    assetsDir: 'assets',
   },
   server: {
     port: 3000,
     proxy: {
-      '/proxy': {
+      '/api': {
         target: 'http://localhost:4000',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/proxy/, '/proxy'),
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
       },
     },
   },

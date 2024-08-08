@@ -67,7 +67,7 @@ const TransactionConfirmationModal: React.FC<
       const apiUrl = `${api}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc`;
       console.log(apiUrl);
       const response = await axios.get(
-        `/proxy?url=${encodeURIComponent(apiUrl)}`
+        `/api/proxy?url=${encodeURIComponent(apiUrl)}`
       );
       const history = await response.data.result;
       console.log(history);
