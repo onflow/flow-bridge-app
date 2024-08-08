@@ -4,13 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"vite\" \"tsc -p tsconfig.api.json --watch\" \"nodemon dist/api/proxy.js\"",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx,ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "start": "node dist/api/proxy.js",
     "build:server": "tsc -p src/api/tsconfig.json",
     "vercel-build": "npm run build && npm run build:server"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.16.2",
@@ -48,6 +51,8 @@
     "postcss": "^8.4.39",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.5.3",
-    "vite": "^5.3.1"
+    "vite": "^5.3.1",
+    "concurrently": "^6.0.0",
+    "nodemon": "^2.0.7"
   }
 }
