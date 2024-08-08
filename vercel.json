@@ -12,8 +12,13 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "/api/proxy.js" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/proxy.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
   ]
 }
