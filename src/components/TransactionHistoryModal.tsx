@@ -4,6 +4,7 @@ import GenericModal from "./GenericModal";
 import { useInitialization } from "../InitializationContext";
 import { CircleXIcon } from "./CircleXIcon";
 import { UpArrowIcon } from "./UpArrowIcon";
+import Spinner from "./Spinner";
 import { useBlockNumber } from "wagmi";
 import axios from "axios";
 import { NetworkInfo } from "../services/ApiService";
@@ -37,8 +38,9 @@ const TransactionConfirmationModal: React.FC<
   } = useInitialization();
 
   const blockNumber = useBlockNumber();
-  const [noExplorer, setNoExplorer] = React.useState(false);
+  const [noExplorer, setNoExplorer] = React.useState(true);
   const [userBridgedTxs, setUserBridgedTxs] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
   let icon = <CircleXIcon />;
   let link = "";
   let destLink = "";
@@ -63,22 +65,27 @@ const TransactionConfirmationModal: React.FC<
         setNoExplorer(true);
         return;
       }
-      // get user's transaction history
-      const apiUrl = `${api}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc`;
-      console.log(apiUrl);
-      const response = await axios.get(
-        `/api/proxy?url=${encodeURIComponent(apiUrl)}`
-      );
-      const history = await response.data.result;
-      console.log(history);
+      setLoading(true);
+      try {
+        // get user's transaction history
+        const apiUrl = `${api}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc`;
+        console.log(apiUrl);
+        const response = await axios.get(
+          `/api/proxy?url=${encodeURIComponent(apiUrl)}`
+        );
+        const history = await response.data.result;
+        console.log(history);
 
-      // filter to only the gateway contract transactions
-      const bridgeTxs = (history || []).filter(
-        (tx: any) =>
-          tx.to.toLowerCase() === sourceNetwork?.gatewayAddress.toLowerCase()
-      );
-      console.log(bridgeTxs);
-      setUserBridgedTxs(bridgeTxs);
+        // filter to only the gateway contract transactions
+        const bridgeTxs = (history || []).filter(
+          (tx: any) =>
+            tx.to.toLowerCase() === sourceNetwork?.gatewayAddress.toLowerCase()
+        );
+        console.log(bridgeTxs);
+        setUserBridgedTxs(bridgeTxs);
+      } finally {
+        setLoading(false);
+      }
     };
     if (address) getHistory(address);
   }, [sourceNetwork, address, blockNumber?.data]);
@@ -96,9 +103,11 @@ const TransactionConfirmationModal: React.FC<
               networks={networks}
             />
           ))}
-
-        {userBridgedTxs.length === 0 && (
-          <div className="flex justify-center mb-6 items-center m-20">No Transactions Found</div>
+        {loading && <Spinner />}
+        {userBridgedTxs.length === 0 && !loading && (
+          <div className="flex justify-center mb-6 items-center m-20">
+            No Transactions Found
+          </div>
         )}
       </div>
     </GenericModal>
