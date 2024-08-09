@@ -14,6 +14,7 @@ import {
   optimism,
   arbitrum,
   base,
+  avalanche,
   flowPreviewnet,
 } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
@@ -26,7 +27,7 @@ import { createClient, http } from "viem";
 const c = {
   ...flowPreviewnet,
   name: "Flow",
-  iconUrl: "/src/assets/flow.png",
+  iconUrl: "/assets/flow.png",
 };
 
 const PROJECT_ID = "YOUR_PROJECT_ID"
@@ -47,7 +48,7 @@ const connectors = connectorsForWallets(
 
 const config = createConfig({
   connectors,
-  chains: [mainnet, polygon, optimism, arbitrum, base, c],
+  chains: [mainnet, polygon, optimism, arbitrum, base, avalanche, c],
   client({chain}) {
     return createClient({chain, transport: http()})
   }
