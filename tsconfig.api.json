@@ -7,8 +7,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "rootDir": "."
+    "outDir": "./dist/api",
+    "rootDir": "./api"
   },
   "include": ["api/**/*"],
   "exclude": ["node_modules"]
