@@ -8,6 +8,7 @@
     "dev:app": "vite",
     "dev:api": "node --loader ts-node/esm api/proxy.ts",
     "build": "tsc && vite build && tsc -p tsconfig.api.json",
+    "vercel-build": "tsc -p tsconfig.api.json && vite build",
     "start": "node dist/api/proxy.js",
     "preview": "vite preview"
   },

@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "target": "es2018",
-    "module": "CommonJS",
+    "module": "commonjs",
     "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist/api",
-    "rootDir": "./api"
+    "outDir": "./dist",
+    "rootDir": "."
   },
   "include": ["api/**/*"],
   "exclude": ["node_modules"]
