@@ -1,15 +1,15 @@
 {
-    "compilerOptions": {
-      "target": "es2018",
-      "module": "ESNext",
-      "moduleResolution": "node",
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "forceConsistentCasingInFileNames": true,
-      "outDir": "./dist/api",
-      "rootDir": "./src/api"
-    },
-    "include": ["src/api/**/*"],
-    "exclude": ["node_modules"]
-  }
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "./dist/api",
+    "rootDir": "./api"
+  },
+  "include": ["api/**/*"],
+  "exclude": ["node_modules"]
+}
