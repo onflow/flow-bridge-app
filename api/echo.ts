@@ -9,7 +9,7 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
   const { method, query, body, headers } = req;
   const { key } = query;
 
-  if (method !== "POST") {
+  if (method !== "GET") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
