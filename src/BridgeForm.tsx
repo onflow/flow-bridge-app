@@ -57,7 +57,7 @@ const BridgeForm: React.FC = () => {
         setEstimatedAmount("");
         return;
       }
-      
+
       const estAmount = Number(amount) - Number(transferFee?.fee);
       if (estAmount < 0 && error === "") {
         setError("Receive amount is negative");
@@ -154,15 +154,6 @@ const BridgeForm: React.FC = () => {
   };
 
   const needsApproval = !isApproved(amount);
-
-  console.log(
-    "rendering form",
-    needsApproval,
-    approvalError?.message,
-    approvalError,
-    "error", error
-  );
-
 
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">

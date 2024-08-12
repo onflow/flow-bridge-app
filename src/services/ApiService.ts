@@ -88,7 +88,6 @@ class ApiService {
   public DefaultToken: string = "uusdc";
 
   constructor() {
-    console.log("ApiService constructor");
   }
 
   public isInitialized(): boolean {
@@ -120,7 +119,6 @@ class ApiService {
         functionName: "balanceOf",
         args: [account],
       })) as bigint;
-      console.log("user balance:", result);
       bal = BigInt(result.toString());
     } catch (error) {
       console.error("Failed to get token balance:", error);

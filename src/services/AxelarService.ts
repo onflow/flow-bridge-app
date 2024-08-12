@@ -48,7 +48,6 @@ export class AxelarService {
   });
 
   constructor() {
-    console.log("AxelarService constructor");
     this.init();
   }
 
@@ -152,7 +151,6 @@ export class AxelarService {
       .catch((error) => {
         console.error("Failed to estimate gas fee:", error);
       });
-    console.log("gasFee", gasFee);
 
     return gasFee as string;
   }
