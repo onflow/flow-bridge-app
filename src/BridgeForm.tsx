@@ -52,9 +52,18 @@ const BridgeForm: React.FC = () => {
 
   useEffect(() => {
     if (transferFee?.fee) {
+      if (amount === "" || amount === "0") {
+        setError("");
+        setEstimatedAmount("");
+        return;
+      }
+      
       const estAmount = Number(amount) - Number(transferFee?.fee);
       if (estAmount < 0 && error === "") {
         setError("Receive amount is negative");
+      }
+      if (amount === "" || amount === "0") {
+        return;
       }
       setEstimatedAmount(String(estAmount));
     }
@@ -113,6 +122,12 @@ const BridgeForm: React.FC = () => {
     } 
     setError(err);
 
+    console.log("value amount", value);
+    if (value === "") {
+      setEstimatedAmount("");
+      return;
+    }
+
     const estAmount = Number(value) - Number(transferFee?.fee || 0);
     setEstimatedAmount(String(estAmount));
     setAmountReceive(String(estAmount));
@@ -133,6 +148,8 @@ const BridgeForm: React.FC = () => {
       console.error("Source and destination networks must be selected");
       return;
     }
+    setEstimatedAmount("");
+    setAmountReceive("");
     swapNetworks();
   };
 
