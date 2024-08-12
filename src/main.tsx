@@ -30,7 +30,7 @@ const c = {
   iconUrl: "/assets/flow.png",
 };
 
-const PROJECT_ID = "YOUR_PROJECT_ID"
+const PROJECT_ID = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID
 const APP_NAME = "Flow Bridge App"
 
 const connectors = connectorsForWallets(
