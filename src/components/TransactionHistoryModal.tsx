@@ -7,6 +7,7 @@ import { useBlockNumber } from "wagmi";
 import axios from "axios";
 import { NetworkInfo } from "../services/ApiService";
 import { TransactionEntry } from "./TransactionEntry";
+import { BlockExplorerLinks } from "./BlockExplorerLinks";
 
 interface TransactionConfirmationModalProps {
   onClose: () => void;
@@ -26,12 +27,8 @@ const blockExplorerApis: { [key: string]: string } = {
 const TransactionConfirmationModal: React.FC<
   TransactionConfirmationModalProps
 > = ({ onClose }) => {
-  const {
-    address,
-    sourceNetwork,
-    sourceNetworkTokens,
-    networks,
-  } = useInitialization();
+  const { address, sourceNetwork, sourceNetworkTokens, networks } =
+    useInitialization();
 
   const blockNumber = useBlockNumber();
   const [noExplorer, setNoExplorer] = React.useState(false);
@@ -58,19 +55,25 @@ const TransactionConfirmationModal: React.FC<
         // get user's transaction history
         const apiUrl = `${api}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=10&sort=desc`;
         console.log(apiUrl);
-        const response = await axios.get(
-          `/api/proxy?name=${name}&url=${encodeURIComponent(apiUrl)}`
-        );
-        const history = await response.data.result;
-        console.log(history);
+        const response = await axios
+          .get(`/api/proxy?name=${name}&url=${encodeURIComponent(apiUrl)}`)
+          .catch((error) => {
+            console.error(error);
+          });
 
-        // filter to only the gateway contract transactions
-        const bridgeTxs = (history || []).filter(
-          (tx: any) =>
-            tx.to.toLowerCase() === sourceNetwork?.gatewayAddress.toLowerCase()
-        );
-        console.log(bridgeTxs);
-        setUserBridgedTxs(bridgeTxs);
+        if (response?.data) {
+          const history = await response.data.result;
+          console.log(history);
+
+          // filter to only the gateway contract transactions
+          const bridgeTxs = (history || []).filter(
+            (tx: any) =>
+              tx.to.toLowerCase() ===
+              sourceNetwork?.gatewayAddress.toLowerCase()
+          );
+          console.log(bridgeTxs);
+          setUserBridgedTxs(bridgeTxs);
+        }
       } finally {
         setLoading(false);
       }
@@ -80,29 +83,34 @@ const TransactionConfirmationModal: React.FC<
 
   return (
     <GenericModal title="Your latest transactions" onClose={onClose}>
-      <div className="flex flex-col h-full text-center">
-        {userBridgedTxs.length > 0 &&
-          userBridgedTxs.map((tx: any, index: number) => (
-            <TransactionEntry
-              key={index}
-              tx={tx}
-              sourceNetwork={sourceNetwork}
-              tokens={sourceNetworkTokens}
-              networks={networks}
-            />
-          ))}
-        {loading && <Spinner />}
-        {userBridgedTxs.length === 0 && !loading && !noExplorer && (
-          <div className="flex justify-center mb-6 items-center m-20">
-            No Transactions Found
-          </div>
-        )}
-        {noExplorer && (
-          <div className="flex justify-center mb-6 items-center m-20">
-            No block explorer available for this network
-          </div>
-        )}
-      </div>
+      <>
+        <div className="flex flex-col h-full text-center">
+          {userBridgedTxs.length > 0 &&
+            userBridgedTxs.map((tx: any, index: number) => (
+              <TransactionEntry
+                key={index}
+                tx={tx}
+                sourceNetwork={sourceNetwork}
+                tokens={sourceNetworkTokens}
+                networks={networks}
+              />
+            ))}
+          {loading && <Spinner />}
+          {userBridgedTxs.length === 0 && !loading && !noExplorer && (
+            <div className="flex justify-center mb-6 items-center m-20">
+              No Transactions Found
+            </div>
+          )}
+          {noExplorer && (
+            <div className="flex justify-center mb-6 items-center m-20">
+              No block explorer available for this network
+            </div>
+          )}
+        </div>
+        <div className="mt-auto">
+          <BlockExplorerLinks />
+        </div>
+      </>
     </GenericModal>
   );
 };

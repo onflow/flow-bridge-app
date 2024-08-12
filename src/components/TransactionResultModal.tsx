@@ -8,6 +8,7 @@ import { ActionButton } from "./ActionButton";
 import { ExternalLinkIcon } from "./ExternalLinkIcon";
 import { type WriteContractErrorType } from "@wagmi/core";
 import { DisplayErrorMessage } from "./DisplayErrorMessage";
+import { BlockExplorerLinks } from "./BlockExplorerLinks";
 
 interface TransactionConfirmationModalProps {
   onClose: () => void;
@@ -32,7 +33,6 @@ const TransactionConfirmationModal: React.FC<
     destLink = `${destinationNetwork?.blockExplorer?.url}/address/${destinationAddress}`;
   }
 
-  console.log(sourceNetwork?.blockExplorer);
   return (
     <GenericModal title="" onClose={onClose}>
       <div className="flex flex-col h-full text-center">
@@ -74,20 +74,9 @@ const TransactionConfirmationModal: React.FC<
             <ExternalLinkIcon />
           </span>
         )}
-        {destLink && (
-          <span className="mb-8 flex items-center gap-1 justify-center">
-            {`${destinationNetwork?.name} block explorer:`}
-            <a
-              href={destLink}
-              className="text-green-500 hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {`View destination address`}
-            </a>
-            <ExternalLinkIcon />
-          </span>
-        )}
+        <div className="mt-auto">
+          <BlockExplorerLinks />
+        </div>
         <div className="mt-auto">
           <ActionButton
             title="OK"
