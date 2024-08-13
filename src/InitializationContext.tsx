@@ -145,7 +145,6 @@ export const InitializationProvider: React.FC<{
             destination = network;
           }
         });
-
         setSourceNetwork(source);
         if (!destinationNetwork) setDestinationNetwork(destination);
       } catch (err) {
@@ -178,7 +177,7 @@ export const InitializationProvider: React.FC<{
     setLoading(true);
     try {
       // set tokens for network
-      const tokens = ApiService.getSupportedChainTokens(String(network.name));
+      const tokens = ApiService.getSupportedChainTokens(String(network.nameKey));
       setSourceNetworkTokens(tokens);
       setOriginNetwork(network);
       setAmount(""); // reset amount

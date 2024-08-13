@@ -26,7 +26,7 @@ export const BlockExplorerLinks = () => {
         <span className="flex items-center gap-1 justify-center">
           {`${sourceNetwork?.name} block explorer:`}
           <a
-            href={destLink}
+            href={sourceLink}
             className="flex text-green-500 hover:no-underline"
             target="_blank"
             rel="noopener noreferrer"

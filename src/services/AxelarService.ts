@@ -34,13 +34,13 @@ interface AxelarConfigs {
   };
 }
 
-const SupportedTokens = ["uusdc", "weth-wei", "wbtc-satoshi"];
+const SupportedTokens = ["uausdc", "uaxl", "wbtc-satoshi"];
 export class AxelarService {
   private configs: AxelarConfigs | null = null;
-  private configUrl =
-    "https://axelar-mainnet.s3.us-east-2.amazonaws.com/configs/mainnet-config-1.x.json";
+  //  private configUrl = "https://axelar-mainnet.s3.us-east-2.amazonaws.com/configs/mainnet-config-1.x.json";
 
-  //  private configUrl = "https://axelar-testnet.s3.us-east-2.amazonaws.com/configs/testnet-config-1.x.json";
+  private configUrl =
+    "https://axelar-testnet.s3.us-east-2.amazonaws.com/configs/testnet-config-1.x.json";
   private assetUrl = "";
 
   private querySdk = new AxelarQueryAPI({
@@ -81,11 +81,12 @@ export class AxelarService {
         const explorer = value?.blockExplorers?.[0];
         result[key] = {
           name: value.displayName,
+          nameKey: value?.id,
           icon: `${this.assetUrl}${value.iconUrl}`,
           id: parseInt(value?.externalChainId),
           assets: value.assets,
           approxFinalityWaitTime: value.config.approxFinalityWaitTime,
-          gatewayAddress: value.config.contracts.AxelarGateway
+          gatewayAddress: value.config?.contracts?.AxelarGateway
             ?.address as Address,
           blockExplorer: {
             // grab the first block explorer
@@ -93,10 +94,10 @@ export class AxelarService {
             url: explorer?.url,
           },
           nativeCurrency: {
-            name: value.nativeCurrency.name,
-            symbol: value.nativeCurrency.symbol,
-            decimals: value.nativeCurrency.decimals,
-            iconUrl: `${this.assetUrl}${value.nativeCurrency.iconUrl}`,
+            name: value.nativeCurrency?.name,
+            symbol: value.nativeCurrency?.symbol,
+            decimals: value.nativeCurrency?.decimals,
+            iconUrl: `${this.assetUrl}${value.nativeCurrency?.iconUrl}`,
           },
         };
       }
@@ -110,10 +111,7 @@ export class AxelarService {
     asset: TokenConfig
   ): Promise<FeeInfoResponse> {
     // get denom for token from chain
-    const denom = await this.getTokenDenom(chain, asset);
-    if (!denom) {
-      throw new Error(`Token denom not found for token ${asset.name}`);
-    }
+    let denom = await this.getTokenDenom(chain, asset);
 
     return await this.querySdk.getFeeForChainAndAsset(chain, denom);
   }
@@ -128,9 +126,6 @@ export class AxelarService {
     // get denom for token from chain
     // convert amount to denom units
     const denom = await this.getTokenDenom(fromChain, token);
-    if (!denom) {
-      throw new Error(`Token denom not found for token ${token.name}`);
-    }
 
     return await this.querySdk.getTransferFee(
       fromChain,
@@ -153,50 +148,6 @@ export class AxelarService {
       });
 
     return gasFee as string;
-  }
-
-  public async transfer(
-    fromChainGatewayAddress: string,
-    fromChain: string,
-    toChain: string,
-    token: TokenConfig,
-    amount: string,
-    destinationAddress: string,
-    config: Config
-  ): Promise<string> {
-    console.log("IAxelarGateway", IAxelarGateway.abi);
-    const amountInAtomicUnits = ethers.utils
-      .parseUnits(amount.toString(), token.decimals)
-      .toString();
-
-    const denom = (await this.getTokenDenom(fromChain, token)) || token.id;
-
-    console.log("from chain", fromChain, fromChainGatewayAddress);
-    const result = await writeContract(config, {
-      address: fromChainGatewayAddress as Address,
-      abi: IAxelarGateway.abi,
-      functionName: "sendToken",
-      args: [toChain, destinationAddress, denom, amountInAtomicUnits],
-    });
-    /*
-    const requestOptions: SendTokenParams = {
-      fromChain,
-      toChain,
-      destinationAddress,
-      asset: { denom, symbol: token.symbol },
-      amountInAtomicUnits,
-      options: {
-        evmOptions: {
-          signer,
-          provider: provider,
-          approveSendForMe: true,
-        },
-      },
-    };
-    
-    return this.assetTransfer.sendToken(requestOptions) as Promise<ethers.providers.TransactionResponse>;
-    */
-    return result;
   }
 
   public getTokensForChain(chainName: string): TokenConfig[] {
@@ -247,13 +198,17 @@ export class AxelarService {
   public async getTokenDenom(
     chainName: string,
     token: TokenConfig
-  ): Promise<string | null> {
+  ): Promise<string> {
     if (!this.configs) {
       throw new Error("AxelarService is not initialized yet.");
     }
-    return await this.querySdk.getDenomFromSymbol(
+    let denom = await this.querySdk.getDenomFromSymbol(
       token?.symbol,
       chainName.toLowerCase()
     );
+    if (!denom) {
+     denom = token.symbol;
+    } 
+    return denom as string;
   }
 }

@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/proxy': {
-        target: 'https://api.basescan.org',
+        target: 'https://api-sepolia.basescan.org/api',
         changeOrigin: true,
         rewrite: (path) => {
           console.log('Proxying request:', path);
