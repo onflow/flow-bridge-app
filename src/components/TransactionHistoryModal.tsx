@@ -40,7 +40,7 @@ const TransactionConfirmationModal: React.FC<
   const [loading, setLoading] = React.useState(false);
 
   const getBlockExplorerApi = (network: NetworkInfo): string => {
-    const name = network.name.toLowerCase();
+    const name = network.nameKey.toLowerCase();
     return blockExplorerApis[name];
   };
 

@@ -7,17 +7,18 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/proxy': {
-        target: 'https://api-sepolia.basescan.org/api',
+        target: 'https://api-sepolia.basescan.org',
         changeOrigin: true,
         rewrite: (path) => {
-          console.log('Proxying request:', path);
           const url = new URL(path, 'http://dummy.com');
           const targetUrl = url.searchParams.get('url');
           if (!targetUrl) {
             console.error('No URL provided in the proxy request');
             return path;
           }
-          return targetUrl;
+          const parsedUrl = new URL(targetUrl);
+          console.log('Proxying to:', parsedUrl.pathname + parsedUrl.search);
+          return parsedUrl.pathname + parsedUrl.search;
         },
       },
     },

@@ -82,7 +82,7 @@ export class AxelarService {
         result[key] = {
           name: value.displayName,
           nameKey: value?.id,
-          icon: `${this.assetUrl}${value.iconUrl}`,
+          icon: `${this.assetUrl}${value.iconUrl.replace("-sepolia", "")}`,
           id: parseInt(value?.externalChainId),
           assets: value.assets,
           approxFinalityWaitTime: value.config.approxFinalityWaitTime,
