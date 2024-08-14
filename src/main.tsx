@@ -57,7 +57,8 @@ const config = createConfig({
   chains: [sepolia, baseSepolia, optimismSepolia, arbitrumSepolia, blastSepolia,flow],
   client({chain}) {
     return createClient({chain, transport: http()})
-  }
+  },
+  multiInjectedProviderDiscovery: true,
 });
 
 const queryClient = new QueryClient({
