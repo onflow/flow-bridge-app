@@ -15,13 +15,7 @@ import {
   arbitrum,
   base,
   avalanche,
-  flowPreviewnet,
-  flowTestnet,
-  arbitrumSepolia,
-  optimismSepolia,
-  sepolia,
-  blastSepolia,
-  baseSepolia,
+  flowMainnet,
 } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { flowDarkTheme } from "./FlowDarkTheme"; // Import your custom theme
@@ -31,7 +25,7 @@ import { flowWallet } from "./flow-wallet";
 import { createClient, http } from "viem";
 
 const flow = {
-  ...flowTestnet,
+  ...flowMainnet,
   name: "Flow",
   iconUrl: "/assets/flow.png",
 };
