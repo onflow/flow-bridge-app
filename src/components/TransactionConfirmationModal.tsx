@@ -54,7 +54,7 @@ const TransactionConfirmationModal: React.FC<
     try {
       bridgeTokens(
         sourceNetwork,
-        destinationNetwork?.name,
+        destinationNetwork?.nameKey as string,
         sourceToken,
         amount,
         destinationAddress as string,

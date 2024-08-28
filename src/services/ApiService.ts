@@ -4,6 +4,7 @@ import { AxelarService } from "./AxelarService";
 import { readContract } from "viem/actions";
 
 export interface ChainConfig {
+  id: string;
   displayName: string;
   iconUrl: string;
   chainType: string;
@@ -34,6 +35,7 @@ export interface TokenConfig {
   address: string;
 }
 export interface NetworkInfo {
+  nameKey: string;
   name: string;
   icon: string;
   id: number;
@@ -133,14 +135,14 @@ class ApiService {
     amount: string
   ): Promise<BridgingTransferFee> {
     const transferFee = await this.axelarService.getTransferFee(
-      sourceNetwork.name,
-      destinationNetwork.name,
+      sourceNetwork.nameKey,
+      destinationNetwork.nameKey,
       token,
       amount
     );
 
     const chainFees = await this.axelarService.getFeeForChainAndAsset(
-      sourceNetwork.name,
+      sourceNetwork.nameKey,
       token
     );
 

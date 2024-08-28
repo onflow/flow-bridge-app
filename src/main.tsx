@@ -16,16 +16,22 @@ import {
   base,
   avalanche,
   flowPreviewnet,
+  flowTestnet,
+  arbitrumSepolia,
+  optimismSepolia,
+  sepolia,
+  blastSepolia,
+  baseSepolia,
 } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { flowDarkTheme } from "./FlowDarkTheme"; // Import your custom theme
 import { InitializationProvider } from "./InitializationContext";
-import { metaMaskWallet, rainbowWallet, walletConnectWallet, injectedWallet } from "@rainbow-me/rainbowkit/wallets";
+import { metaMaskWallet, rainbowWallet, walletConnectWallet, injectedWallet, coinbaseWallet } from "@rainbow-me/rainbowkit/wallets";
 import { flowWallet } from "./flow-wallet";
 import { createClient, http } from "viem";
 
-const c = {
-  ...flowPreviewnet,
+const flow = {
+  ...flowTestnet,
   name: "Flow",
   iconUrl: "/assets/flow.png",
 };
@@ -37,7 +43,7 @@ const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended',
-      wallets: [flowWallet, rainbowWallet, walletConnectWallet, metaMaskWallet, walletConnectWallet, injectedWallet],
+      wallets: [flowWallet, rainbowWallet, metaMaskWallet, walletConnectWallet, injectedWallet, coinbaseWallet],
     },
   ],
   {
@@ -48,10 +54,11 @@ const connectors = connectorsForWallets(
 
 const config = createConfig({
   connectors,
-  chains: [mainnet, polygon, optimism, arbitrum, base, avalanche, c],
+  chains: [sepolia, baseSepolia, optimismSepolia, arbitrumSepolia, blastSepolia,flow],
   client({chain}) {
     return createClient({chain, transport: http()})
-  }
+  },
+  multiInjectedProviderDiscovery: true,
 });
 
 const queryClient = new QueryClient({
