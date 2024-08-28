@@ -33,6 +33,7 @@ export interface TokenConfig {
   decimals: number;
   icon: string;
   address: string;
+  translatedSymbol: string;
 }
 export interface NetworkInfo {
   nameKey: string;

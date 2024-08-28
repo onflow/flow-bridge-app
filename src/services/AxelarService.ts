@@ -34,13 +34,26 @@ interface AxelarConfigs {
   };
 }
 
-const SupportedTokens = ["uausdc", "uaxl", "wbtc-satoshi"];
+// TODO: Support PYUSD when it gets added to the Axelar configs
+/* Need to add translation for token symbols to denoms 
+pyUSD rename to USDf
+axlBTC rename to BTCf
+axlETH rename to ETHf
+*/
+const SupportedTokens = ["uausdc", "uaxl", "wbtc-satoshi", "weth-wei"];
+const SupportedTokensNames: { [key: string]: string } = {
+  uausdc: "USDf",
+  uaxl: "AXL",
+  "wbtc-satoshi": "BTCf",
+  "weth-wei": "ETHf",
+};
+
 export class AxelarService {
   private configs: AxelarConfigs | null = null;
-  //  private configUrl = "https://axelar-mainnet.s3.us-east-2.amazonaws.com/configs/mainnet-config-1.x.json";
+  private configUrl = "https://axelar-mainnet.s3.us-east-2.amazonaws.com/configs/mainnet-config-1.x.json";
 
-  private configUrl =
-    "https://axelar-testnet.s3.us-east-2.amazonaws.com/configs/testnet-config-1.x.json";
+  // private configUrl =
+  //  "https://axelar-testnet.s3.us-east-2.amazonaws.com/configs/testnet-config-1.x.json";
   private assetUrl = "";
 
   private querySdk = new AxelarQueryAPI({
@@ -82,7 +95,7 @@ export class AxelarService {
         result[key] = {
           name: value.displayName,
           nameKey: value?.id,
-          icon: `${this.assetUrl}${value.iconUrl.replace("-sepolia", "")}`,
+          icon: `${this.assetUrl}${value.iconUrl}`,
           id: parseInt(value?.externalChainId),
           assets: value.assets,
           approxFinalityWaitTime: value.config.approxFinalityWaitTime,
@@ -192,6 +205,7 @@ export class AxelarService {
       decimals: token.decimals,
       address: address,
       icon: `${this.assetUrl}${token.iconUrl}`,
+      translatedSymbol: SupportedTokensNames[key],
     };
   }
 

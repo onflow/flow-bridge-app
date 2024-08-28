@@ -54,7 +54,7 @@ const connectors = connectorsForWallets(
 
 const config = createConfig({
   connectors,
-  chains: [sepolia, baseSepolia, optimismSepolia, arbitrumSepolia, blastSepolia,flow],
+  chains: [mainnet, polygon, optimism, arbitrum, base, avalanche, flow],
   client({chain}) {
     return createClient({chain, transport: http()})
   },

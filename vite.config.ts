@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api/proxy': {
-        target: 'https://api-sepolia.basescan.org',
+        target: 'https://api.basescan.org',
         changeOrigin: true,
         rewrite: (path) => {
           const url = new URL(path, 'http://dummy.com');
@@ -17,7 +17,6 @@ export default defineConfig({
             return path;
           }
           const parsedUrl = new URL(targetUrl);
-          console.log('Proxying to:', parsedUrl.pathname + parsedUrl.search);
           return parsedUrl.pathname + parsedUrl.search;
         },
       },

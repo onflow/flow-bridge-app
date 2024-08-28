@@ -22,10 +22,6 @@ const blockExplorerApis: { [key: string]: string } = {
   optimism: "https://api.optimism.io/api",
   xdai: "https://blockscout.com/poa/xdai/api",
   ethereum: "https://api.etherscan.io/api",
-  "base-sepolia": "https://api-sepolia.basescan.org/api",
-  "ethereum-sepolia": "https://api-sepolia.etherscan.io/api",
-  "optimism-sepolia": "https://api-sepolia-optimistic.etherscan.io/api",
-  "arbitrum-sepolia": "https://api-sepolia.arbiscan.io/api",
 };
 
 const TransactionConfirmationModal: React.FC<
