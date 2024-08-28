@@ -40,9 +40,9 @@ pyUSD rename to USDf
 axlBTC rename to BTCf
 axlETH rename to ETHf
 */
-const SupportedTokens = ["uausdc", "uaxl", "wbtc-satoshi", "weth-wei"];
+const SupportedTokens = ["uusdc", "uaxl", "wbtc-satoshi", "weth-wei"];
 const SupportedTokensNames: { [key: string]: string } = {
-  uausdc: "USDf",
+  uusdc: "USDf",
   uaxl: "AXL",
   "wbtc-satoshi": "BTCf",
   "weth-wei": "ETHf",
