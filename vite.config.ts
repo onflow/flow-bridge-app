@@ -10,14 +10,14 @@ export default defineConfig({
         target: 'https://api.basescan.org',
         changeOrigin: true,
         rewrite: (path) => {
-          console.log('Proxying request:', path);
           const url = new URL(path, 'http://dummy.com');
           const targetUrl = url.searchParams.get('url');
           if (!targetUrl) {
             console.error('No URL provided in the proxy request');
             return path;
           }
-          return targetUrl;
+          const parsedUrl = new URL(targetUrl);
+          return parsedUrl.pathname + parsedUrl.search;
         },
       },
     },

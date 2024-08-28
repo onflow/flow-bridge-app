@@ -39,7 +39,7 @@ const BridgeForm: React.FC = () => {
     address,
     config,
     loading,
-    setAmountReceive
+    setAmountReceive,
   } = useInitialization();
 
   const {
@@ -112,14 +112,14 @@ const BridgeForm: React.FC = () => {
 
   const handleAmountChange = (value: string) => {
     setAmount(value);
-    const bal = displayUserBalance()
+    const bal = displayUserBalance();
     let err = "";
     console.log("bal", value, bal, Number(value) > Number(bal));
     if (!/^[0-9]*\.?[0-9]*$/.test(value)) {
       err = "Please enter a valid number";
     } else if (Number(value) > Number(bal)) {
       err = "Amount greater than balance";
-    } 
+    }
     setError(err);
 
     console.log("value amount", value);
@@ -155,8 +155,18 @@ const BridgeForm: React.FC = () => {
 
   const needsApproval = !isApproved(amount);
 
+  const BannerText = import.meta.env.VITE_BANNER_TEXT;
+  const BannerInfo = () => {
+    return (
+      <div className="w-[50%] p-6 bg-primary-highlight m-2 rounded-xlg items-center justify-center flex">
+        <span className="text-black font-semibold">{BannerText}</span>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
+      {BannerText && BannerInfo()}
       <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-700">
         <div className="flex justify-start mb-4 items-center">
           <label className="block text-sm font-medium mr-4">From</label>
