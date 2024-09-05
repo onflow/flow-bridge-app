@@ -20,7 +20,7 @@ export default {
         },
         secondary: "#14171A",
         accent: "#657786",
-        background: "#00000",
+        background: "#000000",
         card: "#17171A",
         modal: "#232530",
       },

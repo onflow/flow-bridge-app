@@ -158,15 +158,15 @@ const BridgeForm: React.FC = () => {
   const BannerText = import.meta.env.VITE_BANNER_TEXT;
   const BannerInfo = () => {
     return (
-      <div className="w-[50%] p-6 bg-primary-highlight m-2 rounded-xlg items-center justify-center flex">
+      <div className="w-full max-w-lg p-6 bg-primary-highlight m-2 rounded-xlg flex items-center justify-center">
         <span className="text-black font-semibold">{BannerText}</span>
       </div>
     );
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen w-full text-white p-4">
-      {BannerText && BannerInfo()}
+    <div className="flex flex-col items-center w-full text-white p-4">
+      {BannerText && <BannerInfo />}
       <div className="p-6 rounded-xlg shadow-md w-full max-w-lg bg-gray-700">
         <div className="flex justify-start mb-4 items-center">
           <label className="block text-sm font-medium mr-4">From</label>
