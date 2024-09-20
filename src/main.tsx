@@ -21,7 +21,6 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { flowDarkTheme } from "./FlowDarkTheme"; // Import your custom theme
 import { InitializationProvider } from "./InitializationContext";
 import { metaMaskWallet, rainbowWallet, walletConnectWallet, injectedWallet, coinbaseWallet } from "@rainbow-me/rainbowkit/wallets";
-import { flowWallet } from "./flow-wallet";
 import { createClient, http } from "viem";
 
 const flow = {
@@ -37,7 +36,7 @@ const connectors = connectorsForWallets(
   [
     {
       groupName: 'Recommended',
-      wallets: [flowWallet, rainbowWallet, metaMaskWallet, walletConnectWallet, injectedWallet, coinbaseWallet],
+      wallets: [rainbowWallet, metaMaskWallet, walletConnectWallet, injectedWallet, coinbaseWallet],
     },
   ],
   {

@@ -252,7 +252,7 @@ const BridgeForm: React.FC = () => {
           <div className="flex items-center mb-4">
             <label className="block text-sm font-medium mr-2 text-gray-400">
               Recipient address on {destinationNetwork?.name} (do NOT send funds
-              to exchanges)
+              to exchanges or Cadence owned Accounts (COA))
             </label>
           </div>
           <input

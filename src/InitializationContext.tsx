@@ -96,10 +96,8 @@ export const InitializationProvider: React.FC<{
 
   const { isConnected, address: account, chain } = useAccount();
 
-  const {
-    transactionHash: transferTxHash,
-    status: transferStatus,
-  } = useBridgeTokens();
+  const { transactionHash: transferTxHash, status: transferStatus } =
+    useBridgeTokens();
 
   const {
     isApproved,
@@ -117,7 +115,9 @@ export const InitializationProvider: React.FC<{
     }
     if (address === null || address !== account) {
       setAddress(account);
-      setDestinationAddress(account);
+      if (!account.startsWith("0x00000")) { // don't allow users to put in COA address
+        setDestinationAddress(account);
+      }
     }
 
     const initialize = async () => {
@@ -177,7 +177,9 @@ export const InitializationProvider: React.FC<{
     setLoading(true);
     try {
       // set tokens for network
-      const tokens = ApiService.getSupportedChainTokens(String(network.nameKey));
+      const tokens = ApiService.getSupportedChainTokens(
+        String(network.nameKey)
+      );
       setSourceNetworkTokens(tokens);
       setOriginNetwork(network);
       setAmount(""); // reset amount
