@@ -1028,6 +1028,11 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@layerzerolabs/oft-evm@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@layerzerolabs/oft-evm/-/oft-evm-3.0.0.tgz#ce6743c5eca30b35dfb01714779aa4137310292d"
+  integrity sha512-dP5/fmjWQ5TTEIknKRr8o9W3SUpgOf/1jtThDVqryUMuwoS1YF87xPKwi+fS8GxnEWyfmEJlLY2URHzF9UnzkQ==
+
 "@lit-labs/ssr-dom-shim@^1.0.0", "@lit-labs/ssr-dom-shim@^1.1.0":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@lit-labs/ssr-dom-shim/-/ssr-dom-shim-1.2.1.tgz#2f3a8f1d688935c704dbc89132394a41029acbb8"

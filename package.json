@@ -17,6 +17,7 @@
   "dependencies": {
     "@axelar-network/axelarjs-sdk": "^0.16.2",
     "@axelar-network/axelarjs-types": "^0.33.0",
+    "@layerzerolabs/oft-evm": "^3.0.0",
     "@rainbow-me/rainbowkit": "^2.1.4",
     "@tanstack/react-query": "^5.49.2",
     "@types/axios": "^0.14.0",
