@@ -124,11 +124,11 @@
     "@openzeppelin/contracts/utils/introspection/IERC165.sol": {
       "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v5.1.0) (utils/introspection/IERC165.sol)\n\npragma solidity ^0.8.20;\n\n/**\n * @dev Interface of the ERC-165 standard, as defined in the\n * https://eips.ethereum.org/EIPS/eip-165[ERC].\n *\n * Implementers can declare support of contract interfaces, which can then be\n * queried by others ({ERC165Checker}).\n *\n * For an implementation, see {ERC165}.\n */\ninterface IERC165 {\n    /**\n     * @dev Returns true if this contract implements the interface defined by\n     * `interfaceId`. See the corresponding\n     * https://eips.ethereum.org/EIPS/eip-165#how-interfaces-are-identified[ERC section]\n     * to learn more about how these ids are created.\n     *\n     * This function call must use less than 30 000 gas.\n     */\n    function supportsInterface(bytes4 interfaceId) external view returns (bool);\n}\n"
     },
-    "contracts/mocks/MyOFTMock.sol": {
-      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity ^0.8.22;\n\nimport { MyOFT } from \"../MyOFT.sol\";\n\n// @dev WARNING: This is for testing purposes only\ncontract MyOFTMock is MyOFT {\n    constructor(\n        string memory _name,\n        string memory _symbol,\n        address _lzEndpoint,\n        address _delegate\n    ) MyOFT(_name, _symbol, _lzEndpoint, _delegate) {}\n\n    function mint(address _to, uint256 _amount) public {\n        _mint(_to, _amount);\n    }\n}\n"
-    },
     "contracts/MyOFT.sol": {
-      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity 0.8.22;\n\nimport { Ownable } from \"@openzeppelin/contracts/access/Ownable.sol\";\nimport { OFT } from \"@layerzerolabs/oft-evm/contracts/OFT.sol\";\n\ncontract MyOFT is OFT {\n    constructor(\n        string memory _name,\n        string memory _symbol,\n        address _lzEndpoint,\n        address _delegate\n    ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {\n        _mint(msg.sender, 100_000 * 10 ** 18);\n    }\n}\n"
+      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity 0.8.22;\n\nimport { Ownable } from \"@openzeppelin/contracts/access/Ownable.sol\";\nimport { OFT } from \"@layerzerolabs/oft-evm/contracts/OFT.sol\";\n\ncontract MyOFT is OFT {\n    constructor(\n        string memory _name,\n        string memory _symbol,\n        address _lzEndpoint,\n        address _delegate\n    ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {\n    }\n}\n"
+    },
+    "contracts/MyOFTMock.sol": {
+      "content": "// SPDX-License-Identifier: UNLICENSED\npragma solidity 0.8.22;\n\nimport \"./MyOFT.sol\";\n\ncontract MyOFTMock is MyOFT {\n    constructor(\n        string memory _name,\n        string memory _symbol,\n        address _lzEndpoint,\n        address _delegate\n    ) MyOFT(_name, _symbol, _lzEndpoint, _delegate) {\n        _mint(msg.sender, 100_000 * 10 ** 18);\n    }\n\n    function mint(address _to, uint256 _amount) public {\n        _mint(_to, _amount);\n    }\n}\n"
     }
   },
   "settings": {

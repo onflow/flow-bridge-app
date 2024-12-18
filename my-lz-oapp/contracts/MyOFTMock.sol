@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.22;
 
-import "../MyOFT.sol";
+import "./MyOFT.sol";
 
 contract MyOFTMock is MyOFT {
     constructor(
@@ -9,9 +9,11 @@ contract MyOFTMock is MyOFT {
         string memory _symbol,
         address _lzEndpoint,
         address _delegate
-    ) MyOFT(_name, _symbol, _lzEndpoint, _delegate) {}
+    ) MyOFT(_name, _symbol, _lzEndpoint, _delegate) {
+        _mint(msg.sender, 100_000 * 10 ** 18);
+    }
 
-    function mint(address _to, uint256 _amount) public override {
+    function mint(address _to, uint256 _amount) public {
         _mint(_to, _amount);
     }
 }

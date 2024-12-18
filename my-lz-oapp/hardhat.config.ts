@@ -53,11 +53,6 @@ const config: HardhatUserConfig = {
         ],
     },
     networks: {
-        'base-sepolia': {
-            eid: EndpointId.BASESEP_V2_TESTNET,
-            url: process.env.RPC_URL_BASE_SEPOLIA || 'https://sepolia.base.org',
-            accounts,
-        },
         'avalanche-testnet': {
             eid: EndpointId.AVALANCHE_V2_TESTNET,
             url: process.env.RPC_URL_FUJI || 'https://rpc.ankr.com/avalanche_fuji',
@@ -71,11 +66,6 @@ const config: HardhatUserConfig = {
         'arbitrum-testnet': {
             eid: EndpointId.ARBSEP_V2_TESTNET,
             url: process.env.RPC_URL_ARBITRUM || 'https://sepolia-rollup.arbitrum.io/rpc',
-            accounts,
-        },
-        'polygon-amoy-testnet': {
-            eid: EndpointId.AMOY_V2_TESTNET,
-            url: process.env.RPC_URL_AMOY || 'https://rpc-amoy.polygon.technology',
             accounts,
         },
         hardhat: {

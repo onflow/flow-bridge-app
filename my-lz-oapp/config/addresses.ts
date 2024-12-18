@@ -9,16 +9,15 @@ export const addresses = {
             // other contracts...
         },
         avalanche: {
-            MyOFT: '0x9D6e122780974a917952D70646dD50D2C4f906ae',
+            MyOFT: '0x4F4784defd5c4ea50727dbBA7E0Ef9f4b9089705',
             // other contracts...
         },
         arbitrum: {
-            MyOFT: '0x9D6e122780974a917952D70646dD50D2C4f906ae',
+            MyOFT: '0x2ecDac406108d35C921BaCD18Fe6be74260e4f4b',
             // other contracts...
         },
         polygonAmoy: {
-            MyOFT: '0x2560AD73aAECf0Fec3Bfc71F39d11988950Fb11e',
-            // other contracts...
+            MyOFT: '0x4e2dCCAfe86719B7BFfAc3b1041031dDd07aF5fF',
         },
     },
     mainnet: {

@@ -1,4 +1,4 @@
-import { EndpointId } from '@layerzerolabs/lz-definitions'
+import { TestnetV2EndpointId } from '@layerzerolabs/lz-definitions'
 
 import { addresses } from './config/addresses'
 import layerZero from './config/layerzero.json'
@@ -6,73 +6,50 @@ import layerZero from './config/layerzero.json'
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 
 const arbitrumTestnet = layerZero['Arbitrum-Sepolia-Testnet']
-const polygonAmoyTestnet = layerZero['Polygon-Amoy-Testnet']
+const avalancheTestnet = layerZero['Avalanche-Fuji-Testnet']
+const flowTestnet = layerZero['Flow-Testnet']
 
 const arbitrumContract: OmniPointHardhat = {
-    eid: EndpointId.ARBSEP_V2_TESTNET,
-    contractName: 'MyOFT',
-    address: addresses.testnet.arbitrum.MyOFT,
+    eid: TestnetV2EndpointId.ARBSEP_V2_TESTNET,
+    contractName: 'MyOFTMock',
 }
 
-const polygonAmoyContract: OmniPointHardhat = {
-    eid: EndpointId.AMOY_V2_TESTNET,
-    contractName: 'MyOFT',
-    address: addresses.testnet.polygonAmoy.MyOFT,
+const avalancheContract: OmniPointHardhat = {
+    eid: TestnetV2EndpointId.AVALANCHE_V2_TESTNET,
+    contractName: 'MyOFTMock',
+}
+
+const flowContract: OmniPointHardhat = {
+    eid: TestnetV2EndpointId.FLOW_V2_TESTNET,
+    contractName: 'MyOFTMock',
 }
 
 const config: OAppOmniGraphHardhat = {
-    contracts: [{ contract: arbitrumContract }, { contract: polygonAmoyContract }],
+    contracts: [{ contract: arbitrumContract }, { contract: avalancheContract }, { contract: flowContract }],
     connections: [
         {
             from: arbitrumContract,
-            to: polygonAmoyContract,
-            config: {
-                sendLibrary: arbitrumTestnet.sendUln301,
-                receiveLibraryConfig: {
-                    receiveLibrary: polygonAmoyTestnet.receiveUln301,
-                    gracePeriod: BigInt(0),
-                },
-                sendConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        optionalDVNThreshold: 0,
-                        requiredDVNs: [addresses.DVN.arbitrum],
-                        optionalDVNs: [],
-                    },
-                },
-                receiveConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        optionalDVNThreshold: 0,
-                        requiredDVNs: [],
-                    },
-                },
-            },
+            to: avalancheContract,
         },
         {
-            from: polygonAmoyContract,
+            from: avalancheContract,
             to: arbitrumContract,
-            config: {
-                sendLibrary: polygonAmoyTestnet.sendUln301,
-                receiveLibraryConfig: {
-                    receiveLibrary: arbitrumTestnet.receiveUln301,
-                    gracePeriod: BigInt(0),
-                },
-                sendConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        optionalDVNThreshold: 0,
-                        requiredDVNs: [addresses.DVN.polygonAmoy],
-                    },
-                },
-                receiveConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        optionalDVNThreshold: 0,
-                        requiredDVNs: [],
-                    },
-                },
-            },
+        },
+        {
+            from: arbitrumContract,
+            to: flowContract,
+        },
+        {
+            from: avalancheContract,
+            to: flowContract,
+        },
+        {
+            from: flowContract,
+            to: arbitrumContract,
+        },
+        {
+            from: flowContract,
+            to: avalancheContract,
         },
     ],
 }

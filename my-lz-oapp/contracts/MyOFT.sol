@@ -11,11 +11,5 @@ contract MyOFT is OFT {
         address _lzEndpoint,
         address _delegate
     ) OFT(_name, _symbol, _lzEndpoint, _delegate) Ownable(_delegate) {
-        _mint(msg.sender, 100_000 * 10 ** decimals());
-    }
-
-    // Add virtual keyword to allow overriding
-    function mint(address to, uint256 amount) external virtual onlyOwner {
-        _mint(to, amount);
     }
 }
