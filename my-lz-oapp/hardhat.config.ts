@@ -9,6 +9,8 @@ import 'hardhat-deploy'
 import 'hardhat-contract-sizer'
 import '@nomiclabs/hardhat-ethers'
 import '@layerzerolabs/toolbox-hardhat'
+import '@nomiclabs/hardhat-waffle'
+import '@typechain/hardhat'
 import { HardhatUserConfig, HttpNetworkAccountsUserConfig } from 'hardhat/types'
 
 import { EndpointId } from '@layerzerolabs/lz-definitions'
@@ -77,6 +79,10 @@ const config: HardhatUserConfig = {
         deployer: {
             default: 0, // wallet address of index[0], of the mnemonic in .env
         },
+    },
+    typechain: {
+        outDir: 'typechain', // Output directory for generated types
+        target: 'ethers-v5', // Target for TypeChain
     },
 }
 
