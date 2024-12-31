@@ -1,59 +1,81 @@
 import { ethers } from 'hardhat'
-
-import { MyOFTAdapter__factory } from '../typechain/factories/contracts/MyOFTAdapter__factory'
-
 import hre from 'hardhat'
+import layerzeroConfig from '../config/layerzero.json'
+import { networkMapping } from '../config/network-mapping'
 
 async function main() {
+    // Get source contract name from command line arguments
+    const sourceContract = process.env.SOURCE_CONTRACT || process.argv[2]
+    const amount = process.env.AMOUNT || process.argv[3]
+    if (!sourceContract) {
+        throw new Error('Please provide source contract name as first argument')
+    }
+    console.log('Source contract:', sourceContract)
+
+    // Get destination network from command line arguments
+    const dstNetwork = process.env.DST_NETWORK || process.argv[3]
+    if (!dstNetwork) {
+        throw new Error('Please provide destination network as second argument')
+    }
+
+    // Map destination network name to LayerZero network name
+    const lzNetwork = networkMapping[dstNetwork.toLowerCase()]
+    if (!lzNetwork) {
+        console.error('No LayerZero network mapping found for:', dstNetwork)
+        console.error('Available networks:', Object.keys(networkMapping).join(', '))
+        throw new Error(`Network ${dstNetwork} not mapped to LayerZero network`)
+    }
+
+    // Get destination EID from LayerZero config
+    const dstConfig = layerzeroConfig[lzNetwork]
+    if (!dstConfig) {
+        throw new Error(`Network ${lzNetwork} not found in LayerZero config`)
+    }
+
+    const dstEid = parseInt(dstConfig.eid)
+    console.log(`Sending to ${lzNetwork} (EID: ${dstEid})`)
+
     // Get the signer
     const [signer] = await ethers.getSigners()
 
-    // Get deployment from the current network
-    const deployments = await hre.deployments.get('MyOFTAdapter')
-    const adapterAddress = deployments.address
-    console.log('Adapter address:', adapterAddress)
+    // Get deployment of the specified contract
+    const deployment = await hre.deployments.get(sourceContract)
+    console.log(`${sourceContract} address:`, deployment.address)
 
     // Create contract instance
-    const adapter = MyOFTAdapter__factory.connect(adapterAddress, signer)
+    const contract = await ethers.getContractAt(sourceContract, deployment.address, signer)
 
-    /**
-     * This is the struct for the sendParam
-     * https://sepolia.arbiscan.io/address/0xdd3bffb358ef34c2964cb9ce29013d071d59094c#readContract
-     */
+    // Common send parameters for all contract types
     const sendParam = {
-        dstEid: 40351, // Flow testnet EID
-        to: '0x000000000000000000000000825d7531f79Be811E6ed5BD94C9c02d0eB493848', // Destination address in bytes
-        amountLD: ethers.utils.parseEther('10.0'), // Amount to send
-        minAmountLD: ethers.utils.parseEther('10.0'), // Minimum amount to receive
-        extraOptions: '0x00030100110100000000000000000000000000030d40', // Extra options in bytes
-        composeMsg: '0x', // Compose message in bytes
-        oftCmd: '0x', // OFT command in bytes
+        dstEid,
+        to: '0x000000000000000000000000825d7531f79Be811E6ed5BD94C9c02d0eB493848',
+        amountLD: ethers.utils.parseEther(amount),
+        minAmountLD: ethers.utils.parseEther(amount),
+        extraOptions: '0x00030100110100000000000000000000000000030d40',
+        composeMsg: '0x',
+        oftCmd: '0x',
     }
 
     try {
-        // Get the token address and create token contract instance
-        const tokenAddress = await adapter.token()
-        const token = await ethers.getContractAt('MyFungi', tokenAddress, signer)
+        // Handle approval if it's the adapter
+        if (sourceContract === 'MyOFTAdapter') {
+            const tokenAddress = await contract.token()
+            const token = await ethers.getContractAt('MyFungi', tokenAddress, signer)
 
-        // Approve adapter to spend tokens
-        console.log('Approving adapter...')
-        const approveTx = await token.approve(adapterAddress, sendParam.amountLD)
-        await approveTx.wait()
-        console.log('Approval confirmed')
+            console.log('Approving adapter...')
+            const approveTx = await token.approve(deployment.address, sendParam.amountLD)
+            await approveTx.wait()
+            console.log('Approval confirmed')
+        }
 
-        // First get the quote to know how much native token to send
-        const [nativeFee, zroFee] = await adapter.quoteSend(
-            sendParam,
-            false // don't use ZRO token
-        )
-
+        // Common sending logic for both contracts
+        const [nativeFee, zroFee] = await contract.quoteSend(sendParam, false)
         console.log('Quote results:')
         console.log('Native fee:', ethers.utils.formatEther(nativeFee), 'ETH')
         console.log('ZRO fee:', ethers.utils.formatEther(zroFee), 'ZRO')
 
-        // Send the transaction
         console.log('Sending transaction...')
-        const tx = await adapter.send(
+        const tx = await contract.send(
             sendParam,
             {
                 nativeFee,
@@ -61,18 +83,19 @@ async function main() {
             },
             signer.address,
             {
-                value: nativeFee, // Use BigNumber directly instead of formatted string
+                value: nativeFee,
             }
         )
 
         console.log('Transaction sent! Waiting for confirmation...')
         console.log('Transaction hash:', tx.hash)
 
-        // Wait for the transaction to be confirmed
         const receipt = await tx.wait()
         console.log('Transaction confirmed! Block number:', receipt.blockNumber)
+
     } catch (error) {
         console.error('Error sending tokens:', error)
+        throw error
     }
 }
 
