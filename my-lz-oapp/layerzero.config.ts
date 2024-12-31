@@ -21,7 +21,7 @@ const avalancheContract: OmniPointHardhat = {
 
 const flowContract: OmniPointHardhat = {
     eid: TestnetV2EndpointId.FLOW_V2_TESTNET,
-    contractName: 'MyOFTMock',
+    contractName: 'MyOFTFungi',
 }
 
 const config: OAppOmniGraphHardhat = {

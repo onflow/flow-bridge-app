@@ -1,13 +1,13 @@
 import { ethers } from 'hardhat'
 import { MyOFTAdapter__factory } from '../typechain/factories/contracts/MyOFTAdapter__factory'
-import deploymentData from '../deployments/arbitrum-testnet/MyOFTAdapter.json'
+import hre from 'hardhat'
 
 async function main() {
+    const deployments = await hre.deployments.get('MyOFTAdapter')
+    const adapterAddress = deployments.address
+
     // Get the signer
     const [signer] = await ethers.getSigners()
-
-    // Get the MyOFTAdapter contract address from deployment
-    const adapterAddress = deploymentData.address
 
     console.log('Adapter address:', adapterAddress)
 
@@ -18,7 +18,7 @@ async function main() {
      * This is the struct for the sendParam
      * https://sepolia.arbiscan.io/address/0xdd3bffb358ef34c2964cb9ce29013d071d59094c#readContract
      * [40351,"0x000000000000000000000000825d7531f79Be811E6ed5BD94C9c02d0eB493848","10000000000000000000", "10000000000000000000", "0x00030100110100000000000000000000000000030d40", "0x", "0x"]
-     */ 
+     */
     // Build SendParamStruct
     const sendParam = {
         dstEid: 40351, // Flow testnet EID
@@ -32,10 +32,7 @@ async function main() {
 
     try {
         // Call quoteSend with the struct
-        const [nativeFee, zroFee] = await adapter.quoteSend(
-            sendParam,
-            false
-        )
+        const [nativeFee, zroFee] = await adapter.quoteSend(sendParam, false)
 
         console.log('Quote results:')
         console.log('Native fee:', ethers.utils.formatEther(nativeFee), 'ETH')
@@ -47,6 +44,13 @@ async function main() {
     } catch (error) {
         console.error('Error getting quote:', error)
     }
+    /**
+     * in wei: 61675064999029
+     * Quote results:
+     * Native fee: 0.000061675064999029 ETH
+     * ZRO fee: 0.0 ZRO
+     * Total fee: 0.000061675064999029 ETH
+     */
 }
 
 main()
