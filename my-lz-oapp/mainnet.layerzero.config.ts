@@ -25,12 +25,12 @@ const config: OAppOmniGraphHardhat = {
     contracts: [{ contract: sepoliaContract }, { contract: flowContract }],
     connections: [
         {
-            from: flowContract,
-            to: sepoliaContract,
-        },
-        {
             from: sepoliaContract,
             to: flowContract,
+        },
+        {
+            from: flowContract,
+            to: sepoliaContract,
         },
     ],
 }

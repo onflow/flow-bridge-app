@@ -75,6 +75,16 @@ const config: HardhatUserConfig = {
             url: process.env.RPC_URL_ARBITRUM || 'https://sepolia-rollup.arbitrum.io/rpc',
             accounts,
         },
+        'flow-mainnet': {
+            eid: EndpointId.FLOW_MAINNET,
+            url: process.env.RPC_URL_FLOW || 'https://mainnet.evm.nodes.onflow.org/',
+            accounts,
+        },
+        'ethereum-mainnet': {
+            eid: EndpointId.ETHEREUM_V2_MAINNET,
+            url: process.env.RPC_URL_ETHEREUM || 'https://rpc.mevblocker.io',
+            accounts,
+        },
         hardhat: {
             // Need this for testing because TestHelperOz5.sol is exceeding the compiled contract size limit
             allowUnlimitedContractSize: true,

@@ -29,5 +29,6 @@ export const addresses = {
         arbitrum: '0x53f488e93b4f1b60e8e83aa374dbe1780a1ee8a8',
         avalanche: '0x9f0e79aeb198750f963b6f30b99d87c6ee5a0467',
         polygonAmoy: '0x55c175dd5b039331db251424538169d8495c18d1',
+        sepolia: '0x530fbe405189204ef459fa4b767167e4d41e3a37',
     },
 }

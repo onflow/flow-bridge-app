@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat'
+import { ethers } from '@ethersproject/providers'
 import hre from 'hardhat'
 import layerzeroConfig from '../config/layerzero.json'
 import { networkMapping } from '../config/network-mapping'
@@ -36,43 +36,41 @@ async function main() {
     console.log(`Sending to ${lzNetwork} (EID: ${dstEid})`)
 
     // Get the signer
-    const [signer] = await ethers.getSigners()
+    const [signer] = await hre.ethers.getSigners()
 
-    // Get deployment of the specified contract
+    // Get deployment of the specified contract (PYUSDLocker)
     const deployment = await hre.deployments.get(sourceContract)
     console.log(`${sourceContract} address:`, deployment.address)
 
     // Create contract instance
-    const contract = await ethers.getContractAt(sourceContract, deployment.address, signer)
+    const contract = await hre.ethers.getContractAt(sourceContract, deployment.address, signer)
 
     // Common send parameters for all contract types
     const sendParam = {
         dstEid,
         to: '0x000000000000000000000000825d7531f79Be811E6ed5BD94C9c02d0eB493848',
-        amountLD: ethers.utils.parseEther(amount),
-        minAmountLD: ethers.utils.parseEther(amount),
+        amountLD: hre.ethers.utils.parseUnits(amount, 6),
+        minAmountLD: hre.ethers.utils.parseUnits(amount, 6),
         extraOptions: '0x00030100110100000000000000000000000000030d40',
         composeMsg: '0x',
         oftCmd: '0x',
     }
 
     try {
-        // Handle approval if it's the adapter
-        if (sourceContract === 'MyOFTAdapter') {
-            const tokenAddress = await contract.token()
-            const token = await ethers.getContractAt('MyFungi', tokenAddress, signer)
+        // Always handle PYUSD approval for PYUSDLocker
+        const PYUSD_ADDRESS = '0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9'
+        const pyusd = await hre.ethers.getContractAt('IERC20', PYUSD_ADDRESS, signer)
 
-            console.log('Approving adapter...')
-            const approveTx = await token.approve(deployment.address, sendParam.amountLD)
-            await approveTx.wait()
-            console.log('Approval confirmed')
-        }
+        console.log('Approving PYUSDLocker to spend PYUSD...')
+        const approveTx = await pyusd.approve(deployment.address, sendParam.amountLD)
+        await approveTx.wait()
+        console.log('Approval confirmed')
 
-        // Common sending logic for both contracts
+        // Rest of the sending logic remains the same
         const [nativeFee, zroFee] = await contract.quoteSend(sendParam, false)
         console.log('Quote results:')
-        console.log('Native fee:', ethers.utils.formatEther(nativeFee), 'ETH')
-        console.log('ZRO fee:', ethers.utils.formatEther(zroFee), 'ZRO')
+        console.log('Native fee:', hre.ethers.utils.formatEther(nativeFee), 'ETH')
+        console.log('ZRO fee:', hre.ethers.utils.formatEther(zroFee), 'ZRO')
 
         console.log('Sending transaction...')
         const tx = await contract.send(
