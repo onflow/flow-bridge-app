@@ -1,70 +1,44 @@
-import { EndpointId } from '@layerzerolabs/lz-definitions'
-import { OAppOmniGraphConfig } from '@layerzerolabs/devtools'
-import { addresses } from './config/addresses'
+import { TestnetV2EndpointId } from '@layerzerolabs/lz-definitions'
 
-// Import the full contract ABI
-import MyOFTArtifact from './artifacts/contracts/MyOFT.sol/MyOFT.json'
+import layerZero from './config/layerzero.json'
 
-const arbitrumContract = {
-    name: 'MyOFT',
-    version: '1.0.0',
-    eid: EndpointId.ARBSEP_V2_TESTNET,
-    address: '0x...',
-    abi: MyOFTArtifact.abi,
+import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
+
+const flowTestnet = layerZero['Flow-Testnet']
+const sepoliaTestnet = layerZero['Ethereum-Sepolia-Testnet']
+
+const sepoliaContract: OmniPointHardhat = {
+    eid: TestnetV2EndpointId.SEPOLIA_V2_TESTNET,
+    contractName: 'PYUSDLocker',
 }
 
-const avalancheContract = {
-    name: 'MyOFT',
-    version: '1.0.0',
-    eid: EndpointId.AVALANCHE_V2_TESTNET,
-    address: '0x...',
-    abi: MyOFTArtifact.abi,
+const flowContract: OmniPointHardhat = {
+    eid: TestnetV2EndpointId.FLOW_V2_TESTNET,
+    contractName: 'USDF',
 }
 
-const config: OAppOmniGraphConfig = {
-    contracts: [{ contract: arbitrumContract }, { contract: avalancheContract }],
+const config: OAppOmniGraphHardhat = {
+    contracts: [{ contract: sepoliaContract }, { contract: flowContract }],
     connections: [
         {
-            from: arbitrumContract,
-            to: avalancheContract,
+            from: flowContract,
+            to: sepoliaContract,
             config: {
-                sendConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        requiredDVNs: [addresses.DVN.arbitrum],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
-                },
-                receiveConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        requiredDVNs: [],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
+                sendLibrary: flowTestnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: flowTestnet.receiveUln302,
+                    gracePeriod: BigInt(0),
                 },
             },
         },
         {
-            from: avalancheContract,
-            to: arbitrumContract,
+            from: sepoliaContract,
+            to: flowContract,
             config: {
-                sendConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        requiredDVNs: [addresses.DVN.avalanche],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
-                },
-                receiveConfig: {
-                    ulnConfig: {
-                        confirmations: BigInt(5),
-                        requiredDVNs: [],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
+                sendLibrary: sepoliaTestnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: sepoliaTestnet.receiveUln302,
+                    gracePeriod: BigInt(0),
                 },
             },
         },

@@ -2,11 +2,37 @@ import hre from 'hardhat'
 
 // Map networks to their contracts
 const NETWORK_CONTRACTS: Record<string, string[]> = {
-    'sepolia-testnet': ['PYUSDLocker'], // PYUSDLocker is on Arbitrum Sepolia
+    'ethereum-mainnet': ['PYUSDLocker'], // PYUSDLocker is on Ethereum Mainnet
+    'flow-mainnet': ['USDF'], // USDF is on Flow Mainnet
+    'sepolia-testnet': ['PYUSDLocker'], // PYUSDLocker is on Sepolia testnet
     'flow-testnet': ['USDF'], // USDF is on Flow testnet
     // Add more networks and their contracts as needed
 }
 
+/**
+ * Script to transfer ownership of contracts to a new owner address
+ *
+ * Usage:
+ * For PYUSDLocker on Ethereum Mainnet:
+ * ```
+ * NEW_OWNER=0xNewOwnerAddress npx hardhat run scripts/transferOwnership.ts --network ethereum-mainnet
+ * ```
+ *
+ * For USDF on Flow Mainnet:
+ * ```
+ * NEW_OWNER=0xNewOwnerAddress npx hardhat run scripts/transferOwnership.ts --network flow-mainnet
+ * ```
+ *
+ * Or using environment variable:
+ * ```
+ * NEW_OWNER=0xNewOwnerAddress npx hardhat run scripts/transferOwnership.ts --network flow-testnet
+ * ```
+ *
+ * Make sure:
+ * 1. You're using the current owner's account (check PRIVATE_KEY in .env)
+ * 2. You have enough native tokens for gas
+ * 3. The new owner address is correct (transfers can't be undone)
+ */
 async function main() {
     // Get the new owner from command line
     const newOwner = process.env.NEW_OWNER || process.argv[2]
