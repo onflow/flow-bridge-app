@@ -76,7 +76,7 @@ const config: HardhatUserConfig = {
             accounts,
         },
         'flow-mainnet': {
-            eid: EndpointId.FLOW_MAINNET,
+            eid: EndpointId.FLOW_V2_MAINNET,
             url: process.env.RPC_URL_FLOW || 'https://mainnet.evm.nodes.onflow.org/',
             accounts,
         },

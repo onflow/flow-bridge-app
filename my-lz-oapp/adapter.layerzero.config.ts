@@ -16,11 +16,6 @@ const flowContract: OmniPointHardhat = {
     contractName: 'MyOFTFungi',
 }
 
-const arbitrumContract: OmniPointHardhat = {
-    eid: TestnetV2EndpointId.ARBSEP_V2_TESTNET,
-    contractName: 'MyOFTAdapter',
-}
-
 const sepoliaConfig = layerzero['Ethereum-Sepolia-Testnet']
 const flowConfig = layerzero['Flow-Testnet']
 const arbitrumConfig = layerzero['Arbitrum-Sepolia-Testnet']

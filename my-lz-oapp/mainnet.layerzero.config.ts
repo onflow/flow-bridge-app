@@ -1,36 +1,78 @@
-import { TestnetV2EndpointId } from '@layerzerolabs/lz-definitions'
+import { MainnetV2EndpointId } from '@layerzerolabs/lz-definitions'
 
-import { addresses } from './config/addresses'
 import layerZero from './config/layerzero.json'
 
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 
-const arbitrumTestnet = layerZero['Arbitrum-Sepolia-Testnet']
-const avalancheTestnet = layerZero['Avalanche-Fuji-Testnet']
-const flowTestnet = layerZero['Flow-Testnet']
 const flowMainnet = layerZero['Flow-Mainnet']
 const ethereumMainnet = layerZero['Ethereum-Mainnet']
 
-const sepoliaContract: OmniPointHardhat = {
-    eid: TestnetV2EndpointId.SEPOLIA_V2_TESTNET,
+const EthMainnetContract: OmniPointHardhat = {
+    eid: MainnetV2EndpointId.ETHEREUM_V2_MAINNET,
     contractName: 'PYUSDLocker',
 }
 
-const flowContract: OmniPointHardhat = {
-    eid: TestnetV2EndpointId.FLOW_V2_TESTNET,
+const FlowMainnetContract: OmniPointHardhat = {
+    eid: MainnetV2EndpointId.FLOW_V2_MAINNET,
     contractName: 'USDF',
 }
 
 const config: OAppOmniGraphHardhat = {
-    contracts: [{ contract: sepoliaContract }, { contract: flowContract }],
+    contracts: [{ contract: EthMainnetContract }, { contract: FlowMainnetContract }],
     connections: [
         {
-            from: sepoliaContract,
-            to: flowContract,
+            from: EthMainnetContract,
+            to: FlowMainnetContract,
+            config: {
+                sendLibrary: ethereumMainnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: ethereumMainnet.receiveUln302,
+                    gracePeriod: BigInt(0),
+                },
+                sendConfig: {
+                    executorConfig: {
+                        executor: ethereumMainnet.executor,
+                        maxMessageSize: 10000,
+                    },
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ['0x589dedbd617e0cbcb916a9223f4d1300c294236b'],
+                    },
+                },
+                receiveConfig: {
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ['0x589dedbd617e0cbcb916a9223f4d1300c294236b'],
+                    },
+                },
+            },
         },
         {
-            from: flowContract,
-            to: sepoliaContract,
+            from: FlowMainnetContract,
+            to: EthMainnetContract,
+            config: {
+                sendLibrary: flowMainnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: flowMainnet.receiveUln302,
+                    gracePeriod: BigInt(0),
+                },
+                sendConfig: {
+                    executorConfig: {
+                        executor: flowMainnet.executor,
+                        maxMessageSize: 10000,
+                    },
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+                    },
+                },
+                receiveConfig: {
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+                    },
+                },
+            },
         },
     ],
 }

@@ -46,7 +46,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await deploy('PYUSDLocker', {
         from: deployer,
         args: [
-            '0xcac524bca292aaade2df8a05cc58f0a65b1b3bb9',
+            '0x6c3ea9036406852006290770bedfcaba0e23a0e8', // sepolia PYUSD address: '0xcac524bca292aaade2df8a05cc58f0a65b1b3bb9',
             endpointAddress, // _lzEndpoint: LayerZero endpoint
             deployer, // _owner: The deployer address as owner
         ],

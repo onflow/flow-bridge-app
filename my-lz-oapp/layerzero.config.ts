@@ -1,15 +1,11 @@
 import { TestnetV2EndpointId } from '@layerzerolabs/lz-definitions'
 
-import { addresses } from './config/addresses'
 import layerZero from './config/layerzero.json'
 
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 
-const arbitrumTestnet = layerZero['Arbitrum-Sepolia-Testnet']
-const avalancheTestnet = layerZero['Avalanche-Fuji-Testnet']
 const flowTestnet = layerZero['Flow-Testnet']
-const flowMainnet = layerZero['Flow-Mainnet']
-const ethereumMainnet = layerZero['Ethereum-Mainnet']
+const sepoliaTestnet = layerZero['Ethereum-Sepolia-Testnet']
 
 const sepoliaContract: OmniPointHardhat = {
     eid: TestnetV2EndpointId.SEPOLIA_V2_TESTNET,
@@ -27,10 +23,24 @@ const config: OAppOmniGraphHardhat = {
         {
             from: flowContract,
             to: sepoliaContract,
+            config: {
+                sendLibrary: flowTestnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: flowTestnet.receiveUln302,
+                    gracePeriod: BigInt(0),
+                },
+            },
         },
         {
             from: sepoliaContract,
             to: flowContract,
+            config: {
+                sendLibrary: sepoliaTestnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: sepoliaTestnet.receiveUln302,
+                    gracePeriod: BigInt(0),
+                },
+            },
         },
     ],
 }
