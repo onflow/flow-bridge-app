@@ -10,7 +10,7 @@ const NETWORK_CONTRACTS: Record<string, string[]> = {
 }
 
 /**
- * Script to transfer ownership of contracts to a new owner address
+ * Script to transfer ownership and set delegate of contracts
  *
  * Usage:
  * For PYUSDLocker on Ethereum Mainnet:
@@ -23,15 +23,11 @@ const NETWORK_CONTRACTS: Record<string, string[]> = {
  * NEW_OWNER=0xNewOwnerAddress npx hardhat run scripts/transferOwnership.ts --network flow-mainnet
  * ```
  *
- * Or using environment variable:
- * ```
- * NEW_OWNER=0xNewOwnerAddress npx hardhat run scripts/transferOwnership.ts --network flow-testnet
- * ```
- *
  * Make sure:
  * 1. You're using the current owner's account (check PRIVATE_KEY in .env)
  * 2. You have enough native tokens for gas
  * 3. The new owner address is correct (transfers can't be undone)
+ * 4. The same address will be used for both owner and delegate
  */
 async function main() {
     // Get the new owner from command line
@@ -70,16 +66,53 @@ async function main() {
             const currentOwner = await contract.owner()
             console.log('Current owner:', currentOwner)
 
-            // Transfer ownership
-            const tx = await contract.transferOwnership(newOwner)
-            console.log('Transaction sent:', tx.hash)
+            // Verify signer is current owner
+            if (currentOwner.toLowerCase() !== signer.address.toLowerCase()) {
+                throw new Error(
+                    `Signer ${signer.address} is not the current owner ${currentOwner}. Make sure you're using the correct PRIVATE_KEY in .env`
+                )
+            }
 
-            await tx.wait()
-            console.log(`${contractName} ownership transferred successfully`)
+            // Check if already owned by target address
+            if (currentOwner.toLowerCase() === newOwner.toLowerCase()) {
+                console.log('Already owned by target address, skipping ownership transfer')
+            } else {
+                // Transfer ownership
+                const ownerTx = await contract.transferOwnership(newOwner)
+                console.log('Ownership transaction sent:', ownerTx.hash)
+                await ownerTx.wait()
+                console.log('Ownership transferred successfully')
+            }
 
-            // Verify new owner
+            // Get current delegate
+            try {
+                const currentDelegate = await contract.delegate()
+                console.log('Current delegate:', currentDelegate)
+
+                // Check if already delegated to target address
+                if (currentDelegate.toLowerCase() === newOwner.toLowerCase()) {
+                    console.log('Already delegated to target address, skipping delegate transfer')
+                } else {
+                    // Set delegate (same as owner)
+                    const delegateTx = await contract.setDelegate(newOwner)
+                    console.log('Delegate transaction sent:', delegateTx.hash)
+                    await delegateTx.wait()
+                    console.log('Delegate set successfully')
+                }
+            } catch (error) {
+                console.log('No delegate function found or error checking delegate')
+            }
+
+            // Verify new owner and delegate
             const newContractOwner = await contract.owner()
             console.log('New owner:', newContractOwner)
+
+            try {
+                const newContractDelegate = await contract.delegate()
+                console.log('New delegate:', newContractDelegate)
+            } catch {
+                // Skip delegate verification if function doesn't exist
+            }
         } catch (error) {
             console.error(`Error transferring ownership of ${contractName}:`, error)
         }
