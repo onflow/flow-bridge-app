@@ -3,9 +3,9 @@ import hre from 'hardhat'
 // Map networks to their contracts
 const NETWORK_CONTRACTS: Record<string, string[]> = {
     'ethereum-mainnet': ['PYUSDLocker'], // PYUSDLocker is on Ethereum Mainnet
-    'flow-mainnet': ['NewName'], // NewName is on Flow Mainnet
+    'flow-mainnet': ['USDF'], // USDF is on Flow Mainnet
     'sepolia-testnet': ['PYUSDLocker'], // PYUSDLocker is on Sepolia testnet
-    'flow-testnet': ['NewName'], // NewName is on Flow testnet
+    'flow-testnet': ['USDF'], // USDF is on Flow testnet
     // Add more networks and their contracts as needed
 }
 

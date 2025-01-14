@@ -4,7 +4,7 @@ import layerZero from './config/layerzero.json'
 
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 
-const flowTestnet = layerZero['Flow-Testnet']
+const flowTestnet = layerZero['EVM-on-Flow-Testnet']
 const sepoliaTestnet = layerZero['Ethereum-Sepolia-Testnet']
 
 const sepoliaContract: OmniPointHardhat = {

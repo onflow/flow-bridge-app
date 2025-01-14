@@ -1,5 +1,5 @@
-import { ethers } from '@ethersproject/providers'
 import hre from 'hardhat'
+
 import layerzeroConfig from '../config/layerzero.json'
 import { networkMapping } from '../config/network-mapping'
 
@@ -90,7 +90,6 @@ async function main() {
 
         const receipt = await tx.wait()
         console.log('Transaction confirmed! Block number:', receipt.blockNumber)
-
     } catch (error) {
         console.error('Error sending tokens:', error)
         throw error

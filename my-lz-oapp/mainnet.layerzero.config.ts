@@ -4,7 +4,7 @@ import layerZero from './config/layerzero.json'
 
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 
-const flowMainnet = layerZero['Flow-Mainnet']
+const flowMainnet = layerZero['EVM-on-Flow-Mainnet']
 const ethereumMainnet = layerZero['Ethereum-Mainnet']
 
 const EthMainnetContract: OmniPointHardhat = {
