@@ -1,8 +1,11 @@
 import { EndpointId } from '@layerzerolabs/lz-definitions'
 import { ExecutorOptionType } from '@layerzerolabs/lz-v2-utilities'
+import layerZero from './config/layerzero.json'
 
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 
+const flowMainnet = layerZero['EVM-on-Flow-Mainnet']
+const solanaMainnet = layerZero["Solana-Mainnet"]
 // Note:  Do not use address for EVM OmniPointHardhat contracts.  Contracts are loaded using hardhat-deploy.
 // If you do use an address, ensure artifacts exists.
 const flowContract: OmniPointHardhat = {
@@ -32,20 +35,20 @@ const config: OAppOmniGraphHardhat = {
             // You need to either enable these enforcedOptions or pass in extraOptions when calling send().
             // Having neither will cause a revert when calling send().
             // We suggest performing additional profiling to ensure they are correct for your use case.
-            // config: {
-            //     enforcedOptions: [
-            //         {
-            //             msgType: 1,
-            //             optionType: ExecutorOptionType.LZ_RECEIVE,
-            //             gas: 200000,
-            //             value: 200000,
-            //         },
-            //         {
-            //             msgType: 2,
-            //             optionType: ExecutorOptionType.LZ_RECEIVE,
-            //             gas: 200000,
-            //             value: 200000,
-            //         },
+            config: {
+                enforcedOptions: [
+                    {
+                        msgType: 1,
+                        optionType: ExecutorOptionType.LZ_RECEIVE,
+                        gas: 200000,
+                        value: 200000,
+                    },
+                    {
+                        msgType: 2,
+                        optionType: ExecutorOptionType.LZ_RECEIVE,
+                        gas: 200000,
+                        value: 200000,
+                    },
             //         {
             //             // Solana options use (gas == compute units, value == lamports)
             //             msgType: 2,
@@ -54,8 +57,30 @@ const config: OAppOmniGraphHardhat = {
             //             gas: 0,
             //             value: 0,
             //         },
-            //     ],
-            // },
+                ],
+
+                sendLibrary: flowMainnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: flowMainnet.receiveUln302,
+                    gracePeriod: BigInt(0),
+                },
+                sendConfig: {
+                    executorConfig: {
+                        executor: flowMainnet.executor,
+                        maxMessageSize: 10000,
+                    },
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+                    },
+                },
+                receiveConfig: {
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+                    },
+                },
+            },
         },
         {
             from: solanaContract,
@@ -123,6 +148,28 @@ const config: OAppOmniGraphHardhat = {
                         gas: 200000,
                     },
                 ],
+
+                sendLibrary: solanaMainnet.sendUln302,
+                receiveLibraryConfig: {
+                    receiveLibrary: solanaMainnet.receiveUln302,
+                    gracePeriod: BigInt(0),
+                },
+                sendConfig: {
+                    executorConfig: {
+                        executor: solanaMainnet.executor,
+                        maxMessageSize: 10000,
+                    },
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ["4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb"],
+                    },
+                },
+                receiveConfig: {
+                    ulnConfig: {
+                        confirmations: BigInt(0),
+                        requiredDVNs: ["4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb"],
+                    },
+                },
             },
         },
     ],
