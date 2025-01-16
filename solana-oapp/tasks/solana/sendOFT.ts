@@ -1,7 +1,7 @@
 import { findAssociatedTokenPda } from '@metaplex-foundation/mpl-toolbox'
 import { publicKey, transactionBuilder } from '@metaplex-foundation/umi'
 import { fromWeb3JsPublicKey } from '@metaplex-foundation/umi-web3js-adapters'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { TOKEN_2022_PROGRAM_ID } from '@solana/spl-token'
 import bs58 from 'bs58'
 import { task } from 'hardhat/config'
 
@@ -33,7 +33,7 @@ task('lz:oft:solana:send', 'Send tokens from Solana to a target EVM chain')
     .addParam('mint', 'The OFT token mint public key', undefined, types.string)
     .addParam('programId', 'The OFT program ID', undefined, types.string)
     .addParam('escrow', 'The OFT escrow public key', undefined, types.string)
-    .addParam('tokenProgram', 'The Token Program public key', TOKEN_PROGRAM_ID.toBase58(), types.string, true)
+    .addParam('tokenProgram', 'The Token Program public key', TOKEN_2022_PROGRAM_ID.toBase58(), types.string, true)
     .addParam('computeUnitPriceScaleFactor', 'The compute unit price scale factor', 4, types.float, true)
     .setAction(
         async ({
@@ -52,7 +52,7 @@ task('lz:oft:solana:send', 'Send tokens from Solana to a target EVM chain')
             const oftProgramId = publicKey(programIdStr)
             const mint = publicKey(mintStr)
             const umiEscrowPublicKey = publicKey(escrowStr)
-            const tokenProgramId = tokenProgramStr ? publicKey(tokenProgramStr) : fromWeb3JsPublicKey(TOKEN_PROGRAM_ID)
+            const tokenProgramId = tokenProgramStr ? publicKey(tokenProgramStr) : fromWeb3JsPublicKey(TOKEN_2022_PROGRAM_ID)
 
             const tokenAccount = findAssociatedTokenPda(umi, {
                 mint: publicKey(mintStr),
