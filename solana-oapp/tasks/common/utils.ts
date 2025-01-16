@@ -27,7 +27,8 @@ export const createSolanaConnectionFactory = () =>
         createRpcUrlFactory({
             [EndpointId.SOLANA_V2_MAINNET]: process.env.RPC_URL_SOLANA,
             [EndpointId.SOLANA_V2_TESTNET]: process.env.RPC_URL_SOLANA_TESTNET,
-            [EndpointId.FLOW_V2_TESTNET]: 'https://testnet.evm.nodes.onflow.org',
+            [EndpointId.FLOW_V2_TESTNET]: process.env.EVM_ON_FLOW_TESTNET || 'https://testnet.evm.nodes.onflow.org',
+            [EndpointId.FLOW_V2_MAINNET]: process.env.EVM_ON_FLOW_MAINNET || 'https://mainnet.evm.nodes.onflow.org',
         })
     )
 

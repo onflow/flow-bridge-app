@@ -6,13 +6,13 @@ import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/tool
 // Note:  Do not use address for EVM OmniPointHardhat contracts.  Contracts are loaded using hardhat-deploy.
 // If you do use an address, ensure artifacts exists.
 const flowContract: OmniPointHardhat = {
-    eid: EndpointId.FLOW_V2_TESTNET,
+    eid: EndpointId.FLOW_V2_MAINNET,
     contractName: 'USDF',
 }
 
 const solanaContract: OmniPointHardhat = {
-    eid: EndpointId.SOLANA_V2_TESTNET,
-    address: 'CFVgSccTEXbs3hN7gnCHx3FAa1L5j5StsKABTPuMaAYo', // NOTE: update this with the OFTStore address.
+    eid: EndpointId.SOLANA_V2_MAINNET,
+    address: '2KUb8dcZR9LyrSg4RdkQx91xX6mPQLpS1MEo6gwfvLZk', // NOTE: update this with the OFTStore address.
 }
 
 const config: OAppOmniGraphHardhat = {
@@ -54,7 +54,7 @@ const config: OAppOmniGraphHardhat = {
             //             gas: 0,
             //             value: 0,
             //         },
-            // ],
+            //     ],
             // },
         },
         {
