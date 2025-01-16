@@ -5,6 +5,9 @@ export const networkMapping: Record<string, string> = {
     'base-sepolia': 'Base-Sepolia-Testnet',
     'optimism-sepolia': 'Optimism-Sepolia',
     'polygon-zkevm-sepolia': 'Polygon-zkEVM-Sepolia-Testnet',
-    'flow-testnet': 'Flow-Testnet',
+    'flow-testnet': 'EVM-on-Flow-Testnet',
+    'flow-mainnet': 'EVM-on-Flow-Mainnet',
+    'solana-testnet': 'Solana-Devnet',
+    'solana-mainnet': 'Solana-Mainnet',
     // Add more mappings as needed
 }

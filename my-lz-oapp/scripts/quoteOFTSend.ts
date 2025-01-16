@@ -3,7 +3,7 @@ import { MyOFTAdapter__factory } from '../typechain/factories/contracts/MyOFTAda
 import hre from 'hardhat'
 
 async function main() {
-    const deployments = await hre.deployments.get('MyOFTAdapter')
+    const deployments = await hre.deployments.get('PYUSDLocker')
     const adapterAddress = deployments.address
 
     // Get the signer
