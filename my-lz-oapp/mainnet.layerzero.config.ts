@@ -3,6 +3,7 @@ import { MainnetV2EndpointId } from '@layerzerolabs/lz-definitions'
 import layerZero from './config/layerzero.json'
 
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
+import { ExecutorOptionType } from '@layerzerolabs/lz-v2-utilities'
 
 const flowMainnet = layerZero['EVM-on-Flow-Mainnet']
 const ethereumMainnet = layerZero['Ethereum-Mainnet']
@@ -45,6 +46,13 @@ const config: OAppOmniGraphHardhat = {
                         requiredDVNs: ['0x589dedbd617e0cbcb916a9223f4d1300c294236b'],
                     },
                 },
+                enforcedOptions: [
+                    {
+                        msgType: 1,
+                        optionType: ExecutorOptionType.LZ_RECEIVE,
+                        gas: BigInt(253000),
+                    },
+                ],
             },
         },
         {
@@ -72,6 +80,13 @@ const config: OAppOmniGraphHardhat = {
                         requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
                     },
                 },
+                enforcedOptions: [
+                    {
+                        msgType: 1,
+                        optionType: ExecutorOptionType.LZ_RECEIVE,
+                        gas: BigInt(230000),
+                    },
+                ],
             },
         },
     ],

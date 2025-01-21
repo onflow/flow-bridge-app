@@ -1,4 +1,5 @@
 import { TestnetV2EndpointId } from '@layerzerolabs/lz-definitions'
+import { ExecutorOptionType } from '@layerzerolabs/lz-v2-utilities'
 
 import layerZero from './config/layerzero.json'
 
@@ -29,6 +30,13 @@ const config: OAppOmniGraphHardhat = {
                     receiveLibrary: flowTestnet.receiveUln302,
                     gracePeriod: BigInt(0),
                 },
+                enforcedOptions: [
+                    {
+                        msgType: 1,
+                        optionType: ExecutorOptionType.LZ_RECEIVE,
+                        gas: BigInt(230000),
+                    },
+                ],
             },
         },
         {
@@ -40,6 +48,13 @@ const config: OAppOmniGraphHardhat = {
                     receiveLibrary: sepoliaTestnet.receiveUln302,
                     gracePeriod: BigInt(0),
                 },
+                enforcedOptions: [
+                    {
+                        msgType: 1,
+                        optionType: ExecutorOptionType.LZ_RECEIVE,
+                        gas: BigInt(253000),
+                    },
+                ],
             },
         },
     ],
