@@ -1,6 +1,7 @@
 import './common/config.get'
 import './common/wire'
 import './evm/send'
+import './solana/transferOwnership'
 import './solana/createOFT'
 import './solana/createOFTAdapter'
 import './solana/sendOFT'

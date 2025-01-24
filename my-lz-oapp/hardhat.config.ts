@@ -68,7 +68,7 @@ const config: HardhatUserConfig = {
         },
         'flow-testnet': {
             eid: EndpointId.FLOW_V2_TESTNET,
-            url: process.env.RPC_URL_FLOW || 'https://testnet.evm.nodes.onflow.org',
+            url: process.env.RPC_URL_FLOW_TESTNET || 'https://testnet.evm.nodes.onflow.org',
             accounts,
         },
         'arbitrum-testnet': {
@@ -78,7 +78,7 @@ const config: HardhatUserConfig = {
         },
         'flow-mainnet': {
             eid: EndpointId.FLOW_V2_MAINNET,
-            url: process.env.RPC_URL_FLOW || 'https://mainnet.evm.nodes.onflow.org/',
+            url: process.env.RPC_URL_FLOW_MAINNET || 'https://mainnet.evm.nodes.onflow.org/',
             accounts,
         },
         'ethereum-mainnet': {
