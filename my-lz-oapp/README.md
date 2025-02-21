@@ -531,58 +531,58 @@ npx hardhat lz:oapp:wire --oapp-config layerzero.config.ts
 
 ### OFT Transfer Scripts
 
-This project includes custom scripts for transferring OFT tokens between EVM chains and Flow blockchain:
+This project includes custom scripts for transferring OFT tokens between EVM chains and Flow blockchain. There are two ways to execute transfers:
 
-#### Send OFT Between EVM Chains
+#### 1. Using Hardhat Tasks
 
-To send OFT tokens between EVM chains, use the `sendOFT` script:
-
+For EVM to EVM or EVM to Flow transfers:
 ```bash
 npx hardhat oft:send \
-  --from-chain ethereum-sepolia \
-  --to-chain base-sepolia \
+  --from-chain ethereum-mainnet \
+  --to-chain flow-mainnet \
   --amount 1.5 \
   --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
 ```
 
-Example:
-```bash
-npx hardhat oft:send \
-  --from-chain ethereum-sepolia \
-  --to-chain base-sepolia \
-  --amount 1.5 \
-  --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
-```
-
-#### Send OFT from Flow to EVM
-
-To send OFT tokens from Flow blockchain to an EVM chain, use the `sendOFTFromFlow` script:
-
+For Flow to EVM transfers:
 ```bash
 npx hardhat oft:send-from-flow \
-  --to-chain <destination-chain> \
-  --amount <amount> \
-  --receiver <receiver-address>
-```
-
-Example:
-```bash
-npx hardhat oft:send-from-flow \
-  --to-chain ethereum-sepolia \
+  --to-chain ethereum-mainnet \
   --amount 1.0 \
   --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
 ```
 
-### Script Options
+#### 2. Using Direct Script Execution
 
-Both scripts support the following options:
+For sending from Ethereum to Flow:
+```bash
+SOURCE_CONTRACT=PYUSDLocker AMOUNT=2 DST_NETWORK=flow-testnet \
+npx hardhat run scripts/sendOFT.ts --network ethereum-sepolia
+```
 
-- `--from-chain`: Source chain name (as configured in hardhat.config.ts)
-- `--to-chain`: Destination chain name
+For sending from Flow to Ethereum:
+```bash
+SOURCE_CONTRACT=USDF AMOUNT=1 DST_NETWORK=sepolia-testnet \
+npx hardhat run scripts/sendOFT.ts --network flow-testnet
+```
+
+### Command Parameters Explained
+
+#### Hardhat Tasks Parameters
+- `--from-chain`: Source chain name (e.g., ethereum-mainnet, ethereum-sepolia)
+- `--to-chain`: Destination chain name (e.g., flow-mainnet, flow-testnet)
 - `--amount`: Amount of tokens to send (in decimal format)
 - `--receiver`: Recipient address on the destination chain
 - `--gas-limit`: (Optional) Custom gas limit for the transaction
 - `--debug`: (Optional) Enable debug logging
+
+#### Direct Script Parameters
+- `SOURCE_CONTRACT`: The token contract to use
+  - Use `PYUSDLocker` for Ethereum/EVM chains
+  - Use `USDF` for Flow blockchain
+- `AMOUNT`: Amount of tokens to send
+- `DST_NETWORK`: Destination network (e.g., flow-testnet, sepolia-testnet)
+- `--network`: Source network flag (e.g., ethereum-sepolia, flow-testnet)
 
 ### Environment Setup
 
