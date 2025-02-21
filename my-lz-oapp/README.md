@@ -224,7 +224,7 @@ If you do NOT explicitly set each configuration parameter, your OApp will fallba
 │                    │ ├──────────────────────┼────────────────────────────────────────────────────┤ │ ├──────────────────────┼────────────────────────────────────────────────────┤ │ ├──────────────────────┼────────────────────────────────────────────────────┤ │
 │                    │ │ requiredDVNs         │ ┌───┬────────────────────────────────────────────┐ │ │ │ requiredDVNs         │ ┌───┬────────────────────────────────────────────┐ │ │ │ requiredDVNs         │ ┌───┬────────────────────────────────────────────┐ │ │
 │                    │ │                      │ │ 0 │ 0x53f488E93b4f1b60E8E83aa374dBe1780A1EE8a8 │ │ │ │                      │ │ 0 │ 0x53f488E93b4f1b60E8E83aa374dBe1780A1EE8a8 │ │ │ │                      │ │ 0 │ 0x53f488E93b4f1b60E8E83aa374dBe1780A1EE8a8 │ │ │
-│                    │ │                      │ └───┴────────────────────────────────────────────┘ │ │ │                      │ └───┴────────────────────────────────────────────┘ │ │ │                      │ └───┴────────────────────────────────────────────┘ │ │
+│                    │ │                      │ └───┴────────────────────────────────────────────┘ │ │ │                      │ └───┴────────────────────────────────────────────┘ │ │ │                      │ └───┴────────────────────────────────────────────┘ │
 │                    │ │                      │                                                    │ │ │                      │                                                    │ │ │                      │                                                    │ │
 │                    │ ├──────────────────────┼────────────────────────────────────────────────────┤ │ ├──────────────────────┼────────────────────────────────────────────────────┤ │ ├──────────────────────┼────────────────────────────────────────────────────┤ │
 │                    │ │ optionalDVNs         │                                                    │ │ │ optionalDVNs         │                                                    │ │ │ optionalDVNs         │                                                    │ │
@@ -526,3 +526,91 @@ npx hardhat lz:oapp:wire --oapp-config layerzero.config.ts
 <p align="center">
   Join our community on <a href="https://discord-layerzero.netlify.app/discord" style="color: #a77dff">Discord</a> | Follow us on <a href="https://twitter.com/LayerZero_Labs" style="color: #a77dff">Twitter</a>
 </p>
+
+## Custom Scripts and Commands
+
+### OFT Transfer Scripts
+
+This project includes custom scripts for transferring OFT tokens between EVM chains and Flow blockchain:
+
+#### Send OFT Between EVM Chains
+
+To send OFT tokens between EVM chains, use the `sendOFT` script:
+
+```bash
+npx hardhat oft:send \
+  --from-chain ethereum-sepolia \
+  --to-chain base-sepolia \
+  --amount 1.5 \
+  --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+```
+
+Example:
+```bash
+npx hardhat oft:send \
+  --from-chain ethereum-sepolia \
+  --to-chain base-sepolia \
+  --amount 1.5 \
+  --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+```
+
+#### Send OFT from Flow to EVM
+
+To send OFT tokens from Flow blockchain to an EVM chain, use the `sendOFTFromFlow` script:
+
+```bash
+npx hardhat oft:send-from-flow \
+  --to-chain <destination-chain> \
+  --amount <amount> \
+  --receiver <receiver-address>
+```
+
+Example:
+```bash
+npx hardhat oft:send-from-flow \
+  --to-chain ethereum-sepolia \
+  --amount 1.0 \
+  --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
+```
+
+### Script Options
+
+Both scripts support the following options:
+
+- `--from-chain`: Source chain name (as configured in hardhat.config.ts)
+- `--to-chain`: Destination chain name
+- `--amount`: Amount of tokens to send (in decimal format)
+- `--receiver`: Recipient address on the destination chain
+- `--gas-limit`: (Optional) Custom gas limit for the transaction
+- `--debug`: (Optional) Enable debug logging
+
+### Environment Setup
+
+Make sure you have the following environment variables set in your `.env` file:
+
+```env
+PRIVATE_KEY=your_private_key
+FLOW_PRIVATE_KEY=your_flow_private_key
+```
+
+### Supported Networks
+
+#### Testnet Networks
+The scripts support transfers between the following testnet networks:
+- Ethereum Sepolia
+- Base Sepolia
+- Flow Testnet
+
+#### Mainnet Networks
+The following mainnet networks are supported:
+- Ethereum
+- Flow
+- Solana (via EVM compatibility layer)
+
+Note: When using mainnet networks, ensure you have:
+- Sufficient funds for gas fees
+- Double-checked all addresses and amounts
+- Tested the flow on testnet first
+- Verified the contract addresses on block explorers
+
+Check your `hardhat.config.ts` for the complete list of configured networks and their specific configurations.
