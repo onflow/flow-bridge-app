@@ -46,12 +46,29 @@ This standard works by burning tokens on the source chain and minting equivalent
 pnpm install
 ```
 
+### Generate TypeChain Types
+Generate TypeScript types for smart contracts (required for some scripts):
+```bash
+npx hardhat typechain
+```
+
+### Compile Contracts
+Compile Solidity contracts:
+```bash
+pnpm compile
+```
+
 ### Environment Setup
-Create a `.env` file with your private keys:
+
+⚠️ **CRITICAL SECURITY WARNING**: Never commit `.env` files to version control! They contain sensitive private keys.
+
+Create a `.env` file with your private keys (this file is already in `.gitignore`):
 ```env
 PRIVATE_KEY=your_ethereum_private_key
 FLOW_PRIVATE_KEY=your_flow_private_key
 ```
+
+**Important**: Make sure `.env` is listed in your `.gitignore` file and never commit it to the repository.
 
 ## Bridge PYUSD & USDF Tokens
 
@@ -62,20 +79,31 @@ This repository includes pre-deployed contracts for bridging PYUSD (Ethereum) an
 pnpm install
 ```
 
-### Step 2: Configure Environment
+### Step 2: Generate TypeChain Types (if using quote script)
+If you plan to use the quote script, generate TypeScript types:
+```bash
+npx hardhat typechain
+```
+
+### Step 3: Compile Contracts
+```bash
+pnpm compile
+```
+
+### Step 4: Configure Environment
 Create a `.env` file with your wallet private keys:
 ```env
 PRIVATE_KEY=your_ethereum_private_key_here
 FLOW_PRIVATE_KEY=your_flow_private_key_here
 ```
 
-### Step 3: Fund Your Wallet
+### Step 5: Fund Your Wallet
 Ensure your wallet has sufficient funds on the source network for gas fees:
 - **Ethereum Mainnet**: ~0.01-0.05 ETH for bridging
 - **Sepolia Testnet**: Testnet ETH (get from faucets)
 - **Flow Mainnet/Testnet**: FLOW tokens for gas
 
-### Step 4: Bridge Tokens
+### Step 6: Bridge Tokens
 
 #### From Ethereum to Flow (PYUSD)
 ```bash
@@ -143,7 +171,19 @@ contract MyOFT is OFT {
 }
 ```
 
-### Step 2: Configure LayerZero Connections
+### Step 2: Compile and Generate Types
+
+Compile your contracts and generate TypeScript types:
+
+```bash
+# Compile contracts
+pnpm compile
+
+# Generate TypeScript types for contract interaction
+npx hardhat typechain
+```
+
+### Step 3: Configure LayerZero Connections
 
 Create a `layerzero.config.ts` file to define your network connections:
 
@@ -151,7 +191,7 @@ Create a `layerzero.config.ts` file to define your network connections:
 import { EndpointId } from '@layerzerolabs/lz-definitions'
 
 const ethereumContract = {
-    eid: EndpointId.ETHEREUM_V2_MAINNET,
+  eid: EndpointId.ETHEREUM_V2_MAINNET,
     contractName: 'MyOFT',
 }
 
@@ -165,16 +205,16 @@ export default {
         { contract: ethereumContract },
         { contract: flowContract }
     ],
-    connections: [
-        {
-            from: ethereumContract,
+connections: [
+  {
+    from: ethereumContract,
             to: flowContract,
-            config: {
+    config: {
                 // Basic send/receive configuration
                 sendLibrary: '0x...',
-                receiveLibraryConfig: {
+      receiveLibraryConfig: {
                     receiveLibrary: '0x...',
-                    gracePeriod: BigInt(0),
+        gracePeriod: BigInt(0),
                 },
             },
         },
@@ -189,7 +229,7 @@ export default {
 }
 ```
 
-### Step 3: Deploy Contracts
+### Step 4: Deploy Contracts
 
 Deploy to your desired networks:
 ```bash
@@ -200,21 +240,21 @@ npx hardhat lz:deploy --contract-name MyOFT --networks ethereum-mainnet
 npx hardhat lz:deploy --contract-name MyOFT --networks flow-mainnet
 ```
 
-### Step 4: Configure Cross-Chain Connections
+### Step 5: Configure Cross-Chain Connections
 
 Wire up the contracts to enable cross-chain communication:
 ```bash
 npx hardhat lz:oapp:wire --oapp-config layerzero.config.ts
 ```
 
-### Step 5: Verify Configuration
+### Step 6: Verify Configuration
 
 Check that your contracts are properly connected:
 ```bash
 npx hardhat lz:oapp:config:get --oapp-config layerzero.config.ts
 ```
 
-### Step 6: Test Your Bridge
+### Step 7: Test Your Bridge
 
 Use the transfer scripts with your custom contract:
 ```bash
@@ -258,7 +298,7 @@ npx hardhat oft:send-from-flow \
 The repository includes several utility scripts in the `scripts/` directory:
 - `sendOFT.ts`: Send OFT tokens from EVM chains
 - `sendOFTFromFlow.ts`: Send OFT tokens from Flow blockchain
-- `quoteOFTSend.ts`: Quote the cost of sending OFT tokens
+- `quoteOFTSend.ts`: Quote the cost of sending OFT tokens (*requires TypeChain types*)
 - `check-config.ts`: Verify LayerZero configuration
 - `verify-oft.ts`: Verify deployed OFT contracts
 
