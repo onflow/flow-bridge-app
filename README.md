@@ -140,6 +140,52 @@ npx hardhat --network sepolia-testnet send --dst-eid 40168 --amount <AMOUNT> --t
 npx hardhat lz:oft:solana:send --amount <AMOUNT> --from-eid 40168 --to <ADDRESS> --to-eid 40161
 ```
 
+## Deployed Contract Addresses
+
+### EVM Testnets
+
+#### Sepolia Testnet
+- **MyOFTAdapter**: `0x9D6e122780974a917952D70646dD50D2C4f906ae`
+- **PYUSDLocker**: `0xb077Ef2833Fd7b426146839a86100708c37bfa65`
+- **MyFungi**: `0x39dBc26413e6eEe40265E4a7ddc5abDC64849781`
+
+#### Arbitrum Sepolia Testnet
+- **MyOFTAdapter**: `0xDD3BFfb358eF34C2964CB9ce29013D071d59094C`
+- **MyOFTMock**: `0x4e2dCCAfe86719B7BFfAc3b1041031dDd07aF5fF`
+- **MyFungi**: `0x1605B1067Ce0D294786A09368f38063Df50C0e92`
+
+#### Avalanche Fuji Testnet
+- **MyOFTMock**: `0x1119cA4D5145432b7B1CD197d136Da15e236E896`
+
+### EVM Mainnets
+
+#### Ethereum Mainnet
+- **PYUSDLocker**: `0xFA0e06B54986ad96DE87a8c56Fea76FBD8d493F8`
+
+### Flow Networks
+
+#### Flow Testnet
+- **USDF**: `0xf2E5A325f7D678DA511E66B1c0Ad7D5ba4dF93D3`
+
+#### Flow Mainnet
+- **USDF**: `0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED`
+
+### Solana Networks
+
+#### Solana Devnet/Testnet
+- **Program ID**: `D6RHLYN7x69Cb5Y7dFj9T9uJrJCVT9Bt1LT71xHf7QqK`
+- **Mint**: `CXk2AMBfi3TwaEL2468s6zP8xq9NxTXjp9gjMgzeUynM`
+- **Mint Authority**: `A6v157j6XFJXwtT5VWXX7uLYTUrxcYGXB8R6rxrgr9hQ`
+- **Escrow**: `FKt7QuGTkFWHVt7RVgtEsh3rVRZMaeCdQBseyQ9Vf1PN`
+- **OFT Store**: `CFVgSccTEXbs3hN7gnCHx3FAa1L5j5StsKABTPuMaAYo`
+
+#### Solana Mainnet
+- **Program ID**: `28EyPNAi9BMTvGuCaQrptMXjpWUi7wx8SxAFVoSZxSXe`
+- **Mint**: `2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo`
+- **Mint Authority**: `22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGsXzz`
+- **Escrow**: `6z3QyVS36nQ9fk2YvToxqJqXqtAFsSijqgHxpzKyG5xn`
+- **OFT Store**: `2KUb8dcZR9LyrSg4RdkQx91xX6mPQLpS1MEo6gwfvLZk`
+
 ## Documentation
 
 For detailed information about each implementation:
