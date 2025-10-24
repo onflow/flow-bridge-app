@@ -21,9 +21,9 @@ Repository containing LayerZero Omnichain Fungible Token (OFT) implementations f
            │ 1. Call send()                                      
            ▼                                                     
     ┌──────────────┐                                             
-    │ OFT Contract │                                             
-    │  Lock/Burn   │                                             
-    │    Tokens    │                                             
+    │ OFT Adapter  │                                             
+    │Token Locker  │                                             
+    │ Lock Tokens  │                                             
     └──────┬───────┘                                             
            │                                                     
            │ 2. Emit Message                                     
@@ -57,14 +57,58 @@ Repository containing LayerZero Omnichain Fungible Token (OFT) implementations f
                    │   on Flow    │                              
                    │  (1:1 parity)│                              
                    └──────────────┘                              
+                          
+                          
+    ◄─── Return Path (Flow to EVM) ───►
+                          
+                   ┌──────────────┐                              
+                   │     User     │                              
+                   │   on Flow    │                              
+                   └──────┬───────┘                              
+                          │                                      
+                          │ 1. Call send()                       
+                          ▼                                      
+                   ┌──────────────┐                              
+                   │ OFT Contract │                              
+                   │  on Flow EVM │                              
+                   │  Burn Tokens │                              
+                   └──────┬───────┘                              
+                          │                                      
+                          │ 2. Message                           
+                          ▼                                      
+           ╔══════════════════════════════════╗                  
+           ║   LayerZero Messaging Layer      ║                  
+           ╚══════════════╦═══════════════════╝                  
+           │              │ 3. Relay                             
+           ▼              │                                      
+    ┌──────────────┐     │                                      
+    │ OFT Adapter  │◄────┘                                      
+    │Token Locker  │                                             
+    │Unlock Tokens │                                             
+    └──────┬───────┘                                             
+           │                                                     
+           │ 4. Transfer                                         
+           ▼                                                     
+    ┌──────────────┐                                             
+    │     User     │                                             
+    │ (Ethereum/   │                                             
+    │  Arbitrum)   │                                             
+    └──────────────┘                                             
 ```
 
 **Bridging Process:**
 
-1. **Source Chain (EVM)**: User calls `send()` on OFT contract, tokens are locked (adapter) or burned (native OFT)
+**EVM to Flow (Lock & Mint):**
+1. **Source Chain (EVM)**: User calls `send()` on OFT Adapter, tokens are **locked** in the adapter contract
 2. **LayerZero Protocol**: Message is encoded and sent through LayerZero's decentralized network of verifiers (DVNs) and oracles
-3. **Destination Chain (Flow)**: OFT contract receives verified message and mints equivalent tokens on Flow EVM
-4. **Result**: User receives tokens on Flow with 1:1 parity, maintaining total supply across chains
+3. **Destination Chain (Flow)**: OFT contract receives verified message and **mints** equivalent tokens on Flow EVM
+4. **Result**: User receives newly minted tokens on Flow with 1:1 parity
+
+**Flow to EVM (Burn & Unlock):**
+1. **Source Chain (Flow)**: User calls `send()` on Flow OFT contract, tokens are **burned**
+2. **LayerZero Protocol**: Message is relayed back through the decentralized network
+3. **Destination Chain (EVM)**: OFT Adapter receives message and **unlocks** the original tokens
+4. **Result**: User receives unlocked tokens on the EVM chain, maintaining 1:1 parity
 
 ## Project Structure
 
