@@ -4,31 +4,67 @@ Repository containing LayerZero Omnichain Fungible Token (OFT) implementations f
 
 ## Token Bridging Flow
 
-```mermaid
-graph TD
-    A[User on EVM Chain<br/>Ethereum/Arbitrum/etc.] --> B[Initiate OFT Transfer]
-    B --> C[Call send() on OFT Contract]
-    C --> D[Tokens Locked/Burned<br/>on Source Chain]
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Cross-Chain Token Bridge                        │
+└─────────────────────────────────────────────────────────────────────────┘
 
-    D --> E[LayerZero Messaging Layer]
-    E --> F[Message relayed via<br/>DVNs & Oracle Network]
-
-    F --> G[OFT Contract on Flow<br/>receives message]
-    G --> H[Tokens Minted on Flow<br/>EVM-compatible]
-
-    H --> I[User receives tokens<br/>on Flow blockchain]
-
-    style A fill:#e1f5fe
-    style I fill:#e8f5e8
-    style E fill:#fff3e0
-    style F fill:#fff3e0
+    Source Chain (EVM)              LayerZero Protocol           Destination (Flow)
+    ──────────────────              ──────────────────           ──────────────────
+         
+    ┌──────────────┐                                             
+    │     User     │                                             
+    │ (Ethereum/   │                                             
+    │  Arbitrum)   │                                             
+    └──────┬───────┘                                             
+           │                                                     
+           │ 1. Call send()                                      
+           ▼                                                     
+    ┌──────────────┐                                             
+    │ OFT Contract │                                             
+    │  Lock/Burn   │                                             
+    │    Tokens    │                                             
+    └──────┬───────┘                                             
+           │                                                     
+           │ 2. Emit Message                                     
+           ▼                                                     
+           ╔══════════════════════════════════╗                  
+           ║   LayerZero Messaging Layer      ║                  
+           ║                                  ║                  
+           ║   ┌─────────────────────────┐   ║                  
+           ║   │  Decentralized Verifier │   ║                  
+           ║   │   Network (DVNs)        │   ║                  
+           ║   └─────────────────────────┘   ║                  
+           ║                                  ║                  
+           ║   ┌─────────────────────────┐   ║                  
+           ║   │   Oracle Network        │   ║                  
+           ║   └─────────────────────────┘   ║                  
+           ║                                  ║                  
+           ╚══════════════╦═══════════════════╝                  
+                          │ 3. Relay Message                     
+                          │                                      
+                          ▼                                      
+                   ┌──────────────┐                              
+                   │ OFT Contract │                              
+                   │  on Flow EVM │                              
+                   │ Mint Tokens  │                              
+                   └──────┬───────┘                              
+                          │                                      
+                          │ 4. Transfer                          
+                          ▼                                      
+                   ┌──────────────┐                              
+                   │     User     │                              
+                   │   on Flow    │                              
+                   │  (1:1 parity)│                              
+                   └──────────────┘                              
 ```
 
 **Bridging Process:**
-1. **Source Chain (EVM)**: User calls `send()` on OFT contract, tokens are locked/burned
-2. **LayerZero Protocol**: Message is encoded and sent through LayerZero's decentralized network of verifiers and oracles
-3. **Destination Chain (Flow)**: OFT contract receives message and mints equivalent tokens
-4. **Result**: User receives tokens on Flow with 1:1 parity
+
+1. **Source Chain (EVM)**: User calls `send()` on OFT contract, tokens are locked (adapter) or burned (native OFT)
+2. **LayerZero Protocol**: Message is encoded and sent through LayerZero's decentralized network of verifiers (DVNs) and oracles
+3. **Destination Chain (Flow)**: OFT contract receives verified message and mints equivalent tokens on Flow EVM
+4. **Result**: User receives tokens on Flow with 1:1 parity, maintaining total supply across chains
 
 ## Project Structure
 
