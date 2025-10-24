@@ -2,6 +2,34 @@
 
 Repository containing LayerZero Omnichain Fungible Token (OFT) implementations for cross-chain token bridging between EVM chains and Flow blockchain.
 
+## Token Bridging Flow
+
+```mermaid
+graph TD
+    A[User on EVM Chain<br/>Ethereum/Arbitrum/etc.] --> B[Initiate OFT Transfer]
+    B --> C[Call send() on OFT Contract]
+    C --> D[Tokens Locked/Burned<br/>on Source Chain]
+
+    D --> E[LayerZero Messaging Layer]
+    E --> F[Message relayed via<br/>DVNs & Oracle Network]
+
+    F --> G[OFT Contract on Flow<br/>receives message]
+    G --> H[Tokens Minted on Flow<br/>EVM-compatible]
+
+    H --> I[User receives tokens<br/>on Flow blockchain]
+
+    style A fill:#e1f5fe
+    style I fill:#e8f5e8
+    style E fill:#fff3e0
+    style F fill:#fff3e0
+```
+
+**Bridging Process:**
+1. **Source Chain (EVM)**: User calls `send()` on OFT contract, tokens are locked/burned
+2. **LayerZero Protocol**: Message is encoded and sent through LayerZero's decentralized network of verifiers and oracles
+3. **Destination Chain (Flow)**: OFT contract receives message and mints equivalent tokens
+4. **Result**: User receives tokens on Flow with 1:1 parity
+
 ## Project Structure
 
 This repository contains multiple implementations for cross-chain token bridging:
