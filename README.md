@@ -5,95 +5,89 @@ Repository containing LayerZero Omnichain Fungible Token (OFT) implementations f
 ## Token Bridging Flow
 
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                         Cross-Chain Token Bridge                        │
-└─────────────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                         Cross-Chain Token Bridge                                │
+└─────────────────────────────────────────────────────────────────────────────────┘
 
-    Source Chain (EVM)              LayerZero Protocol           Destination (Flow)
-    ──────────────────              ──────────────────           ──────────────────
-         
-    ┌──────────────┐                                             
-    │     User     │                                             
-    │ (Ethereum/   │                                             
-    │  Arbitrum)   │                                             
-    └──────┬───────┘                                             
-           │                                                     
-           │ 1. Call send()                                      
-           ▼                                                     
-    ┌──────────────┐                                             
-    │ OFT Adapter  │                                             
-    │Token Locker  │                                             
-    │ Lock Tokens  │                                             
-    └──────┬───────┘                                             
-           │                                                     
-           │ 2. Emit Message                                     
-           ▼                                                     
-           ╔══════════════════════════════════╗                  
-           ║   LayerZero Messaging Layer      ║                  
-           ║                                  ║                  
-           ║   ┌─────────────────────────┐   ║                  
-           ║   │  Decentralized Verifier │   ║                  
-           ║   │   Network (DVNs)        │   ║                  
-           ║   └─────────────────────────┘   ║                  
-           ║                                  ║                  
-           ║   ┌─────────────────────────┐   ║                  
-           ║   │   Oracle Network        │   ║                  
-           ║   └─────────────────────────┘   ║                  
-           ║                                  ║                  
-           ╚══════════════╦═══════════════════╝                  
-                          │ 3. Relay Message                     
-                          │                                      
-                          ▼                                      
-                   ┌──────────────┐                              
-                   │ OFT Contract │                              
-                   │  on Flow EVM │                              
-                   │ Mint Tokens  │                              
-                   └──────┬───────┘                              
-                          │                                      
-                          │ 4. Transfer                          
-                          ▼                                      
-                   ┌──────────────┐                              
-                   │     User     │                              
-                   │   on Flow    │                              
-                   │  (1:1 parity)│                              
-                   └──────────────┘                              
-                          
-                          
-    ◄─── Return Path (Flow to EVM) ───►
-                          
-                   ┌──────────────┐                              
-                   │     User     │                              
-                   │   on Flow    │                              
-                   └──────┬───────┘                              
-                          │                                      
-                          │ 1. Call send()                       
-                          ▼                                      
-                   ┌──────────────┐                              
-                   │ OFT Contract │                              
-                   │  on Flow EVM │                              
-                   │  Burn Tokens │                              
-                   └──────┬───────┘                              
-                          │                                      
-                          │ 2. Message                           
-                          ▼                                      
-           ╔══════════════════════════════════╗                  
-           ║   LayerZero Messaging Layer      ║                  
-           ╚══════════════╦═══════════════════╝                  
-           │              │ 3. Relay                             
-           ▼              │                                      
-    ┌──────────────┐     │                                      
-    │ OFT Adapter  │◄────┘                                      
-    │Token Locker  │                                             
-    │Unlock Tokens │                                             
-    └──────┬───────┘                                             
-           │                                                     
-           │ 4. Transfer                                         
-           ▼                                                     
-    ┌──────────────┐                                             
-    │     User     │                                             
-    │ (Ethereum/   │                                             
-    │  Arbitrum)   │                                             
-    └──────────────┘                                             
+═══════════════════════════════════════════════════════════════════════════════════
+  SCENARIO 1: EVM to Flow (Lock & Mint)
+═══════════════════════════════════════════════════════════════════════════════════
+
+  EVM Chain                    LayerZero Protocol                Flow Chain
+  ─────────                    ──────────────────                ──────────
+
+  ┌──────────┐
+  │   User   │
+  │(Ethereum)│
+  └────┬─────┘
+       │ 1. send()
+       ▼
+  ┌──────────┐
+  │   OFT    │
+  │ Adapter  │──────┐
+  │  LOCK    │      │ 2. Emit
+  │ Tokens   │      │    Message
+  └──────────┘      │
+                    ▼
+              ╔════════════════╗
+              ║   LayerZero    ║
+              ║   Messaging    ║      3. Relay
+              ║   Layer (DVNs  ║─────────────────────┐
+              ║   & Oracles)   ║                     │
+              ╚════════════════╝                     │
+                                                     ▼
+                                                ┌──────────┐
+                                                │   OFT    │
+                                                │ Contract │
+                                                │   MINT   │
+                                                │  Tokens  │
+                                                └────┬─────┘
+                                                     │ 4. Transfer
+                                                     ▼
+                                                ┌──────────┐
+                                                │   User   │
+                                                │ on Flow  │
+                                                └──────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════
+  SCENARIO 2: Flow to EVM (Burn & Unlock)
+═══════════════════════════════════════════════════════════════════════════════════
+
+  Flow Chain                   LayerZero Protocol                EVM Chain
+  ──────────                   ──────────────────                ─────────
+
+  ┌──────────┐
+  │   User   │
+  │ on Flow  │
+  └────┬─────┘
+       │ 1. send()
+       ▼
+  ┌──────────┐
+  │   OFT    │
+  │ Contract │──────┐
+  │   BURN   │      │ 2. Emit
+  │  Tokens  │      │    Message
+  └──────────┘      │
+                    ▼
+              ╔════════════════╗
+              ║   LayerZero    ║
+              ║   Messaging    ║      3. Relay
+              ║   Layer (DVNs  ║─────────────────────┐
+              ║   & Oracles)   ║                     │
+              ╔════════════════╝                     │
+                                                     ▼
+                                                ┌──────────┐
+                                                │   OFT    │
+                                                │ Adapter  │
+                                                │  UNLOCK  │
+                                                │ Tokens   │
+                                                └────┬─────┘
+                                                     │ 4. Transfer
+                                                     ▼
+                                                ┌──────────┐
+                                                │   User   │
+                                                │(Ethereum)│
+                                                └──────────┘
 ```
 
 **Bridging Process:**
