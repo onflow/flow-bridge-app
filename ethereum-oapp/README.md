@@ -119,10 +119,20 @@ npx hardhat run scripts/sendOFT.ts --network sepolia-testnet
 #### From Flow to Ethereum (USDF)
 ```bash
 # Mainnet
+# Source: USDF on Flow Mainnet (0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED)
+# Destination: PYUSD on Ethereum Mainnet (0xFA0e06B54986ad96DE87a8c56Fea76FBD8d493F8)
+# Block Explorers:
+#   - Flow: https://flowscan.io/account/0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED
+#   - Ethereum: https://etherscan.io/address/0xFA0e06B54986ad96DE87a8c56Fea76FBD8d493F8
 SOURCE_CONTRACT=USDF AMOUNT=100 DST_NETWORK=ethereum-mainnet \
 npx hardhat run scripts/sendOFTFromFlow.ts --network flow-mainnet
 
 # Testnet
+# Source: USDF on Flow Testnet (0xf2E5A325f7D678DA511E66B1c0Ad7D5ba4dF93D3)
+# Destination: PYUSD on Sepolia Testnet (0xb077Ef2833Fd7426146839a86100708c37bfa65)
+# Block Explorers:
+#   - Flow Testnet: https://testnet.flowscan.io/account/0xf2E5A325f7D678DA511E66B1c0Ad7D5ba4dF93D3
+#   - Sepolia: https://sepolia.etherscan.io/address/0xb077Ef2833Fd7426146839a86100708c37bfa65
 SOURCE_CONTRACT=USDF AMOUNT=1 DST_NETWORK=sepolia-testnet \
 npx hardhat run scripts/sendOFTFromFlow.ts --network flow-testnet
 ```
