@@ -157,6 +157,37 @@ A complete Solana-based OFT implementation using Anchor framework for cross-chai
 - Solana Devnet/Testnet and Mainnet-beta
 - Cross-chain compatibility with EVM networks
 
+### web-app/
+**Cross-Chain Bridge Web Interface**
+
+A Next.js web application that provides a user-friendly interface for cross-chain token bridging and swapping. This application integrates the LI.FI Widget to enable seamless token transfers across multiple blockchain networks.
+
+**Purpose:**
+The web app serves as a frontend interface for users to bridge tokens between different blockchain networks without needing to interact directly with smart contracts or command-line tools. It leverages LI.FI's aggregation layer to find the best routes for cross-chain transfers across multiple bridge protocols including LayerZero.
+
+**Key Features:**
+- Simple, intuitive web interface for cross-chain token transfers
+- Integration with LI.FI Widget for access to multiple bridge protocols
+- Support for connecting various wallet providers (MetaMask, WalletConnect, etc.)
+- Real-time bridge route optimization and fee estimation
+- Responsive design for desktop and mobile devices
+- Built with Next.js 14 and TypeScript for optimal performance
+
+**Technology Stack:**
+- Next.js 14 (App Router)
+- React 18
+- TypeScript
+- LI.FI Widget SDK
+- Deployed on Vercel
+
+**Use Cases:**
+- Bridge tokens from Ethereum to Flow and other EVM chains
+- Swap and bridge in a single transaction
+- Compare bridge routes and select optimal paths
+- Monitor cross-chain transaction status
+
+For detailed setup and deployment instructions, see the [Web App README](./web-app/README.md).
+
 
 ## Technologies Used
 
@@ -190,12 +221,14 @@ A complete Solana-based OFT implementation using Anchor framework for cross-chai
    ```
 
 2. **Choose your implementation:**
-   - For **EVM chains**: Navigate to `ethereum-oapp/`
-   - For **Solana**: Navigate to `solana-oapp/`
+   - For **Web Interface**: Navigate to `web-app/` (user-facing bridge application)
+   - For **EVM chains**: Navigate to `ethereum-oapp/` (smart contract development)
+   - For **Solana**: Navigate to `solana-oapp/` (Solana program development)
 
 3. **Follow the setup instructions in each directory's README:**
-   - [EVM OFT Guide](./ethereum-oapp/README.md)
-   - [Solana OFT Guide](./solana-oapp/README.md)
+   - [Web App Guide](./web-app/README.md) - Cross-chain bridge web interface
+   - [EVM OFT Guide](./ethereum-oapp/README.md) - EVM smart contract implementation
+   - [Solana OFT Guide](./solana-oapp/README.md) - Solana program implementation
 
 ## Development Workflow
 
@@ -292,9 +325,11 @@ npx hardhat lz:oft:solana:send --amount <AMOUNT> --from-eid 40168 --to <ADDRESS>
 
 For detailed information about each implementation:
 
+- **[Web App Guide](./web-app/README.md)**: User-facing cross-chain bridge web application
 - **[EVM OFT Guide](./ethereum-oapp/README.md)**: Complete documentation for EVM LayerZero OFT implementation
 - **[Solana OFT Guide](./solana-oapp/README.md)**: Comprehensive guide for Solana OFT implementation
 - **[LayerZero Documentation](https://docs.layerzero.network/)**: Official LayerZero protocol documentation
+- **[LI.FI Documentation](https://docs.li.fi/)**: LI.FI Widget integration documentation
 
 ## Contributing
 
