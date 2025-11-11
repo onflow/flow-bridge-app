@@ -4,7 +4,7 @@ import { LiFiWidget, type WidgetConfig } from '@lifi/widget';
 
 const widgetConfig = {
   variant: 'wide',
-  appearance: 'auto',
+  appearance: 'system' as const,
   theme: {
     colorSchemes: {
       light: {
