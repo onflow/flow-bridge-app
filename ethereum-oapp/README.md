@@ -250,7 +250,7 @@ npx hardhat lz:deploy --contract-name MyOFT --networks ethereum-mainnet
 npx hardhat lz:deploy --contract-name MyOFT --networks flow-mainnet
 ```
 
-### Step 5: Configure Cross-Chain Connections
+### Step 5: Configure Flow Connections
 
 Wire up the contracts to enable cross-chain communication:
 ```bash

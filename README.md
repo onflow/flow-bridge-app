@@ -6,7 +6,7 @@ Repository containing LayerZero Omnichain Fungible Token (OFT) implementations f
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                         Cross-Chain Token Bridge                                │
+│                         Flow Token Bridge                                │
 └─────────────────────────────────────────────────────────────────────────────────┘
 
 ═══════════════════════════════════════════════════════════════════════════════════
@@ -158,7 +158,7 @@ A complete Solana-based OFT implementation using Anchor framework for cross-chai
 - Cross-chain compatibility with EVM networks
 
 ### web-app/
-**Cross-Chain Bridge Web Interface**
+**Flow Bridge Web Interface**
 
 A Next.js web application that provides a user-friendly interface for cross-chain token bridging and swapping. This application integrates the LI.FI Widget to enable seamless token transfers across multiple blockchain networks.
 
@@ -246,7 +246,7 @@ cd solana-oapp
 solana program deploy --program-id target/deploy/oft-keypair.json target/verifiable/oft.so -u devnet
 ```
 
-### Configuring Cross-Chain Connections
+### Configuring Flow Connections
 
 **EVM Networks:**
 ```bash

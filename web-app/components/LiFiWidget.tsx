@@ -1,18 +1,50 @@
 'use client';
 
-import { LiFiWidget, WidgetConfig } from '@lifi/widget';
+import { LiFiWidget, type WidgetConfig } from '@lifi/widget';
+
+const widgetConfig = {
+  variant: 'wide',
+  appearance: 'auto',
+  theme: {
+    colorSchemes: {
+      light: {
+        palette: {
+          primary: {
+            main: '#00EF8B',
+          },
+          secondary: {
+            main: '#00D4A1',
+          },
+          background: {
+            paper: '#FFFFFF',
+          },
+        },
+      },
+      dark: {
+        palette: {
+          primary: {
+            main: '#00EF8B',
+          },
+          secondary: {
+            main: '#00D4A1',
+          },
+          background: {
+            paper: '#1E1E1E',
+            default: '#121212',
+          },
+        },
+      },
+    },
+    typography: {
+      fontFamily: 'Inter, sans-serif',
+    },
+    container: {
+      boxShadow: '0px 8px 32px rgba(0, 0, 0, 0.08)',
+      borderRadius: '24px',
+    },
+  },
+} as Partial<WidgetConfig>;
 
 export default function LiFiWidgetComponent() {
-  const widgetConfig: WidgetConfig = {
-    // Using default configuration for simplicity
-    // The widget will use its default theme and settings
-    integrator: 'flow-bridge-app',
-  };
-
-  return (
-    <div className="widget-container">
-      <LiFiWidget config={widgetConfig} />
-    </div>
-  );
+  return <LiFiWidget integrator="Flow Bridge" config={widgetConfig} />;
 }
-

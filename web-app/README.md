@@ -1,4 +1,4 @@
-# Cross-Chain Bridge Web Application
+# Flow Bridge Web Application
 
 A Next.js web application that provides a user-friendly interface for cross-chain token bridging and swapping using the [LI.FI Widget](https://github.com/lifinance/widget).
 
