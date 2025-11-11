@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "audit:fix": "npm audit fix --audit-level=moderate"
   },
   "dependencies": {
     "@bigmi/react": "0.6.1",
@@ -26,5 +27,8 @@
     "eslint": "8",
     "eslint-config-next": "14.2.5",
     "typescript": "5"
+  },
+  "optionalDependencies": {
+    "pino-pretty": "^11.2.2"
   }
 }
