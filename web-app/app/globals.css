@@ -33,7 +33,6 @@ nav.top-nav {
     sans-serif;
   width: 100%;
   padding: 1rem 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 nav.top-nav .nav-content {
@@ -114,9 +113,6 @@ body > main {
                       radial-gradient(circle at right bottom, #1b2d3d 0%, transparent 50%);
   }
 
-  nav.top-nav {
-    border-bottom: 1px solid rgba(0, 239, 139, 0.15);
-  }
 
   nav.top-nav .logo-text {
     color: #ffffff;
