@@ -5,12 +5,9 @@ export const metadata: Metadata = {
   title: "Flow Foundation - Cross-chain bridge",
   description: "Flow Foundation - Cross-chain bridge",
   icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/flow-logo.svg", type: "image/svg+xml" },
-    ],
-    shortcut: "/flow-logo.svg",
-    apple: "/flow-logo.svg",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
   other: {
     'color-scheme': 'light dark',

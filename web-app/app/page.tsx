@@ -32,7 +32,9 @@ export default function Home() {
         </div>
       </nav>
       <main>
-        <LiFiWidgetComponent />
+        <div id="lifi-widget-wrapper">
+          <LiFiWidgetComponent />
+        </div>
       </main>
     </>
   );
