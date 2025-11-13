@@ -4,25 +4,11 @@ import { LiFiWidget, type WidgetConfig } from '@lifi/widget';
 import { useEffect, useState } from 'react';
 
 export default function LiFiWidgetComponent() {
-  const [appearance, setAppearance] = useState<'light' | 'dark'>('light');
-
-  useEffect(() => {
-    // Check initial color scheme
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setAppearance(mediaQuery.matches ? 'dark' : 'light');
-
-    // Listen for changes
-    const handler = (e: MediaQueryListEvent) => {
-      setAppearance(e.matches ? 'dark' : 'light');
-    };
-
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
 
   const widgetConfig: Partial<WidgetConfig> = {
     variant: 'wide',
-    appearance: appearance,
+    subvariant: 'split',
+    appearance: 'system',
     theme: {
       palette: {
         primary: {
@@ -50,5 +36,5 @@ export default function LiFiWidgetComponent() {
     toToken: "0xF1815bd50389c46847f0Bda824eC8da914045D14", // stgUSDC on Flow
   };
 
-  return <LiFiWidget key={appearance} integrator="Flow Bridge" config={widgetConfig} />;
+  return <LiFiWidget integrator="Flow Bridge" config={widgetConfig} />;
 }
