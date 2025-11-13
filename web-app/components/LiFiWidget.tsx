@@ -43,6 +43,10 @@ const widgetConfig = {
       borderRadius: '24px',
     },
   },
+  fromChain: 1,  // Ethereum Mainnet
+  toChain: 747,  // Flow
+  fromToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
+  toToken: "0xF1815bd50389c46847f0Bda824eC8da914045D14", // stgUSDC on Flow
 } as Partial<WidgetConfig>;
 
 export default function LiFiWidgetComponent() {
