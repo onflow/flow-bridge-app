@@ -12,6 +12,9 @@ export const metadata: Metadata = {
     shortcut: "/flow-logo.svg",
     apple: "/flow-logo.svg",
   },
+  other: {
+    'color-scheme': 'light dark',
+  },
 };
 
 export default function RootLayout({
@@ -20,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>{children}</body>
     </html>
   );
 }

@@ -1,6 +1,22 @@
 'use client';
 
-import LiFiWidgetComponent from '@/components/LiFiWidget';
+import dynamic from 'next/dynamic';
+
+// Import LiFiWidget with SSR disabled to avoid getServerSnapshot warning
+const LiFiWidgetComponent = dynamic(() => import('@/components/LiFiWidget'), {
+  ssr: false,
+  loading: () => (
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      minHeight: '600px',
+      color: '#00EF8B'
+    }}>
+      Loading widget...
+    </div>
+  ),
+});
 
 export default function Home() {
   return (
