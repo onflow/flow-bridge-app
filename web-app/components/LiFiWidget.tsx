@@ -1,11 +1,14 @@
 'use client';
 
+import { useMemo } from 'react';
 import { LiFiWidget, type WidgetConfig } from '@lifi/widget';
-import { useEffect, useState } from 'react';
+import { useWidgetAnalytics } from '@/lib/useWidgetAnalytics';
 
 export default function LiFiWidgetComponent() {
+  // Enable analytics tracking (single line - all logic is in the hook)
+  useWidgetAnalytics();
 
-  const widgetConfig: Partial<WidgetConfig> = {
+  const widgetConfig: Partial<WidgetConfig> = useMemo(() => ({
     variant: 'wide',
     subvariant: 'split',
     appearance: 'system',
@@ -34,7 +37,7 @@ export default function LiFiWidgetComponent() {
     toChain: 747,  // Flow
     fromToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
     toToken: "0xF1815bd50389c46847f0Bda824eC8da914045D14", // stgUSDC on Flow
-  };
+  }), []);
 
   return <LiFiWidget integrator="Flow Bridge" config={widgetConfig} />;
 }
