@@ -2,7 +2,6 @@
 
 import { useMemo } from 'react';
 import { LiFiWidget, type WidgetConfig } from '@lifi/widget';
-import { useWidgetAnalytics } from '@/lib/useWidgetAnalytics';
 
 export default function LiFiWidgetComponent() {
   // Enable analytics tracking (single line - all logic is in the hook)
@@ -37,6 +36,12 @@ export default function LiFiWidgetComponent() {
     toChain: 747,  // Flow
     fromToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", // USDC on Ethereum
     toToken: "0xF1815bd50389c46847f0Bda824eC8da914045D14", // stgUSDC on Flow
+    // WalletConnect configuration - get your project ID from https://cloud.walletconnect.com
+    walletConfig: {
+      walletConnect: {
+        projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '',
+      },
+    },
   }), []);
 
   return <LiFiWidget integrator="Flow Bridge" config={widgetConfig} />;
