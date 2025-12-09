@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { LiFiWidget, type WidgetConfig } from '@lifi/widget';
+import { useWidgetAnalytics } from '@/lib/useWidgetAnalytics';
 
 export default function LiFiWidgetComponent() {
   // Enable analytics tracking (single line - all logic is in the hook)
