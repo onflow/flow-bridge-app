@@ -4,373 +4,148 @@
   </a>
 </p>
 
-<p align="center">
-  <a href="https://layerzero.network" style="color: #a77dff">Homepage</a> | <a href="https://docs.layerzero.network/" style="color: #a77dff">Docs</a> | <a href="https://layerzero.network/developers" style="color: #a77dff">Developers</a>
-</p>
-
-<h1 align="center">Bridge Tokens Between Ethereum & Flow Using LayerZero</h1>
+<h1 align="center">Bridge PYUSD Between Arbitrum & Flow</h1>
 
 <p align="center">
-  <a href="https://layerzero.network" style="color: #a77dff">Homepage</a> | <a href="https://docs.layerzero.network/" style="color: #a77dff">Docs</a> | <a href="https://discord-layerzero.netlify.app/discord" style="color: #a77dff">Discord</a>
+  Bridge PYUSD tokens between Arbitrum and Flow using LayerZero protocol.
 </p>
-
-<p align="center">Bridge PYUSD & USDF tokens between Ethereum and Flow, or deploy your own OFT contracts using LayerZero protocol.</p>
-
-## Table of Contents
-
-- [What is an Omnichain Fungible Token?](#what-is-an-omnichain-fungible-token)
-- [Quick Start](#quick-start)
-- [Bridge PYUSD & USDF Tokens](#bridge-pyusd--usdf-tokens)
-- [Deploy Your Own OFT Contracts](#deploy-your-own-oft-contracts)
-- [Transfer Tokens](#transfer-tokens)
-- [Supported Networks](#supported-networks)
-- [Troubleshooting](#troubleshooting)
-
-## What is an Omnichain Fungible Token?
-
-The Omnichain Fungible Token (OFT) Standard is an ERC20 token that can be transferred across multiple blockchains without asset wrapping or middlechains.
-
-<img alt="LayerZero" style="" src="https://docs.layerzero.network/assets/images/oft_mechanism_light-922b88c364b5156e26edc6def94069f1.jpg#gh-light-mode-only"/>
-
-This standard works by burning tokens on the source chain and minting equivalent tokens on the destination chain through the LayerZero protocol, maintaining a unified total supply across all connected networks.
 
 ## Quick Start
 
-### Prerequisites
-- Node.js and npm/pnpm installed
-- A wallet with testnet/mainnet funds for gas fees
-- Basic understanding of command line tools
-
-### Installation
+### 1. Install Dependencies
 ```bash
 pnpm install
 ```
 
-### Generate TypeChain Types
-Generate TypeScript types for smart contracts (required for some scripts):
+### 2. Configure Environment
+
+Create a `.env` file with your private key:
 ```bash
-npx hardhat typechain
+echo "PRIVATE_KEY=your_private_key_here" > .env
 ```
 
-### Compile Contracts
-Compile Solidity contracts:
-```bash
-pnpm compile
-```
+⚠️ **Never commit `.env` files to version control!**
 
-### Environment Setup
-
-⚠️ **CRITICAL SECURITY WARNING**: Never commit `.env` files to version control! They contain sensitive private keys.
-
-Create a `.env` file with your private keys (this file is already in `.gitignore`):
-```env
-PRIVATE_KEY=your_ethereum_private_key
-FLOW_PRIVATE_KEY=your_flow_private_key
-```
-
-**Important**: Make sure `.env` is listed in your `.gitignore` file and never commit it to the repository.
-
-## Bridge PYUSD & USDF Tokens
-
-This repository includes pre-deployed contracts for bridging PYUSD (Ethereum) and USDF (Flow) tokens. If you just want to bridge these tokens without deploying your own contracts, follow these steps.
-
-### Step 1: Install Dependencies
-```bash
-pnpm install
-```
-
-### Step 2: Generate TypeChain Types (if using quote script)
-If you plan to use the quote script, generate TypeScript types:
-```bash
-npx hardhat typechain
-```
-
-### Step 3: Compile Contracts
+### 3. Compile Contracts
 ```bash
 pnpm compile
 ```
 
-### Step 4: Configure Environment
-Create a `.env` file with your wallet private keys:
-```env
-PRIVATE_KEY=your_ethereum_private_key_here
-FLOW_PRIVATE_KEY=your_flow_private_key_here
-```
+## Contract Addresses
 
-### Step 5: Fund Your Wallet
-Ensure your wallet has sufficient funds on the source network for gas fees:
-- **Ethereum Mainnet**: ~0.01-0.05 ETH for bridging
-- **Sepolia Testnet**: Testnet ETH (get from faucets)
-- **Flow Mainnet/Testnet**: FLOW tokens for gas
+### Arbitrum
+| Contract | Address | Description |
+|----------|---------|-------------|
+| OFT Adapter | `0x3CD2b89C49D130C08f1d683225b2e5DeB63ff876` | Call `send()` on this contract |
+| PYUSD Token | `0x46850aD61C2B7d64d08c9C754F45254596696984` | PayPal USD on Arbitrum |
 
-### Step 6: Bridge Tokens
+### Flow
+| Contract | Address | Description |
+|----------|---------|-------------|
+| OFT Adapter | `0x26d27d5AF2F6f1c14F40013C8619d97aaf015509` | Call `send()` on this contract |
+| **PYUSD0 Token** ⭐ | `0x99aF3EeA856556646C98c8B9b2548Fe815240750` | The token you receive after bridging |
 
-#### From Ethereum to Flow (PYUSD)
-```bash
-# Mainnet
-SOURCE_CONTRACT=PYUSDLocker AMOUNT=100 DST_NETWORK=flow-mainnet \
-npx hardhat run scripts/sendOFT.ts --network ethereum-mainnet
+> **Note**: Check your balance at the **PYUSD0 Token** address, not the OFT Adapter.
 
-# Testnet
-SOURCE_CONTRACT=PYUSDLocker AMOUNT=1 DST_NETWORK=flow-testnet \
-npx hardhat run scripts/sendOFT.ts --network sepolia-testnet
-```
+## Bridge Commands
 
-#### From Flow to Ethereum (USDF)
-```bash
-# Mainnet
-# Source: USDF on Flow Mainnet (0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED)
-# Destination: PYUSD on Ethereum Mainnet (0xFA0e06B54986ad96DE87a8c56Fea76FBD8d493F8)
-# Block Explorers:
-#   - Flow: https://flowscan.io/account/0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED
-#   - Ethereum: https://etherscan.io/address/0xFA0e06B54986ad96DE87a8c56Fea76FBD8d493F8
-SOURCE_CONTRACT=USDF AMOUNT=100 DST_NETWORK=ethereum-mainnet \
-npx hardhat run scripts/sendOFTFromFlow.ts --network flow-mainnet
-
-# Testnet
-# Source: USDF on Flow Testnet (0xf2E5A325f7D678DA511E66B1c0Ad7D5ba4dF93D3)
-# Destination: PYUSD on Sepolia Testnet (0xb077Ef2833Fd7426146839a86100708c37bfa65)
-# Block Explorers:
-#   - Flow Testnet: https://testnet.flowscan.io/account/0xf2E5A325f7D678DA511E66B1c0Ad7D5ba4dF93D3
-#   - Sepolia: https://sepolia.etherscan.io/address/0xb077Ef2833Fd7426146839a86100708c37bfa65
-SOURCE_CONTRACT=USDF AMOUNT=1 DST_NETWORK=sepolia-testnet \
-npx hardhat run scripts/sendOFTFromFlow.ts --network flow-testnet
-```
-
-### Available Contract Addresses
-
-**PYUSD (Ethereum)**:
-- **Mainnet**: `0xFA0e06B54986ad96DE87a8c56Fea76FBD8d493F8`
-- **Sepolia Testnet**: `0xb077Ef2833Fd7b426146839a86100708c37bfa65`
-
-**USDF (Flow)**:
-- **Mainnet**: `0x2aaBea2058b5aC2D339b163C6Ab6f2b6d53aabED`
-- **Testnet**: `0xf2E5A325f7D678DA511E66B1c0Ad7D5ba4dF93D3`
-
-*Note: Contract addresses can also be found in the respective `deployments/[network]/[contract].json` files.*
-
-## Deploy Your Own OFT Contracts
-
-If you want to deploy your own OFT contracts and set up bridging between custom tokens, follow these steps.
-
-### Step 1: Create Your OFT Contract
-
-Choose the appropriate contract type based on your needs:
-
-- **`MyOFT.sol`**: Standard OFT for new tokens
-- **`MyOFTAdapter.sol`**: OFT Adapter for existing ERC20 tokens
-- **`MyOFTFungi.sol`**: OFT with fungible token features
-- **`OFTPermit.sol`**: OFT with permit functionality
-
-Example contract (`contracts/MyOFT.sol`):
-```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.22;
-
-import { OFT } from "@layerzerolabs/oft-evm/contracts/OFT.sol";
-
-contract MyOFT is OFT {
-    constructor(
-        string memory _name,
-        string memory _symbol,
-        address _lzEndpoint,
-        address _delegate
-    ) OFT(_name, _symbol, _lzEndpoint, _delegate) {
-        // Additional initialization if needed
-    }
-}
-```
-
-### Step 2: Compile and Generate Types
-
-Compile your contracts and generate TypeScript types:
+### Arbitrum → Flow
 
 ```bash
-# Compile contracts
-pnpm compile
+# Dry run (quote only):
+DRY_RUN=true AMOUNT=1 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
 
-# Generate TypeScript types for contract interaction
-npx hardhat typechain
+# Execute transfer:
+AMOUNT=1 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
+
+# With custom recipient:
+AMOUNT=2 RECIPIENT=0xYourFlowAddress npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
 ```
 
-### Step 3: Configure LayerZero Connections
+### Flow → Arbitrum
 
-Create a `layerzero.config.ts` file to define your network connections:
-
-```typescript
-import { EndpointId } from '@layerzerolabs/lz-definitions'
-
-const ethereumContract = {
-  eid: EndpointId.ETHEREUM_V2_MAINNET,
-    contractName: 'MyOFT',
-}
-
-const flowContract = {
-    eid: EndpointId.FLOW_V2_MAINNET,
-    contractName: 'MyOFT',
-}
-
-export default {
-    contracts: [
-        { contract: ethereumContract },
-        { contract: flowContract }
-    ],
-connections: [
-  {
-    from: ethereumContract,
-            to: flowContract,
-    config: {
-                // Basic send/receive configuration
-                sendLibrary: '0x...',
-      receiveLibraryConfig: {
-                    receiveLibrary: '0x...',
-        gracePeriod: BigInt(0),
-                },
-            },
-        },
-        {
-            from: flowContract,
-            to: ethereumContract,
-            config: {
-                // Reverse direction config
-            },
-        },
-    ],
-}
-```
-
-### Step 4: Deploy Contracts
-
-Deploy to your desired networks:
 ```bash
-# Deploy to Ethereum mainnet
-npx hardhat lz:deploy --contract-name MyOFT --networks ethereum-mainnet
+# Dry run (quote only):
+DRY_RUN=true AMOUNT=1 npx hardhat run scripts/sendFromFlow.ts --network flow-mainnet
 
-# Deploy to Flow mainnet
-npx hardhat lz:deploy --contract-name MyOFT --networks flow-mainnet
+# Execute transfer:
+AMOUNT=1 npx hardhat run scripts/sendFromFlow.ts --network flow-mainnet
+
+# With custom recipient:
+AMOUNT=2 RECIPIENT=0xYourArbitrumAddress npx hardhat run scripts/sendFromFlow.ts --network flow-mainnet
 ```
 
-### Step 5: Configure Flow Connections
+## Environment Variables
 
-Wire up the contracts to enable cross-chain communication:
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `AMOUNT` | Amount of tokens to bridge | `1` |
+| `RECIPIENT` | Destination address | Your wallet address |
+| `DRY_RUN` | Set to `true` for quote only | `false` |
+
+## Track Your Transaction
+
+After sending, track your cross-chain message at:
+- **LayerZero Scan**: https://layerzeroscan.com/
+
+Enter your transaction hash to see the message status. Transfers typically complete in 2-5 minutes.
+
+## Check Your Balance
+
+### On Flow
 ```bash
-npx hardhat lz:oapp:wire --oapp-config layerzero.config.ts
+# Check PYUSD0 balance
+cast call 0x99aF3EeA856556646C98c8B9b2548Fe815240750 "balanceOf(address)(uint256)" YOUR_ADDRESS --rpc-url https://mainnet.evm.nodes.onflow.org
 ```
 
-### Step 6: Verify Configuration
+Or view on [Flowscan](https://evm.flowscan.io/token/0x99aF3EeA856556646C98c8B9b2548Fe815240750)
 
-Check that your contracts are properly connected:
+### On Arbitrum
 ```bash
-npx hardhat lz:oapp:config:get --oapp-config layerzero.config.ts
+# Check PYUSD balance
+cast call 0x46850aD61C2B7d64d08c9C754F45254596696984 "balanceOf(address)(uint256)" YOUR_ADDRESS --rpc-url https://arb1.arbitrum.io/rpc
 ```
 
-### Step 7: Test Your Bridge
-
-Use the transfer scripts with your custom contract:
-```bash
-# Replace 'MyOFT' with your contract name
-SOURCE_CONTRACT=MyOFT AMOUNT=1 DST_NETWORK=flow-mainnet \
-npx hardhat run scripts/sendOFT.ts --network ethereum-mainnet
-```
-
-## Transfer Tokens (Advanced Usage)
-
-For advanced users who want to use the LayerZero hardhat tasks directly:
-
-### Using Hardhat Tasks
-
-Send tokens using LayerZero's built-in tasks:
-```bash
-# From Ethereum to Flow
-npx hardhat oft:send \
-  --from-chain ethereum-mainnet \
-  --to-chain flow-mainnet \
-  --amount 1.5 \
-  --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
-
-# From Flow to Ethereum
-npx hardhat oft:send-from-flow \
-  --to-chain ethereum-mainnet \
-  --amount 1.0 \
-  --receiver 0x742d35Cc6634C0532925a3b844Bc454e4438f44e
-```
-
-### Task Parameters
-- `--from-chain`: Source chain name (e.g., ethereum-mainnet, ethereum-sepolia)
-- `--to-chain`: Destination chain name (e.g., flow-mainnet, flow-testnet)
-- `--amount`: Amount of tokens to send (in decimal format)
-- `--receiver`: Recipient address on the destination chain
-- `--gas-limit`: (Optional) Custom gas limit for the transaction
-- `--debug`: (Optional) Enable debug logging
-
-### Additional Scripts
-
-The repository includes several utility scripts in the `scripts/` directory:
-- `sendOFT.ts`: Send OFT tokens from EVM chains
-- `sendOFTFromFlow.ts`: Send OFT tokens from Flow blockchain
-- `quoteOFTSend.ts`: Quote the cost of sending OFT tokens (*requires TypeChain types*)
-- `check-config.ts`: Verify LayerZero configuration
-- `verify-oft.ts`: Verify deployed OFT contracts
-
-## Supported Networks
-
-### Testnet Networks
-The scripts support transfers between the following testnet networks:
-- Ethereum Sepolia
-- Base Sepolia
-- Flow Testnet
-
-### Mainnet Networks
-The following mainnet networks are supported:
-- Ethereum
-- Flow
-- Solana (via EVM compatibility layer)
-
-**⚠️ Mainnet Safety Notes:**
-- Ensure you have sufficient funds for gas fees
-- Double-check all addresses and amounts
-- Test the flow on testnet first
-- Verify contract addresses on block explorers
-
-Check your `hardhat.config.ts` for the complete list of configured networks and their specific configurations.
+Or view on [Arbiscan](https://arbiscan.io/token/0x46850aD61C2B7d64d08c9C754F45254596696984)
 
 ## Troubleshooting
 
-### Common Issues
+**Transaction successful but tokens not received:**
+- Check [LayerZero Scan](https://layerzeroscan.com/) for message status
+- Messages typically take 2-5 minutes to be delivered
+- Verify you're checking the correct token address (PYUSD0 on Flow, PYUSD on Arbitrum)
 
-**"Contract not found" error:**
-- Ensure your contract is deployed to the network you're trying to use
-- Check `deployments/[network]/` directory for deployed contract addresses
+**Insufficient balance error:**
+- Ensure you have enough tokens on the source chain
+- Ensure you have native tokens for gas (ETH on Arbitrum, FLOW on Flow)
 
-**"Insufficient funds" error:**
-- Make sure your wallet has enough native tokens for gas fees
-- For mainnet: ~0.01-0.05 ETH on Ethereum, FLOW tokens on Flow
-- For testnet: Get test tokens from faucets
+**RPC timeout:**
+- Try again or use a different RPC endpoint
+- Arbitrum: `https://arb1.arbitrum.io/rpc`
+- Flow: `https://mainnet.evm.nodes.onflow.org`
 
-**"Network not mapped" error:**
-- Check that the network name matches what's in `config/network-mapping.ts`
-- Verify the network is configured in `hardhat.config.ts`
+## Network Information
 
-**Transaction stuck or failed:**
-- Check LayerZero explorer: https://layerzeroscan.com/
-- Verify your contract configuration with `npx hardhat lz:oapp:config:get`
-- Ensure both source and destination contracts are properly wired
+| Network | Chain ID | EID | RPC |
+|---------|----------|-----|-----|
+| Arbitrum | 42161 | 30110 | https://arb1.arbitrum.io/rpc |
+| Flow | 747 | 30336 | https://mainnet.evm.nodes.onflow.org |
 
-### Getting Help
+## Getting Help
 
-- **LayerZero Documentation**: https://docs.layerzero.network/
-- **Discord Community**: https://discord-layerzero.netlify.app/discord
-- **GitHub Issues**: Report bugs and request features
+- **LayerZero Scan**: https://layerzeroscan.com/
+- **LayerZero Docs**: https://docs.layerzero.network/
+- **Discord**: https://discord-layerzero.netlify.app/discord
 
-### Useful Commands
+---
 
-```bash
-# Check your contract configuration
-npx hardhat lz:oapp:config:get --oapp-config layerzero.config.ts
+## Advanced: Getting PYUSD on Arbitrum
 
-# Quote the cost of a transfer
-npx hardhat run scripts/quoteOFTSend.ts --network ethereum-mainnet
+If you have PYUSD on Ethereum and need to get it to Arbitrum first:
 
-# Verify a deployed contract
-npx hardhat run scripts/verify-oft.ts --network ethereum-mainnet
-```
+1. Go to [Stargate Finance](https://stargate.finance/bridge)
+2. Connect your wallet
+3. Select PYUSD: Ethereum → Arbitrum
+4. Complete the bridge
+
+Then use the scripts above to bridge from Arbitrum to Flow.

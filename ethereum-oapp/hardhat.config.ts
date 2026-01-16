@@ -86,6 +86,11 @@ const config: HardhatUserConfig = {
             url: process.env.RPC_URL_ETHEREUM || 'https://rpc.mevblocker.io',
             accounts,
         },
+        'arbitrum-mainnet': {
+            eid: EndpointId.ARBITRUM_V2_MAINNET,
+            url: process.env.RPC_URL_ARBITRUM_MAINNET || 'https://arb1.arbitrum.io/rpc',
+            accounts,
+        },
         hardhat: {
             // Need this for testing because TestHelperOz5.sol is exceeding the compiled contract size limit
             allowUnlimitedContractSize: true,

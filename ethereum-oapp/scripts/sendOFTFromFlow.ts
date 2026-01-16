@@ -1,24 +1,18 @@
 import hre from 'hardhat'
 
-import { addressToBytes32 } from '@layerzerolabs/lz-v2-utilities'
-
 import layerzeroConfig from '../config/layerzero.json'
 import { networkMapping } from '../config/network-mapping'
 
 async function main() {
-    // Get source contract name from command line arguments
-    const sourceContract = process.env.SOURCE_CONTRACT || process.argv[2]
-    const amount = process.env.AMOUNT || process.argv[3]
-    if (!sourceContract) {
-        throw new Error('Please provide source contract name as first argument')
-    }
-    console.log('Source contract:', sourceContract)
+    // Get parameters from environment variables with defaults for mainnet
+    const sourceContract = process.env.SOURCE_CONTRACT || 'USDF'
+    const dstNetwork = process.env.DST_NETWORK || 'ethereum-mainnet'
+    const amount = process.env.AMOUNT || '1' // Amount in token units (e.g., '1' for 1 USDF)
+    const recipientAddress = process.env.RECIPIENT || '' // Will use signer address if not provided
 
-    // Get destination network from command line arguments
-    const dstNetwork = process.env.DST_NETWORK || process.argv[3]
-    if (!dstNetwork) {
-        throw new Error('Please provide destination network as second argument')
-    }
+    console.log('Source contract:', sourceContract)
+    console.log('Destination network:', dstNetwork)
+    console.log('Amount:', amount)
 
     // Map destination network name to LayerZero network name
     const lzNetwork = networkMapping[dstNetwork.toLowerCase()]
@@ -40,7 +34,12 @@ async function main() {
     // Get the signer
     const [signer] = await hre.ethers.getSigners()
 
-    // Get deployment of the specified contract (PYUSDLocker)
+    // Use recipient address from env or default to signer address (padded to bytes32)
+    const recipient = recipientAddress || signer.address
+    const recipientBytes32 = '0x' + '00'.repeat(12) + recipient.slice(2).toLowerCase()
+    console.log('Recipient:', recipient)
+
+    // Get deployment of the specified contract (USDF)
     const deployment = await hre.deployments.get(sourceContract)
     console.log(`${sourceContract} address:`, deployment.address)
 
@@ -50,7 +49,7 @@ async function main() {
     // Common send parameters for all contract types
     const sendParam = {
         dstEid,
-        to: addressToBytes32('EZpp2VWrSpQ4pnk8J9AkDpWjyafhWypny5ENNPmGMPLx'),
+        to: recipientBytes32,
         amountLD: hre.ethers.utils.parseUnits(amount, 6),
         minAmountLD: hre.ethers.utils.parseUnits(amount, 6),
         extraOptions: '0x00030100110100000000000000000000000000030d40',
@@ -65,7 +64,7 @@ async function main() {
 
         const [nativeFee, zroFee] = await contract.quoteSend(sendParam, false)
         console.log('Quote results:')
-        console.log('Native fee:', hre.ethers.utils.formatEther(nativeFee), 'ETH')
+        console.log('Native fee:', hre.ethers.utils.formatEther(nativeFee), 'FLOW')
         console.log('ZRO fee:', hre.ethers.utils.formatEther(zroFee), 'ZRO')
 
         console.log('Sending transaction...')

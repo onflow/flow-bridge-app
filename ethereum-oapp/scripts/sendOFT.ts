@@ -3,19 +3,34 @@ import hre from 'hardhat'
 import layerzeroConfig from '../config/layerzero.json'
 import { networkMapping } from '../config/network-mapping'
 
-async function main() {
-    // Get source contract name from command line arguments
-    const sourceContract = process.env.SOURCE_CONTRACT || process.argv[2]
-    const amount = process.env.AMOUNT || process.argv[3]
-    if (!sourceContract) {
-        throw new Error('Please provide source contract name as first argument')
-    }
-    console.log('Source contract:', sourceContract)
+/**
+ * Send OFT tokens cross-chain
+ * 
+ * NOTE: For PYUSD mainnet bridging (Ethereum <-> Flow), use sendViaStargate.ts instead!
+ * The PYUSD bridge routes through Stargate V2 (EID 30110), not directly to Flow.
+ * 
+ * This script is for direct OFT sends where peers are configured directly.
+ */
 
-    // Get destination network from command line arguments
-    const dstNetwork = process.env.DST_NETWORK || process.argv[3]
-    if (!dstNetwork) {
-        throw new Error('Please provide destination network as second argument')
+async function main() {
+    // Get parameters from environment variables or command line arguments
+    const sourceContract = process.env.SOURCE_CONTRACT || 'PYUSDLocker'
+    // Default to Stargate for mainnet PYUSD bridging
+    const dstNetwork = process.env.DST_NETWORK || 'stargate'
+    const amount = process.env.AMOUNT || '1' // Amount in token units (e.g., '1' for 1 PYUSD)
+    const recipientAddress = process.env.RECIPIENT || '' // Will use signer address if not provided
+
+    console.log('Source contract:', sourceContract)
+    console.log('Destination network:', dstNetwork)
+    console.log('Amount:', amount)
+    
+    // Warning for mainnet users
+    if (hre.network.name === 'ethereum-mainnet' && dstNetwork === 'flow-mainnet') {
+        console.log('')
+        console.log('⚠️  WARNING: Direct Flow routing may not work!')
+        console.log('   PYUSD bridge uses Stargate V2 routing (EID 30110)')
+        console.log('   Consider using: DST_NETWORK=stargate or scripts/sendViaStargate.ts')
+        console.log('')
     }
 
     // Map destination network name to LayerZero network name
@@ -37,6 +52,11 @@ async function main() {
 
     // Get the signer
     const [signer] = await hre.ethers.getSigners()
+    
+    // Use recipient address from env or default to signer address (padded to bytes32)
+    const recipient = recipientAddress || signer.address
+    const recipientBytes32 = '0x' + '00'.repeat(12) + recipient.slice(2).toLowerCase()
+    console.log('Recipient:', recipient)
 
     // Get deployment of the specified contract (PYUSDLocker)
     const deployment = await hre.deployments.get(sourceContract)
@@ -48,7 +68,7 @@ async function main() {
     // Common send parameters for all contract types
     const sendParam = {
         dstEid,
-        to: '0x000000000000000000000000825d7531f79Be811E6ed5BD94C9c02d0eB493848',
+        to: recipientBytes32,
         amountLD: hre.ethers.utils.parseUnits(amount, 6),
         minAmountLD: hre.ethers.utils.parseUnits(amount, 6),
         extraOptions: '0x00030100110100000000000000000000000000030d40',
@@ -57,8 +77,8 @@ async function main() {
     }
 
     try {
-        // Always handle PYUSD approval for PYUSDLocker
-        const PYUSD_ADDRESS = '0xCaC524BcA292aaade2DF8A05cC58F0a65B1B3bB9'
+        // PYUSD mainnet address
+        const PYUSD_ADDRESS = '0x6c3ea9036406852006290770bedfcaba0e23a0e8'
         const pyusd = await hre.ethers.getContractAt('IERC20', PYUSD_ADDRESS, signer)
 
         console.log('Approving PYUSDLocker to spend PYUSD...')

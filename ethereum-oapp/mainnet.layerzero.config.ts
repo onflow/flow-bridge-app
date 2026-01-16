@@ -7,10 +7,22 @@ import { ExecutorOptionType } from '@layerzerolabs/lz-v2-utilities'
 
 const flowMainnet = layerZero['EVM-on-Flow-Mainnet']
 const ethereumMainnet = layerZero['Ethereum-Mainnet']
+const stargateV2 = layerZero['Stargate-V2']
+
+// Stargate V2 EID for routing PYUSD <-> PYUSD0
+const STARGATE_V2_EID = 30110 as const
 
 const EthMainnetContract: OmniPointHardhat = {
     eid: MainnetV2EndpointId.ETHEREUM_V2_MAINNET,
     contractName: 'PYUSDLocker',
+}
+
+// Note: PYUSD bridge uses Stargate V2 routing (EID 30110) not direct Flow connection
+// The peer for PYUSDLocker is set to Stargate (0xFAb5891eD867A1195303251912013B92c4fC3A1D)
+// which then routes to Flow (EID 30336)
+const StargateContract: OmniPointHardhat = {
+    eid: STARGATE_V2_EID,
+    address: stargateV2.peerOnEthereum,  // Stargate peer address
 }
 
 const FlowMainnetContract: OmniPointHardhat = {
@@ -19,11 +31,16 @@ const FlowMainnetContract: OmniPointHardhat = {
 }
 
 const config: OAppOmniGraphHardhat = {
-    contracts: [{ contract: EthMainnetContract }, { contract: FlowMainnetContract }],
+    contracts: [
+        { contract: EthMainnetContract }, 
+        { contract: StargateContract },
+        { contract: FlowMainnetContract }
+    ],
     connections: [
+        // Ethereum -> Stargate V2 (actual peer connection)
         {
             from: EthMainnetContract,
-            to: FlowMainnetContract,
+            to: StargateContract,
             config: {
                 sendLibrary: ethereumMainnet.sendUln302,
                 receiveLibraryConfig: {
@@ -55,6 +72,8 @@ const config: OAppOmniGraphHardhat = {
                 ],
             },
         },
+        // Note: Flow -> Ethereum routing may also go through Stargate
+        // This config is kept for reference but may need updating based on actual peer setup
         {
             from: FlowMainnetContract,
             to: EthMainnetContract,
@@ -91,5 +110,19 @@ const config: OAppOmniGraphHardhat = {
         },
     ],
 }
+
+/*
+ * IMPORTANT: PYUSD Bridge Routing
+ * 
+ * The PYUSD <-> PYUSD0 bridge uses Stargate V2 routing:
+ * - Ethereum PYUSDLocker (0xa2c323...) has peer set for EID 30110 (Stargate)
+ * - NOT for EID 30336 (Flow) directly
+ * 
+ * Routing path:
+ *   Ethereum (30101) → Stargate V2 (30110) → Flow (30336)
+ * 
+ * To bridge using hardhat scripts, use:
+ *   npx hardhat run scripts/sendViaStargate.ts --network ethereum-mainnet
+ */
 
 export default config
