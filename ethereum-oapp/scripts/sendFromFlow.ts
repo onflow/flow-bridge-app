@@ -49,6 +49,7 @@ async function main() {
     const amount = process.env.AMOUNT || '1'
     const recipientAddress = process.env.RECIPIENT || ''
     const dryRun = process.env.DRY_RUN === 'true'
+    const slippageBps = parseInt(process.env.SLIPPAGE || '50') // Default 0.5% (50 basis points)
 
     console.log('===========================================')
     console.log('  Flow → Arbitrum Direct Bridge')
@@ -90,8 +91,10 @@ async function main() {
         process.exit(1)
     }
 
-    // Allow 0.5% slippage
-    const minAmountLD = amountLD.mul(995).div(1000)
+    // Apply slippage tolerance (default 0.5% = 50 bps)
+    const minAmountLD = amountLD.mul(10000 - slippageBps).div(10000)
+    console.log(`Slippage tolerance: ${slippageBps / 100}%`)
+    console.log('')
 
     // Recipient as bytes32
     const recipientBytes32 = hre.ethers.utils.hexZeroPad(recipient.toLowerCase(), 32)

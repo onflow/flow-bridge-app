@@ -49,7 +49,25 @@ pnpm compile
 
 ## Bridge Commands
 
-### Arbitrum → Flow
+### Step 1: Get a Quote (Recommended)
+
+Before bridging, run the quote script to see:
+- Protocol-enforced minimum/maximum amounts
+- Expected amount you'll receive
+- LayerZero messaging fees
+- Any potential issues (insufficient balance, liquidity warnings)
+
+```bash
+# Quote Arbitrum → Flow:
+AMOUNT=1 npx hardhat run scripts/quoteOFT.ts --network arbitrum-mainnet
+
+# Quote Flow → Arbitrum:
+AMOUNT=1 npx hardhat run scripts/quoteOFT.ts --network flow-mainnet
+```
+
+### Step 2: Execute Bridge
+
+#### Arbitrum → Flow
 
 ```bash
 # Dry run (quote only):
@@ -62,7 +80,7 @@ AMOUNT=1 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
 AMOUNT=2 RECIPIENT=0xYourFlowAddress npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
 ```
 
-### Flow → Arbitrum
+#### Flow → Arbitrum
 
 ```bash
 # Dry run (quote only):
@@ -82,6 +100,64 @@ AMOUNT=2 RECIPIENT=0xYourArbitrumAddress npx hardhat run scripts/sendFromFlow.ts
 | `AMOUNT` | Amount of tokens to bridge | `1` |
 | `RECIPIENT` | Destination address | Your wallet address |
 | `DRY_RUN` | Set to `true` for quote only | `false` |
+| `SLIPPAGE` | Slippage tolerance in basis points (100 = 1%) | `50` (0.5%) |
+
+### Slippage Examples
+
+```bash
+# Default 0.5% slippage
+AMOUNT=100 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
+
+# 1% slippage (100 basis points)
+AMOUNT=100 SLIPPAGE=100 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
+
+# 0.1% slippage (10 basis points) - stricter
+AMOUNT=100 SLIPPAGE=10 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
+
+# 0% slippage (must receive exact amount or revert)
+AMOUNT=100 SLIPPAGE=0 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
+```
+
+## Understanding OFT Limits & Amounts
+
+### Minimum Amount Received (`minAmountLD`)
+
+When bridging, you specify a **minimum amount** you're willing to receive on the destination chain. This protects you from:
+- Dust loss (small amounts lost during decimal conversion)
+- Unexpected fees
+
+The scripts use a **0.5% slippage tolerance** by default (configurable via `SLIPPAGE` env var). If the actual received amount would be less than your minimum, the transaction **reverts** and you keep your tokens.
+
+```bash
+# Example: Set 1% slippage tolerance
+AMOUNT=100 SLIPPAGE=100 npx hardhat run scripts/sendFromArbitrum.ts --network arbitrum-mainnet
+```
+
+### Protocol Limits
+
+The OFT contracts may enforce minimum/maximum send amounts. Use `quoteOFT.ts` to check:
+
+```bash
+AMOUNT=1 npx hardhat run scripts/quoteOFT.ts --network arbitrum-mainnet
+```
+
+This shows:
+- `Min Sendable`: Protocol-enforced minimum (transaction fails if below this)
+- `Max Sendable`: Protocol-enforced maximum (may be unlimited)
+- `Amount Received`: Exact amount you'll receive after any dust removal
+
+### Liquidity Considerations
+
+This bridge uses a **lock/mint architecture**:
+
+| Direction | Source Action | Destination Action | Liquidity Risk |
+|-----------|---------------|--------------------| ---------------|
+| Arbitrum → Flow | PYUSD **locked** | PYUSD0 **minted** | None (minting is unlimited) |
+| Flow → Arbitrum | PYUSD0 **burned** | PYUSD **unlocked** | ⚠️ Requires locked PYUSD |
+
+**When bridging Flow → Arbitrum**: The Arbitrum OFT Adapter must have sufficient PYUSD locked to fulfill your withdrawal. If liquidity is insufficient, your transaction may fail on the destination chain.
+
+> **Important**: The `quoteOFT()` function itself does NOT check destination liquidity (it's a view function on the source chain). However, the `quoteOFT.ts` script **does** query Arbitrum's locked balance directly to warn you before you send.
 
 ## Track Your Transaction
 
@@ -118,6 +194,19 @@ Or view on [Arbiscan](https://arbiscan.io/token/0x46850aD61C2B7d64d08c9C754F4525
 **Insufficient balance error:**
 - Ensure you have enough tokens on the source chain
 - Ensure you have native tokens for gas (ETH on Arbitrum, FLOW on Flow)
+
+**Amount below minimum:**
+- Run `quoteOFT.ts` to see the protocol-enforced minimum
+- Increase your amount to meet the minimum requirement
+
+**Slippage error (minAmountLD not met):**
+- The received amount after dust removal is less than your specified minimum
+- Try increasing slippage tolerance or send a rounder amount
+
+**Liquidity error (Flow → Arbitrum):**
+- The Arbitrum adapter may not have enough locked PYUSD
+- This can happen if more has been bridged OUT of Arbitrum than INTO it
+- Wait for liquidity to be restored or try a smaller amount
 
 **RPC timeout:**
 - Try again or use a different RPC endpoint
