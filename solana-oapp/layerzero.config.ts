@@ -76,8 +76,7 @@ const config: OAppOmniGraphHardhat = {
                         maxMessageSize: 10000,
                     },
                     ulnConfig: {
-                        // TODO: Validate appropriate finality window for EVM on Flow (~1s blocks)
-                        confirmations: BigInt(15),
+                        confirmations: BigInt(32),
                         requiredDVNs: [
                             '0x3c61aad6d402d867c653f603558f4b8f91abe952', // Nethermind
                             '0x6788f52439aca6bff597d3eec2dc9a44b8fee842', // LayerZero Labs
@@ -88,7 +87,7 @@ const config: OAppOmniGraphHardhat = {
                 },
                 receiveConfig: {
                     ulnConfig: {
-                        confirmations: BigInt(32), // Solana recommended default
+                        confirmations: BigInt(32),
                         requiredDVNs: [
                             '0x3c61aad6d402d867c653f603558f4b8f91abe952', // Nethermind
                             '0x6788f52439aca6bff597d3eec2dc9a44b8fee842', // LayerZero Labs
@@ -135,8 +134,7 @@ const config: OAppOmniGraphHardhat = {
                 },
                 receiveConfig: {
                     ulnConfig: {
-                        // TODO: Validate appropriate finality window for EVM on Flow (~1s blocks)
-                        confirmations: BigInt(15),
+                        confirmations: BigInt(32),
                         requiredDVNs: [
                             '4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb', // LayerZero Labs
                             '7jMeX5mzXnSSKYd8DxBDP4xMnkNFZZZm5W28FWUTbwU3', // Canary
