@@ -76,14 +76,24 @@ const config: OAppOmniGraphHardhat = {
                         maxMessageSize: 10000,
                     },
                     ulnConfig: {
-                        confirmations: BigInt(0),
-                        requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+                        confirmations: BigInt(20), // LayerZero recommended default for Flow
+                        requiredDVNs: [
+                            '0x3c61aad6d402d867c653f603558f4b8f91abe952', // Nethermind
+                            '0x6788f52439aca6bff597d3eec2dc9a44b8fee842', // LayerZero Labs
+                            '0xdd7b5e1db4aafd5c8ec3b764efb8ed265aa5445b', // Horizen
+                            '0xe4e65d80deb0e2c8391215bcba4b5f7603420407', // Canary
+                        ],
                     },
                 },
                 receiveConfig: {
                     ulnConfig: {
-                        confirmations: BigInt(0),
-                        requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+                        confirmations: BigInt(32), // Solana recommended default
+                        requiredDVNs: [
+                            '0x3c61aad6d402d867c653f603558f4b8f91abe952', // Nethermind
+                            '0x6788f52439aca6bff597d3eec2dc9a44b8fee842', // LayerZero Labs
+                            '0xdd7b5e1db4aafd5c8ec3b764efb8ed265aa5445b', // Horizen
+                            '0xe4e65d80deb0e2c8391215bcba4b5f7603420407', // Canary
+                        ],
                     },
                 },
             },
@@ -111,17 +121,17 @@ const config: OAppOmniGraphHardhat = {
                         executor: executorPDA[0].toString(),
                     },
                     ulnConfig: {
-                        // // The number of block confirmations to wait before emitting the message from the source chain.
-                        confirmations: BigInt(0),
-                        // The address of the DVNs you will pay to verify a sent message on the source chain ).
+                        // The number of block confirmations to wait before emitting the message from the source chain.
+                        confirmations: BigInt(32), // Solana recommended default
+                        // The address of the DVNs you will pay to verify a sent message on the source chain.
                         // The destination tx will wait until ALL `requiredDVNs` verify the message.
                         requiredDVNs: [
-                            '4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb', // LayerZero
+                            '4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb', // LayerZero Labs
+                            '7jMeX5mzXnSSKYd8DxBDP4xMnkNFZZZm5W28FWUTbwU3', // Canary
+                            'GPjyWr8vCotGuFubDpTxDxy9Vj1ZeEN4F2dwRmFiaGab',  // Nethermind
+                            'HR9NQKK1ynW9NzgdM37dU5CBtqRHTukmbMKS7qkwSkHX',  // Horizen
                         ],
-                        // The address of the DVNs you will pay to verify a sent message on the source chain ).
-                        // The destination tx will wait until the configured threshold of `optionalDVNs` verify a message.
                         optionalDVNs: [],
-                        // The number of `optionalDVNs` that need to successfully verify the message for it to be considered Verified.
                         optionalDVNThreshold: 0,
                     },
                 },
@@ -130,16 +140,16 @@ const config: OAppOmniGraphHardhat = {
                 receiveConfig: {
                     ulnConfig: {
                         // The number of block confirmations to expect from the `to` chain.
-                        confirmations: BigInt(0),
-                        // The address of the DVNs your `receiveConfig` expects to receive verifications from on the `from` chain ).
+                        confirmations: BigInt(20), // LayerZero recommended default for Flow
+                        // The address of the DVNs your `receiveConfig` expects to receive verifications from on the `from` chain.
                         // The `from` chain's OApp will wait until the configured threshold of `requiredDVNs` verify the message.
                         requiredDVNs: [
-                            '4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb', // LayerZero
+                            '4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb', // LayerZero Labs
+                            '7jMeX5mzXnSSKYd8DxBDP4xMnkNFZZZm5W28FWUTbwU3', // Canary
+                            'GPjyWr8vCotGuFubDpTxDxy9Vj1ZeEN4F2dwRmFiaGab',  // Nethermind
+                            'HR9NQKK1ynW9NzgdM37dU5CBtqRHTukmbMKS7qkwSkHX',  // Horizen
                         ],
-                        // The address of the DVNs you will pay to verify a sent message on the source chain ).
-                        // The destination tx will wait until the configured threshold of `optionalDVNs` verify a message.
                         optionalDVNs: [],
-                        // The number of `optionalDVNs` that need to successfully verify the message for it to be considered Verified.
                         optionalDVNThreshold: 0,
                     },
                 },
