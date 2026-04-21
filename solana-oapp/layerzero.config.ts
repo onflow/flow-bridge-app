@@ -121,7 +121,10 @@ const config: OAppOmniGraphHardhat = {
                         executor: executorPDA[0].toString(),
                     },
                     ulnConfig: {
+                        // The number of block confirmations to wait before emitting the message from the source chain.
                         confirmations: BigInt(32), // Solana recommended default
+                        // The address of the DVNs you will pay to verify a sent message on the source chain.
+                        // The destination tx will wait until ALL `requiredDVNs` verify the message.
                         requiredDVNs: [
                             '4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb', // LayerZero Labs
                             '7jMeX5mzXnSSKYd8DxBDP4xMnkNFZZZm5W28FWUTbwU3', // Canary
@@ -132,9 +135,14 @@ const config: OAppOmniGraphHardhat = {
                         optionalDVNThreshold: 0,
                     },
                 },
+                // Optional Receive Configuration
+                // @dev Controls how the `from` chain receives messages from the `to` chain.
                 receiveConfig: {
                     ulnConfig: {
+                        // The number of block confirmations to expect from the `to` chain.
                         confirmations: BigInt(32),
+                        // The address of the DVNs your `receiveConfig` expects to receive verifications from on the `from` chain.
+                        // The `from` chain's OApp will wait until the configured threshold of `requiredDVNs` verify the message.
                         requiredDVNs: [
                             '4VDjp6XQaxoZf5RGwiPU9NR1EXSZn2TP4ATMmiSzLfhb', // LayerZero Labs
                             '7jMeX5mzXnSSKYd8DxBDP4xMnkNFZZZm5W28FWUTbwU3', // Canary
