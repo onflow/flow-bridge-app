@@ -76,7 +76,7 @@ const config: OAppOmniGraphHardhat = {
                         maxMessageSize: 10000,
                     },
                     ulnConfig: {
-                        confirmations: BigInt(32),
+                        confirmations: BigInt(20), // LayerZero recommended default for Flow
                         requiredDVNs: [
                             '0x3c61aad6d402d867c653f603558f4b8f91abe952', // Nethermind
                             '0x6788f52439aca6bff597d3eec2dc9a44b8fee842', // LayerZero Labs
@@ -87,7 +87,7 @@ const config: OAppOmniGraphHardhat = {
                 },
                 receiveConfig: {
                     ulnConfig: {
-                        confirmations: BigInt(32),
+                        confirmations: BigInt(32), // Solana recommended default
                         requiredDVNs: [
                             '0x3c61aad6d402d867c653f603558f4b8f91abe952', // Nethermind
                             '0x6788f52439aca6bff597d3eec2dc9a44b8fee842', // LayerZero Labs
@@ -140,7 +140,7 @@ const config: OAppOmniGraphHardhat = {
                 receiveConfig: {
                     ulnConfig: {
                         // The number of block confirmations to expect from the `to` chain.
-                        confirmations: BigInt(32),
+                        confirmations: BigInt(20), // LayerZero recommended default for Flow
                         // The address of the DVNs your `receiveConfig` expects to receive verifications from on the `from` chain.
                         // The `from` chain's OApp will wait until the configured threshold of `requiredDVNs` verify the message.
                         requiredDVNs: [
