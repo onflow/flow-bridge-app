@@ -64,7 +64,7 @@ const flowToEthEnforcedOptions: OAppEnforcedOption[] = [
     {
         msgType: 1,
         optionType: ExecutorOptionType.LZ_RECEIVE,
-        gas: 200000,
+        gas: 230000,
         value: 0,
     },
     {
@@ -112,7 +112,7 @@ const ethToFlowEnforcedOptions: OAppEnforcedOption[] = [
     {
         msgType: 1,
         optionType: ExecutorOptionType.LZ_RECEIVE,
-        gas: 200000,
+        gas: 253000,
         value: 0,
     },
     {
