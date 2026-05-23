@@ -47,13 +47,13 @@ const config: OAppOmniGraphHardhat = {
                         msgType: 1,
                         optionType: ExecutorOptionType.LZ_RECEIVE,
                         gas: 200000,
-                        value: 200000,
+                        value: 2500000,
                     },
                     {
                         msgType: 2,
                         optionType: ExecutorOptionType.LZ_RECEIVE,
                         gas: 200000,
-                        value: 200000,
+                        value: 2500000,
                     },
                     {
                         // Solana options use (gas == compute units, value == lamports)
